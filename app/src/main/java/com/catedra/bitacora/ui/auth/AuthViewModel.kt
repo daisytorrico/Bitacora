@@ -21,7 +21,6 @@ class AuthViewModel : ViewModel() {
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
     private val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
-        Log.d("AUTH", "AuthStateListener disparado, user: ${firebaseAuth.currentUser?.email}")
         _authState.value = if (firebaseAuth.currentUser != null) {
             AuthState.Autenticado
         } else {
