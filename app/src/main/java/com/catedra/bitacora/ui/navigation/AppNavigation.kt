@@ -13,12 +13,14 @@ import com.catedra.bitacora.ui.auth.AuthState
 import com.catedra.bitacora.ui.auth.AuthViewModel
 import com.catedra.bitacora.ui.auth.LoginScreen
 import com.catedra.bitacora.ui.auth.RegisterScreen
+import com.catedra.bitacora.ui.auth.UsernameScreen
 import com.catedra.bitacora.ui.auth.crearGoogleSignInHandler
 import com.catedra.bitacora.ui.home.HomeScreen
 
 object Rutas {
     const val LOGIN = "login"
     const val REGISTRO = "registro"
+    const val USERNAME = "username"
     const val HOME = "home"
 }
 
@@ -29,53 +31,72 @@ fun AppNavigation(viewModel: AuthViewModel) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    // Usamos el helper para mantener limpia la navegación
     val onGoogleSignInClick = crearGoogleSignInHandler(context, coroutineScope, viewModel)
 
-    // Efecto para reaccionar a cambios de autenticación
     LaunchedEffect(authState) {
+        val currentRoute = navController.currentDestination?.route
         when (authState) {
             is AuthState.Autenticado -> {
-                navController.navigate(Rutas.HOME) {
-                    popUpTo(0) { inclusive = true }
-                    launchSingleTop = true
-                }
-            }
-            is AuthState.NoAutenticado -> {
-                if (navController.currentDestination?.route != Rutas.LOGIN &&
-                    navController.currentDestination?.route != Rutas.REGISTRO) {
-                    navController.navigate(Rutas.LOGIN) {
+                if (currentRoute != Rutas.HOME) {
+                    navController.navigate(Rutas.HOME) {
                         popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
                     }
                 }
             }
-            is AuthState.Error -> {
-                // El error ya se muestra en la UI a traves del authState
+            is AuthState.NecesitaPerfil -> {
+                if (currentRoute != Rutas.USERNAME) {
+                    navController.navigate(Rutas.USERNAME) {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
             }
-            is AuthState.Cargando -> {}
+            is AuthState.NoAutenticado -> {
+                if (currentRoute != Rutas.LOGIN && currentRoute != Rutas.REGISTRO) {
+                    navController.navigate(Rutas.LOGIN) {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            }
+            else -> {}
         }
     }
 
     NavHost(
         navController = navController,
-        startDestination = if (authState is AuthState.Autenticado) Rutas.HOME else Rutas.LOGIN
+        startDestination = when {
+            authState is AuthState.Autenticado -> Rutas.HOME
+            authState is AuthState.NecesitaPerfil || authState is AuthState.EsperandoUsername -> Rutas.USERNAME
+            viewModel.estaLogueado() -> Rutas.USERNAME
+            else -> Rutas.LOGIN
+        }
     ) {
         composable(Rutas.LOGIN) {
-            if (authState !is AuthState.Cargando) {
-                LoginScreen(
-                    authState = authState,
-                    onLoginClick = { email, pass -> viewModel.iniciarSesion(email, pass) },
-                    onGoogleSignInClick = onGoogleSignInClick,
-                    onNavigateToRegister = { navController.navigate(Rutas.REGISTRO) }
-                )
-            }
+            LoginScreen(
+                authState = authState,
+                onLoginClick = { email, pass -> viewModel.iniciarSesion(email, pass) },
+                onGoogleSignInClick = onGoogleSignInClick,
+                onNavigateToRegister = { navController.navigate(Rutas.REGISTRO) }
+            )
         }
 
         composable(Rutas.REGISTRO) {
             RegisterScreen(
                 authState = authState,
-                onRegisterClick = { email, pass -> viewModel.registrar(email, pass) },
+                onRegisterClick = { nombre, email, pass -> viewModel.registrar(nombre, email, pass) },
                 onNavigateToLogin = { navController.popBackStack() }
+            )
+        }
+
+        composable(Rutas.USERNAME) {
+            val usernameError by viewModel.usernameError.collectAsStateWithLifecycle()
+            UsernameScreen(
+                authState = authState,
+                usernameError = usernameError,
+                onConfirmarClick = { username -> viewModel.guardarUsername(username) },
+                onResetError = { viewModel.limpiarUsernameError() }
             )
         }
 

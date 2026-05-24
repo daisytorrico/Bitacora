@@ -1,11 +1,13 @@
 package com.catedra.bitacora.ui.auth
 
+import android.util.Patterns
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -24,13 +26,20 @@ import com.catedra.bitacora.R
 @Composable
 fun RegisterScreen(
     authState: AuthState,
-    onRegisterClick: (String, String) -> Unit,
+    onRegisterClick: (String, String, String) -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
+    var nombre by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+
+    // Validaciones en tiempo real
+    val emailValido = email.isNotEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    val passwordValida = password.length >= 6
+    val coinciden = password == confirmPassword && password.isNotEmpty()
+    val habilitado = nombre.isNotEmpty() && emailValido && passwordValida && coinciden && authState !is AuthState.Cargando
 
     Column(
         modifier = Modifier
@@ -65,11 +74,24 @@ fun RegisterScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         OutlinedTextField(
+            value = nombre,
+            onValueChange = { nombre = it },
+            label = { Text("Nombre Completo") },
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+            singleLine = true
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = { email = it.trim() },
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth(),
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+            isError = email.isNotEmpty() && !emailValido,
+            supportingText = { if (email.isNotEmpty() && !emailValido) Text("Email no válido") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true
         )
@@ -88,6 +110,8 @@ fun RegisterScreen(
                     Icon(image, contentDescription = null)
                 }
             },
+            isError = password.isNotEmpty() && !passwordValida,
+            supportingText = { if (password.isNotEmpty() && !passwordValida) Text("Mínimo 6 caracteres") },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true
@@ -109,16 +133,24 @@ fun RegisterScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = { 
-                if (password == confirmPassword) {
-                    onRegisterClick(email, password)
+            onClick = {
+                if (habilitado) {
+                    onRegisterClick(nombre, email, password)
                 }
             },
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.medium,
-            enabled = password.isNotEmpty() && password == confirmPassword
+            enabled = habilitado
         ) {
-            Text("Crear Cuenta")
+            if (authState is AuthState.Cargando) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text("Crear Cuenta")
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
