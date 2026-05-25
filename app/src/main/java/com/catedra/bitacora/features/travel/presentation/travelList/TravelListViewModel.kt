@@ -1,4 +1,4 @@
-package com.catedra.bitacora.features.travel.presentation.travelDetail
+package com.catedra.bitacora.features.travel.presentation.travelList
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,11 +12,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class TravelDetailViewModel @Inject constructor(
+class TravelListViewModel @Inject constructor(
     private val getTravelsList: GetTravelsListUseCase
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(TravelDetailUiState())
-    val uiState: StateFlow<TravelDetailUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(TravelListUiState())
+    val uiState: StateFlow<TravelListUiState> = _uiState.asStateFlow()
 
     init {
         loadTravels()
@@ -27,9 +27,9 @@ class TravelDetailViewModel @Inject constructor(
             getTravelsList(
                 page = uiState.value.page
             ).onSuccess { data ->
-                _uiState.update { it.copy(travels = data) }
+                _uiState.update { it.copy(travels = data, loading = false) }
             }.onFailure {
-                TODO("Señal de error")
+                _uiState.update { it.copy(loading = false) }
             }
         }
     }
