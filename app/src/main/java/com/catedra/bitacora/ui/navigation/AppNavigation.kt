@@ -1,9 +1,15 @@
 package com.catedra.bitacora.ui.navigation
 
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
@@ -29,6 +35,7 @@ fun AppNavigation(viewModel: AuthViewModel) {
     val authState by viewModel.authState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    var showLogOut by remember { mutableStateOf(false) }
 
     val onGoogleSignInClick = crearGoogleSignInHandler(context, coroutineScope, viewModel)
 
@@ -80,7 +87,30 @@ fun AppNavigation(viewModel: AuthViewModel) {
 
         travelGraph(
             navController = navController,
-            onLogout = { viewModel.cerrarSesion() }
+            onLogout = { showLogOut = true }
+        )
+    }
+
+    if (showLogOut) {
+        AlertDialog(
+            onDismissRequest = { showLogOut = false },
+            title = { Text("Cerrar Sesión") },
+            text = { Text("¿Seguro que desea cerrar sesión?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showLogOut = false
+                        viewModel.cerrarSesion()
+                    }
+                ) {
+                    Text("Cerrar sesión")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLogOut = false }) {
+                    Text("Cancelar")
+                }
+            }
         )
     }
 }
