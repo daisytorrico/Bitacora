@@ -1,4 +1,4 @@
-package com.catedra.bitacora.ui.auth
+package com.catedra.bitacora.features.auth.presentation.username
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.catedra.bitacora.features.auth.domain.model.AuthState
 
 @Composable
 fun UsernameScreen(
