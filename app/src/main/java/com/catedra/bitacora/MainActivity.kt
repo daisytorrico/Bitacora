@@ -8,7 +8,9 @@ import androidx.activity.viewModels
 import com.catedra.bitacora.ui.auth.AuthViewModel
 import com.catedra.bitacora.ui.navigation.AppNavigation
 import com.catedra.bitacora.ui.theme.BitacoraTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val viewModel: AuthViewModel by viewModels()
