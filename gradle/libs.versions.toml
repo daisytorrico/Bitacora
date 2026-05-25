@@ -1,24 +1,32 @@
 [versions]
 agp = "9.2.1"
 coreKtx = "1.18.0"
+hiltLifecycleViewmodelCompose = "1.3.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.13.0"
 activityKtx = "1.10.1"
-kotlin = "2.2.10"
-composeBom = "2026.02.01"
-googleServices = "4.4.4"
-firebaseBom = "34.13.0"
-kotlinxCoroutinesPlayServices = "1.11.0"
-lifecycleRuntimeCompose = "2.10.0"
-navigationCompose = "2.8.8"
+kotlin = "2.1.0"
+composeBom = "2024.12.01"
+googleServices = "4.4.2"
+firebaseBom = "33.7.0"
+kotlinxCoroutinesPlayServices = "1.9.0"
+lifecycleRuntimeCompose = "2.8.7"
+navigationCompose = "2.8.5"
 credentials = "1.6.0"
-googleid = "1.2.0"
+googleid = "1.1.1"
+material3 = "1.3.1"
+ksp = "2.1.0-1.0.29"
+hilt = "2.59.2"
+hiltNavigationCompose = "1.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-hilt-lifecycle-viewmodel-compose = { module = "androidx.hilt:hilt-lifecycle-viewmodel-compose", version.ref = "hiltLifecycleViewmodelCompose" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
+hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -43,9 +51,13 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
 androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
