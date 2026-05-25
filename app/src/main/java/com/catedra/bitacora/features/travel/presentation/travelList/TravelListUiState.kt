@@ -1,8 +1,8 @@
-package com.catedra.bitacora.features.travel.presentation.travelDetail
+package com.catedra.bitacora.features.travel.presentation.travelList
 
 import com.catedra.bitacora.features.travel.domain.model.Travel
 
-data class TravelDetailUiState(
+data class TravelListUiState(
     val searchQuery: String = "",
     val travels: List<Travel> = emptyList(),
     val page: Int = 0,
