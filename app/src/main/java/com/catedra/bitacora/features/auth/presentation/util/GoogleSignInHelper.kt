@@ -1,10 +1,11 @@
-package com.catedra.bitacora.ui.auth
+package com.catedra.bitacora.features.auth.presentation.util
 
 import android.content.Context
 import android.util.Log
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
+import com.catedra.bitacora.features.auth.presentation.AuthViewModel
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.CoroutineScope

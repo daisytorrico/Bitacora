@@ -1,11 +1,13 @@
-package com.catedra.bitacora.ui.auth
+package com.catedra.bitacora.features.auth.presentation.register
 
+import android.util.Patterns
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -20,18 +22,25 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.catedra.bitacora.R
+import com.catedra.bitacora.features.auth.domain.model.AuthState
 
 @Composable
-fun LoginScreen(
+fun RegisterScreen(
     authState: AuthState,
-    onLoginClick: (String, String) -> Unit,
-    onGoogleSignInClick: () -> Unit,
-    onNavigateToRegister: () -> Unit
+    onRegisterClick: (String, String, String) -> Unit,
+    onNavigateToLogin: () -> Unit
 ) {
+    var nombre by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-    val cargando = authState is AuthState.Cargando
+
+    // Validaciones en tiempo real
+    val emailValido = email.isNotEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    val passwordValida = password.length >= 6
+    val coinciden = password == confirmPassword && password.isNotEmpty()
+    val habilitado = nombre.isNotEmpty() && emailValido && passwordValida && coinciden && authState !is AuthState.Cargando
 
     Column(
         modifier = Modifier
@@ -49,7 +58,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Bitácora",
+            text = "Travesía",
             style = MaterialTheme.typography.headlineLarge.copy(
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 2.sp
@@ -58,7 +67,7 @@ fun LoginScreen(
         )
 
         Text(
-            text = "Tu bitácora de viaje inteligente",
+            text = "Crea tu cuenta y empieza la aventura",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.secondary
         )
@@ -66,14 +75,26 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         OutlinedTextField(
+            value = nombre,
+            onValueChange = { nombre = it },
+            label = { Text("Nombre Completo") },
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+            singleLine = true
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = { email = it.trim() },
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth(),
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+            isError = email.isNotEmpty() && !emailValido,
+            supportingText = { if (email.isNotEmpty() && !emailValido) Text("Email no válido") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            singleLine = true,
-            enabled = !cargando
+            singleLine = true
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -90,51 +111,53 @@ fun LoginScreen(
                     Icon(image, contentDescription = null)
                 }
             },
+            isError = password.isNotEmpty() && !passwordValida,
+            supportingText = { if (password.isNotEmpty() && !passwordValida) Text("Mínimo 6 caracteres") },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            singleLine = true,
-            enabled = !cargando
+            singleLine = true
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = confirmPassword,
+            onValueChange = { confirmPassword = it },
+            label = { Text("Confirmar Contraseña") },
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            singleLine = true
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = { onLoginClick(email, password) },
+            onClick = {
+                if (habilitado) {
+                    onRegisterClick(nombre, email, password)
+                }
+            },
             modifier = Modifier.fillMaxWidth(),
-            enabled = !cargando,
-            shape = MaterialTheme.shapes.medium
+            shape = MaterialTheme.shapes.medium,
+            enabled = habilitado
         ) {
-            if (cargando) {
+            if (authState is AuthState.Cargando) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    strokeWidth = 2.dp,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp
                 )
             } else {
-                Text("Iniciar Sesión")
+                Text("Crear Cuenta")
             }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        TextButton(
-            onClick = onNavigateToRegister,
-            enabled = !cargando
-        ) {
-            Text("¿No tienes cuenta? Regístrate aquí")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
-        OutlinedButton(
-            onClick = onGoogleSignInClick,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !cargando,
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Text("Continuar con Google")
+        TextButton(onClick = onNavigateToLogin) {
+            Text("¿Ya tienes cuenta? Inicia sesión")
         }
 
         if (authState is AuthState.Error) {

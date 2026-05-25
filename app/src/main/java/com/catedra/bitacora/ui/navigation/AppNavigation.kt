@@ -7,21 +7,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.catedra.bitacora.ui.auth.AuthState
-import com.catedra.bitacora.ui.auth.AuthViewModel
-import com.catedra.bitacora.ui.auth.LoginScreen
-import com.catedra.bitacora.ui.auth.RegisterScreen
-import com.catedra.bitacora.ui.auth.UsernameScreen
-import com.catedra.bitacora.ui.auth.crearGoogleSignInHandler
-import com.catedra.bitacora.ui.home.HomeScreen
+import com.catedra.bitacora.features.auth.domain.model.AuthState
+import com.catedra.bitacora.features.auth.presentation.AuthViewModel
+import com.catedra.bitacora.features.auth.presentation.navigation.AuthDestinations
+import com.catedra.bitacora.features.auth.presentation.navigation.authGraph
+import com.catedra.bitacora.features.auth.presentation.util.crearGoogleSignInHandler
+import com.catedra.bitacora.features.travel.presentation.navigation.TravelDestinations
+import com.catedra.bitacora.features.travel.presentation.navigation.travelGraph
 
 object Rutas {
-    const val LOGIN = "login"
-    const val REGISTRO = "registro"
-    const val USERNAME = "username"
-    const val HOME = "home"
+    const val LOGIN = AuthDestinations.LOGIN
+    const val REGISTRO = AuthDestinations.REGISTRO
+    const val USERNAME = AuthDestinations.USERNAME
+    const val HOME = TravelDestinations.TRAVEL_LIST
 }
 
 @Composable
@@ -73,37 +72,15 @@ fun AppNavigation(viewModel: AuthViewModel) {
             else -> Rutas.LOGIN
         }
     ) {
-        composable(Rutas.LOGIN) {
-            LoginScreen(
-                authState = authState,
-                onLoginClick = { email, pass -> viewModel.iniciarSesion(email, pass) },
-                onGoogleSignInClick = onGoogleSignInClick,
-                onNavigateToRegister = { navController.navigate(Rutas.REGISTRO) }
-            )
-        }
+        authGraph(
+            navController = navController,
+            viewModel = viewModel,
+            onGoogleSignInClick = onGoogleSignInClick
+        )
 
-        composable(Rutas.REGISTRO) {
-            RegisterScreen(
-                authState = authState,
-                onRegisterClick = { nombre, email, pass -> viewModel.registrar(nombre, email, pass) },
-                onNavigateToLogin = { navController.popBackStack() }
-            )
-        }
-
-        composable(Rutas.USERNAME) {
-            val usernameError by viewModel.usernameError.collectAsStateWithLifecycle()
-            UsernameScreen(
-                authState = authState,
-                usernameError = usernameError,
-                onConfirmarClick = { username -> viewModel.guardarUsername(username) },
-                onResetError = { viewModel.limpiarUsernameError() }
-            )
-        }
-
-        composable(Rutas.HOME) {
-            HomeScreen(
-                onCerrarSesion = { viewModel.cerrarSesion() }
-            )
-        }
+        travelGraph(
+            navController = navController,
+            onLogout = { viewModel.cerrarSesion() }
+        )
     }
 }
