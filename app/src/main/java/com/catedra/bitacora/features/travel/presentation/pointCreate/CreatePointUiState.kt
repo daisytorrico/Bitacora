@@ -1,0 +1,38 @@
+package com.catedra.bitacora.features.travel.presentation.pointCreate
+
+import android.net.Uri
+import com.catedra.bitacora.features.travel.domain.model.Travel
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+
+data class CreatePointUiState(
+    val travel: Travel? = null, // Datos del viaje padre para validar
+    val name: String = "",
+    val address: String = "",
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val visitDateMillis: Long? = null,
+    val notes: String = "",
+    val selectedImages: List<Uri> = emptyList(),
+    val isLoading: Boolean = false,
+    val isSuccess: Boolean = false,
+    val error: String? = null
+) {
+    val isDateOutOfRange: Boolean
+        get() {
+            if (visitDateMillis == null || travel == null) return false
+            val visitDate = Instant.ofEpochMilli(visitDateMillis).atZone(ZoneId.systemDefault()).toLocalDate()
+            val start = travel.startDate
+            val end = travel.endDate
+            return if (start != null && end != null) {
+                visitDate.isBefore(start) || visitDate.isAfter(end)
+            } else false
+        }
+
+    val canSave: Boolean 
+        get() = name.isNotBlank() && 
+                address.isNotBlank() && 
+                !isDateOutOfRange && 
+                !isLoading
+}
