@@ -1,0 +1,21 @@
+package com.catedra.bitacora.features.travel.presentation.travelCreate
+
+import android.net.Uri
+
+data class CreateTravelUiState(
+    val name: String = "",
+    val description: String = "",
+    val startDate: Long? = null,
+    val endDate: Long? = null,
+    val imageUri: Uri? = null,
+    val loading: Boolean = false,
+    val error: String? = null,
+    val success: Boolean = false
+) {
+    // Validaciones derivadas del estado
+    val isDateInvalid: Boolean
+        get() = if (startDate != null && endDate != null) endDate < startDate else false
+
+    val canSave: Boolean
+        get() = name.isNotBlank() && !isDateInvalid && !loading
+}
