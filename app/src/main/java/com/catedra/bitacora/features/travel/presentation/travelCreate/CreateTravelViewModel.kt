@@ -7,8 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.catedra.bitacora.features.auth.domain.repository.AuthRepository
 import com.catedra.bitacora.features.travel.domain.model.Travel
 import com.catedra.bitacora.features.travel.domain.useCase.CompressImageUseCase
-import com.catedra.bitacora.features.travel.domain.useCase.GetCameraIntentUseCase
-import com.catedra.bitacora.features.travel.domain.useCase.GetGalleryIntentUseCase
+import com.catedra.bitacora.features.travel.domain.useCase.GetPhotoPickerIntentUseCase
 import com.catedra.bitacora.features.travel.domain.useCase.SaveTravelUseCase
 import com.catedra.bitacora.features.travel.domain.useCase.UploadImageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,8 +27,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateTravelViewModel @Inject constructor(
-    private val getCameraIntentUseCase: GetCameraIntentUseCase,
-    private val getGalleryIntentUseCase: GetGalleryIntentUseCase,
+    private val getPhotoPickerIntentUseCase: GetPhotoPickerIntentUseCase,
     private val compressImageUseCase: CompressImageUseCase,
     private val uploadImageUseCase: UploadImageUseCase,
     private val saveTravelUseCase: SaveTravelUseCase,
@@ -69,12 +67,9 @@ class CreateTravelViewModel @Inject constructor(
     }
 
     fun buildSystemChooserIntent(): Intent {
-        val (cameraIntent, tempUri) = getCameraIntentUseCase()
+        val (intent, tempUri) = getPhotoPickerIntentUseCase("Selecciona una foto o usa la cámara")
         currentTempCameraUri = tempUri
-        val galleryIntent = getGalleryIntentUseCase()
-        val chooserIntent = Intent.createChooser(galleryIntent, "Selecciona una foto o usa la cámara")
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(cameraIntent))
-        return chooserIntent
+        return intent
     }
 
     fun getActiveTempUri(): Uri? = currentTempCameraUri

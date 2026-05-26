@@ -17,5 +17,9 @@ data class CreateTravelUiState(
         get() = if (startDate != null && endDate != null) endDate < startDate else false
 
     val canSave: Boolean
-        get() = name.isNotBlank() && !isDateInvalid && !loading
+        get() = name.isNotBlank() && 
+                startDate != null && 
+                endDate != null && 
+                !isDateInvalid && 
+                !loading
 }
