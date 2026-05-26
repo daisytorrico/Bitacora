@@ -111,7 +111,6 @@ fun PointDetailScreen(
                             }
                         }
                     } else {
-                        // Placeholder si no hay imágenes
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -162,8 +161,6 @@ fun PointDetailScreen(
                                 color = GrisMedio
                             )
                         }
-
-                        // Tarjeta contenedora de dirección
                         Surface(
                             color = Blanco,
                             shape = RoundedCornerShape(12.dp),

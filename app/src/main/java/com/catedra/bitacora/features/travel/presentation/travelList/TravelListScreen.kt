@@ -18,7 +18,7 @@ import com.catedra.bitacora.ui.components.profile.ProfileHeader
 import com.catedra.bitacora.ui.components.AppTopBar
 import com.catedra.bitacora.ui.components.AppBottomBar
 import com.catedra.bitacora.ui.components.TravelItem
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,7 +28,7 @@ fun TravelListScreen(
     onAgregarViajeClick: () -> Unit,
     onEditarPerfilClick: () -> Unit = {},
     onTravelClick: (String) -> Unit = {},
-    navController: androidx.navigation.NavController // Recibir el navController
+    navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -71,7 +71,7 @@ fun TravelListScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentPadding = PaddingValues(bottom = 16.dp),
+            contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Sección de Perfil
@@ -88,7 +88,7 @@ fun TravelListScreen(
                 items = uiState.filteredTravels,
                 key = { it.id }
             ) { travel ->
-                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                Box {
                     TravelItem(
                         travel = travel,
                         pointsCount = travel.pointsCount,
