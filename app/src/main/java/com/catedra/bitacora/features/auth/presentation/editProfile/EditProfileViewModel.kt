@@ -1,0 +1,107 @@
+package com.catedra.bitacora.features.auth.presentation.editProfile
+
+import android.content.Intent
+import android.net.Uri
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.catedra.bitacora.features.auth.domain.repository.AuthRepository
+import com.catedra.bitacora.features.auth.domain.useCase.UpdateProfileUseCase
+import com.catedra.bitacora.features.travel.domain.useCase.CompressImageUseCase
+import com.catedra.bitacora.features.travel.domain.useCase.GetPhotoPickerIntentUseCase
+import com.catedra.bitacora.features.travel.domain.useCase.UploadImageUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+data class EditProfileUiState(
+    val name: String = "",
+    val bio: String = "",
+    val photoUrl: String? = null,
+    val selectedImageUri: Uri? = null,
+    val isLoading: Boolean = false,
+    val isSuccess: Boolean = false,
+    val error: String? = null
+)
+
+@HiltViewModel
+class EditProfileViewModel @Inject constructor(
+    private val authRepository: AuthRepository,
+    private val updateProfileUseCase: UpdateProfileUseCase,
+    private val uploadImageUseCase: UploadImageUseCase,
+    private val getPhotoPickerIntentUseCase: GetPhotoPickerIntentUseCase,
+    private val compressImageUseCase: CompressImageUseCase
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(EditProfileUiState())
+    val uiState: StateFlow<EditProfileUiState> = _uiState.asStateFlow()
+
+    private var currentTempCameraUri: Uri? = null
+
+    init {
+        loadUserData()
+    }
+
+    private fun loadUserData() {
+        viewModelScope.launch {
+            authRepository.getFullUserData().onSuccess { user ->
+                _uiState.update { it.copy(
+                    name = user.displayName ?: "",
+                    bio = user.bio ?: "",
+                    photoUrl = user.photoUrl
+                ) }
+            }
+        }
+    }
+
+    fun buildSystemChooserIntent(): Intent {
+        val (intent, tempUri) = getPhotoPickerIntentUseCase("Seleccionar Foto")
+        currentTempCameraUri = tempUri
+        return intent
+    }
+
+    fun getActiveTempUri(): Uri? = currentTempCameraUri
+
+    fun onNameChange(newName: String) {
+        _uiState.update { it.copy(name = newName) }
+    }
+
+    fun onBioChange(newBio: String) {
+        _uiState.update { it.copy(bio = newBio) }
+    }
+
+    fun onImageSelected(uri: Uri?) {
+        _uiState.update { it.copy(selectedImageUri = uri) }
+    }
+
+    fun saveProfile() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            try {
+                var finalPhotoUrl = uiState.value.photoUrl
+                
+                uiState.value.selectedImageUri?.let { uri ->
+                    val compressedUri = compressImageUseCase(uri)
+                    if (compressedUri != null) {
+                        finalPhotoUrl = uploadImageUseCase(compressedUri)
+                    }
+                }
+
+                updateProfileUseCase(
+                    name = uiState.value.name,
+                    bio = uiState.value.bio,
+                    photoUrl = finalPhotoUrl
+                ).onSuccess {
+                    _uiState.update { it.copy(isLoading = false, isSuccess = true) }
+                }.onFailure { e ->
+                    _uiState.update { it.copy(isLoading = false, error = e.message) }
+                }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, error = e.message) }
+            }
+        }
+    }
+}

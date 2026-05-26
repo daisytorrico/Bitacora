@@ -12,6 +12,8 @@ interface AuthRepository {
     suspend fun signInWithGoogle(idToken: String): Result<Unit>
     suspend fun logout()
     suspend fun saveUsername(username: String): Result<Unit>
+    suspend fun getFullUserData(): Result<User>
+    suspend fun updateProfile(name: String, bio: String, photoUrl: String?): Result<Unit>
     fun getCurrentUser(): User?
     fun isUserLoggedIn(): Boolean
 }

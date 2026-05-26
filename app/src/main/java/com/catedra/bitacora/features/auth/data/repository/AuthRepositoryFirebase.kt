@@ -6,6 +6,8 @@ import com.catedra.bitacora.features.auth.data.remote.AuthRemoteDataSource
 import com.catedra.bitacora.features.auth.domain.model.AuthState
 import com.catedra.bitacora.features.auth.domain.model.User
 import com.catedra.bitacora.features.auth.domain.repository.AuthRepository
+import com.catedra.bitacora.features.auth.data.mapper.toData
+import com.catedra.bitacora.features.auth.data.mapper.toUser
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.userProfileChangeRequest
@@ -116,13 +118,57 @@ class AuthRepositoryFirebase @Inject constructor(
                 return Result.failure(Exception("El nombre de usuario ya está en uso"))
             }
 
-            val datos = hashMapOf(
-                "nombre" to user.displayName,
-                "email" to user.email,
-                "username" to username
+            val userToSave = User(
+                uid = user.uid,
+                email = user.email,
+                displayName = user.displayName,
+                username = username,
+                photoUrl = user.photoUrl?.toString(),
+                bio = ""
             )
-            remoteDataSource.saveUserDocument(user.uid, datos)
+            remoteDataSource.saveUserDocument(user.uid, userToSave.toData())
             _authState.value = AuthState.Autenticado
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getFullUserData(): Result<User> {
+        val firebaseUser = remoteDataSource.currentUser ?: return Result.failure(Exception("No user logged in"))
+        return try {
+            val document = remoteDataSource.getUserDocument(firebaseUser.uid)
+            if (document.exists()) {
+                Result.success(document.toUser())
+            } else {
+                Result.success(firebaseUser.toDomain())
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateProfile(name: String, bio: String, photoUrl: String?): Result<Unit> {
+        val user = remoteDataSource.currentUser ?: return Result.failure(Exception("No user logged in"))
+        return try {
+            val profileUpdates = userProfileChangeRequest {
+                displayName = name
+                photoUrl?.let { this.photoUri = android.net.Uri.parse(it) }
+            }
+            remoteDataSource.updateProfile(profileUpdates)
+            remoteDataSource.reloadUser()
+
+            val updates = mapOf(
+                "nombre" to name,
+                "bio" to bio,
+                "photoUrl" to photoUrl
+            )
+            
+            val currentDoc = remoteDataSource.getUserDocument(user.uid)
+            val finalData = currentDoc.data?.toMutableMap() ?: mutableMapOf()
+            finalData.putAll(updates)
+            remoteDataSource.saveUserDocument(user.uid, finalData)
+
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

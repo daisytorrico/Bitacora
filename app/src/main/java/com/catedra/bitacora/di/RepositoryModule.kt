@@ -2,7 +2,9 @@ package com.catedra.bitacora.di
 
 import com.catedra.bitacora.features.auth.data.repository.AuthRepositoryFirebase
 import com.catedra.bitacora.features.auth.domain.repository.AuthRepository
+import com.catedra.bitacora.features.travel.data.repository.LocationRepositoryImpl
 import com.catedra.bitacora.features.travel.data.repository.TravelRepositoryFirebase
+import com.catedra.bitacora.features.travel.domain.repository.LocationRepository
 import com.catedra.bitacora.features.travel.domain.repository.TravelsRepository
 import dagger.Binds
 import dagger.Module
@@ -24,4 +26,10 @@ abstract class RepositoryModule {
     abstract fun bindAuthRepository(
         impl: AuthRepositoryFirebase
     ): AuthRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindLocationRepository(
+        impl: LocationRepositoryImpl
+    ): LocationRepository
 }
