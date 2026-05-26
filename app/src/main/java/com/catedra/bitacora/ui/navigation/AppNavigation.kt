@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.catedra.bitacora.features.auth.domain.model.AuthState
 import com.catedra.bitacora.features.auth.presentation.AuthViewModel
@@ -43,7 +44,11 @@ fun AppNavigation(viewModel: AuthViewModel) {
         val currentRoute = navController.currentDestination?.route
         when (authState) {
             is AuthState.Autenticado -> {
-                if (currentRoute != Rutas.HOME) {
+                val esRutaDeAuth = currentRoute == Rutas.LOGIN || 
+                                   currentRoute == Rutas.REGISTRO || 
+                                   currentRoute == Rutas.USERNAME
+                
+                if (esRutaDeAuth) {
                     navController.navigate(Rutas.HOME) {
                         popUpTo(0) { inclusive = true }
                         launchSingleTop = true

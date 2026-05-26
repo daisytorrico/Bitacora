@@ -21,4 +21,13 @@ class GeocodingRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    override suspend fun searchLocation(query: String): Result<List<PointOnMap>> {
+        return try {
+            val results = remoteDataSource.searchLocation(query)
+            Result.success(results)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

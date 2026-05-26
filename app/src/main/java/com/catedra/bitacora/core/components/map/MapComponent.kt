@@ -1,7 +1,13 @@
 package com.catedra.bitacora.core.components.map
 
 import android.content.Context
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -9,12 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.catedra.bitacora.core.domain.model.Coordinates
 import com.catedra.bitacora.core.domain.model.PointOnMap
 import org.osmdroid.config.Configuration
-import org.osmdroid.events.MapEventsReceiver
+import org.osmdroid.events.*
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -25,17 +33,32 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 @Composable
 fun MapComponent(
-    viewModel: MapViewModel,
     onPointSelected: (PointOnMap) -> Unit,
+    modifier: Modifier = Modifier,
     buttonText: String = "Seleccionar",
-    modifier: Modifier = Modifier
+    externalPois: List<PointOnMap> = emptyList(),
+    onExternalPoiSelected: (PointOnMap) -> Unit = {},
+    externalPoiButtonText: String = "Detalle",
+    viewModel: MapViewModel = hiltViewModel()
 ) {
+    // Sincronizar POIs externos con el ViewModel
+    LaunchedEffect(externalPois) {
+        viewModel.setExternalPois(externalPois)
+    }
+
     MapContent(
         uiState = viewModel.uiState,
         onMapClick = viewModel::onMapClick,
+        onSearchQueryChanged = viewModel::onSearchQueryChanged,
+        onSearchResultSelected = viewModel::onSearchResultSelected,
+        onExternalPoiClicked = viewModel::onExternalPoiClicked,
         onClearSelection = viewModel::clearSelection,
+        onMapReady = { viewModel.setMapReady(true) },
+        onCameraMoved = viewModel::onCameraMoved,
         onPointSelected = onPointSelected,
         buttonText = buttonText,
+        onExternalPoiAction = onExternalPoiSelected,
+        externalPoiButtonText = externalPoiButtonText,
         modifier = modifier
     )
 }
@@ -45,9 +68,16 @@ fun MapComponent(
 fun MapContent(
     uiState: MapViewUiState,
     onMapClick: (Double, Double) -> Unit,
+    onSearchQueryChanged: (String) -> Unit,
+    onSearchResultSelected: (PointOnMap) -> Unit,
+    onExternalPoiClicked: (PointOnMap) -> Unit,
     onClearSelection: () -> Unit,
+    onMapReady: () -> Unit,
+    onCameraMoved: (Coordinates, Double) -> Unit,
     onPointSelected: (PointOnMap) -> Unit,
     buttonText: String,
+    onExternalPoiAction: (PointOnMap) -> Unit,
+    externalPoiButtonText: String,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -82,14 +112,37 @@ fun MapContent(
                     locationOverlay.enableFollowLocation()
                     overlays.add(locationOverlay)
 
-                    locationOverlay.runOnFirstFix {
-                        val myLocation = locationOverlay.myLocation
-                        post {
-                            controller.animateTo(myLocation)
-                            controller.setZoom(18.0)
-                            invalidate()
+                    // Si ya teníamos una posición (por rotación), la restauramos inmediatamente
+                    uiState.cameraCenter?.let { savedCenter ->
+                        controller.setCenter(GeoPoint(savedCenter.latitude, savedCenter.longitude))
+                        controller.setZoom(uiState.cameraZoom)
+                        onMapReady()
+                    } ?: run {
+                        locationOverlay.runOnFirstFix {
+                            val myLocation = locationOverlay.myLocation
+                            post {
+                                controller.animateTo(myLocation)
+                                controller.setZoom(18.0)
+                                invalidate()
+                                onMapReady()
+                            }
                         }
                     }
+
+                    // Escuchamos el movimiento para guardar la posición en el ViewModel
+                    val mapListener = object : MapListener {
+                        override fun onScroll(event: ScrollEvent?): Boolean {
+                            val center = mapCenter
+                            onCameraMoved(Coordinates(center.latitude, center.longitude), zoomLevelDouble)
+                            return true
+                        }
+                        override fun onZoom(event: ZoomEvent?): Boolean {
+                            val center = mapCenter
+                            onCameraMoved(Coordinates(center.latitude, center.longitude), zoomLevelDouble)
+                            return true
+                        }
+                    }
+                    addMapListener(DelayedMapListener(mapListener, 200))
 
                     val mapEventsReceiver = object : MapEventsReceiver {
                         override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
@@ -103,33 +156,106 @@ fun MapContent(
             },
             update = {
                 mapState.updateSelection(uiState.selectedPoint, uiState.temporaryCoordinates)
+                mapState.updateExternalPois(uiState.externalPois, onExternalPoiClicked)
             }
         )
 
-        if (uiState.isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        }
-
-        uiState.selectedPoint?.let { point ->
-            PointDetailCard(
-                point = point,
-                buttonText = buttonText,
-                onCancel = onClearSelection,
-                onConfirm = { onPointSelected(point) },
-                modifier = Modifier.align(Alignment.BottomCenter)
-            )
-        }
-        
-        uiState.error?.let { error ->
-            Snackbar(
-                modifier = Modifier.padding(16.dp).align(Alignment.BottomCenter),
-                action = {
-                    TextButton(onClick = onClearSelection) {
-                        Text("OK")
+        if (!uiState.isMapReady) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator()
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Preparando mapa...",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
                     }
                 }
+            }
+        }
+
+        if (uiState.isMapReady) {
+            // Barra de búsqueda
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .align(Alignment.TopCenter)
             ) {
-                Text(error)
+                DockedSearchBar(
+                    modifier = Modifier.fillMaxWidth(),
+                    query = uiState.searchQuery,
+                    onQueryChange = onSearchQueryChanged,
+                    onSearch = { /* Ya se busca con debounce */ },
+                    active = uiState.searchResults.isNotEmpty(),
+                    onActiveChange = { },
+                    placeholder = { Text("Buscar lugar...") },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    trailingIcon = {
+                        if (uiState.searchQuery.isNotEmpty()) {
+                            IconButton(onClick = onClearSelection) {
+                                Icon(Icons.Default.Close, contentDescription = null)
+                            }
+                        }
+                    }
+                ) {
+                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                        items(uiState.searchResults) { point ->
+                            ListItem(
+                                headlineContent = { Text(point.name) },
+                                supportingContent = { Text(point.address) },
+                                modifier = Modifier.clickable {
+                                    onSearchResultSelected(point)
+                                    mapState.animateTo(point.coordinates)
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
+            if (uiState.isLoading || uiState.isSearching) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+
+            // Tarjeta para punto nuevo seleccionado
+            uiState.selectedPoint?.let { point ->
+                PointDetailCard(
+                    point = point,
+                    buttonText = buttonText,
+                    onCancel = onClearSelection,
+                    onConfirm = { onPointSelected(point) },
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                )
+            }
+
+            // Tarjeta para POI externo seleccionado
+            uiState.selectedExternalPoi?.let { poi ->
+                PointDetailCard(
+                    point = poi,
+                    buttonText = externalPoiButtonText,
+                    onCancel = onClearSelection,
+                    onConfirm = { onExternalPoiAction(poi) },
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                )
+            }
+
+            uiState.error?.let { error ->
+                Snackbar(
+                    modifier = Modifier.padding(16.dp).align(Alignment.BottomCenter),
+                    action = {
+                        TextButton(onClick = onClearSelection) {
+                            Text("OK")
+                        }
+                    }
+                ) {
+                    Text(error)
+                }
             }
         }
     }
@@ -151,6 +277,13 @@ fun PointDetailCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = point.name, style = MaterialTheme.typography.titleMedium)
+            if (point.address.isNotEmpty()) {
+                Text(
+                    text = point.address,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),

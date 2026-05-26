@@ -2,6 +2,7 @@ package com.catedra.bitacora.core.data.remote
 
 import android.location.Geocoder
 import com.catedra.bitacora.core.domain.model.Coordinates
+import com.catedra.bitacora.core.data.mapper.toBestDomain
 import com.catedra.bitacora.core.data.mapper.toDomain
 import com.catedra.bitacora.core.domain.model.PointOnMap
 import kotlinx.coroutines.Dispatchers
@@ -14,15 +15,24 @@ class GeocodingRemoteDataSource @Inject constructor(
     suspend fun getPointFromCoordinates(coordinates: Coordinates): PointOnMap? = withContext(Dispatchers.IO) {
         try {
             @Suppress("DEPRECATION")
-            val addresses = geocoder.getFromLocation(coordinates.latitude, coordinates.longitude, 1)
+            // Pedimos 5 resultados para poder elegir el más descriptivo (POI vs Calle)
+            val addresses = geocoder.getFromLocation(coordinates.latitude, coordinates.longitude, 5)
             
-            if (!addresses.isNullOrEmpty()) {
-                addresses[0].toDomain(coordinates)
-            } else {
-                null
-            }
+            addresses?.toBestDomain(coordinates)
         } catch (e: Exception) {
             null
+        }
+    }
+
+    suspend fun searchLocation(query: String): List<PointOnMap> = withContext(Dispatchers.IO) {
+        try {
+            @Suppress("DEPRECATION")
+            val addresses = geocoder.getFromLocationName(query, 5)
+            addresses?.map { address ->
+                address.toDomain(Coordinates(address.latitude, address.longitude))
+            } ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
         }
     }
 }
