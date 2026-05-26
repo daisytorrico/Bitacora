@@ -1,9 +1,14 @@
 package com.catedra.bitacora.features.travel.domain.repository
 
+import com.catedra.bitacora.features.travel.domain.model.PointOfInterest
 import com.catedra.bitacora.features.travel.domain.model.Travel
 
 interface TravelsRepository {
     suspend fun getTravels(userId: String, page: Int): Result<List<Travel>>
+    suspend fun getTravelById(travelId: String): Result<Travel>
+    suspend fun getPointsOfInterest(travelId: String): Result<List<PointOfInterest>>
+    suspend fun getPointOfInterest(travelId: String, pointId: String): Result<PointOfInterest>
+    suspend fun getPointsCount(travelId: String): Result<Int>
     
     // Guardar el viaje
     suspend fun saveTravel(travel: Travel): Result<Unit>

@@ -1,15 +1,7 @@
 package com.catedra.bitacora.ui.navigation
 
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
@@ -21,6 +13,7 @@ import com.catedra.bitacora.features.auth.presentation.navigation.authGraph
 import com.catedra.bitacora.features.auth.presentation.util.crearGoogleSignInHandler
 import com.catedra.bitacora.features.travel.presentation.navigation.TravelDestinations
 import com.catedra.bitacora.features.travel.presentation.navigation.travelGraph
+import com.catedra.bitacora.ui.components.AppBottomBar
 
 object Rutas {
     const val LOGIN = AuthDestinations.LOGIN
@@ -43,7 +36,7 @@ fun AppNavigation(viewModel: AuthViewModel) {
         val currentRoute = navController.currentDestination?.route
         when (authState) {
             is AuthState.Autenticado -> {
-                if (currentRoute != Rutas.HOME) {
+                if (currentRoute == Rutas.LOGIN || currentRoute == Rutas.REGISTRO) {
                     navController.navigate(Rutas.HOME) {
                         popUpTo(0) { inclusive = true }
                         launchSingleTop = true

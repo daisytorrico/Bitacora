@@ -22,6 +22,9 @@ import coil.compose.AsyncImage
 import com.catedra.bitacora.features.travel.domain.model.Travel
 import com.catedra.bitacora.ui.theme.BitacoraTheme
 import com.catedra.bitacora.ui.theme.GrisMedio
+import com.catedra.bitacora.ui.theme.Blanco
+import com.catedra.bitacora.ui.theme.GrisSeparador
+import com.catedra.bitacora.ui.theme.GrisFondoApp
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -32,7 +35,6 @@ fun TravelItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val status = remember(travel) { getTravelStatus(travel) }
     val dateRange = remember(travel) { getDateRange(travel) }
 
     Card(
@@ -41,15 +43,14 @@ fun TravelItem(
             .height(115.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, Color(0xFFE0E0E0)), // Contorno gris claro muy sutil
+        colors = CardDefaults.cardColors(containerColor = Blanco),
+        border = BorderStroke(1.dp, GrisSeparador),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Sección Izquierda (Imagen de Portada)
             AsyncImage(
                 model = travel.imageUrl,
                 contentDescription = null,
@@ -60,7 +61,6 @@ fun TravelItem(
                 contentScale = ContentScale.Crop
             )
 
-            // Sección Derecha (Información y Column)
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -87,26 +87,17 @@ fun TravelItem(
                     )
                 }
 
-                // Metadatos Dinámicos (Fila Inferior)
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "$pointsCount puntos",
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            fontSize = 12.sp,
-                            color = GrisMedio
-                        )
+                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, color = GrisMedio)
                     )
                     Text(
                         text = " • ",
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            fontSize = 12.sp,
-                            color = GrisMedio
-                        )
+                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, color = GrisMedio)
                     )
                     Text(
-                        text = status,
+                        text = travel.status.label,
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontWeight = FontWeight.Medium,
                             fontSize = 12.sp,
@@ -116,7 +107,6 @@ fun TravelItem(
                 }
             }
 
-            // Navegación e Indicador
             Icon(
                 imageVector = Icons.Default.ChevronRight,
                 contentDescription = null,
@@ -124,19 +114,6 @@ fun TravelItem(
                 modifier = Modifier.padding(end = 12.dp)
             )
         }
-    }
-}
-
-private fun getTravelStatus(travel: Travel): String {
-    val today = LocalDate.now()
-    val startDate = travel.startDate
-    val endDate = travel.endDate
-
-    return when {
-        startDate == null || endDate == null -> "Planificando"
-        today.isBefore(startDate) -> "Planificando"
-        today.isAfter(endDate) -> "Completado"
-        else -> "En curso"
     }
 }
 
