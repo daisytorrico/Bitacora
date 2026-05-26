@@ -6,6 +6,8 @@ import com.catedra.bitacora.features.travel.data.repository.LocationRepositoryIm
 import com.catedra.bitacora.features.travel.data.repository.TravelRepositoryFirebase
 import com.catedra.bitacora.features.travel.domain.repository.LocationRepository
 import com.catedra.bitacora.features.travel.domain.repository.TravelsRepository
+import com.catedra.bitacora.core.data.repository.GeocodingRepositoryImpl
+import com.catedra.bitacora.core.domain.repository.GeocodingRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -32,4 +34,10 @@ abstract class RepositoryModule {
     abstract fun bindLocationRepository(
         impl: LocationRepositoryImpl
     ): LocationRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindGeocodingRepository(
+        impl: GeocodingRepositoryImpl
+    ): GeocodingRepository
 }
