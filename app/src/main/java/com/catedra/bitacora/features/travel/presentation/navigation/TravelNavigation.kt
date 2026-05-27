@@ -18,8 +18,7 @@ import com.catedra.bitacora.features.travel.presentation.travelCreate.CreateTrav
 import com.catedra.bitacora.features.travel.presentation.travelDetail.TravelDetailScreen
 import com.catedra.bitacora.features.travel.presentation.travelList.TravelListScreen
 import com.catedra.bitacora.features.travel.presentation.travelList.TravelListViewModel
-import com.catedra.bitacora.ui.components.AppTopBar
-import com.catedra.bitacora.ui.components.AppBottomBar
+
 
 object TravelDestinations {
     const val TRAVEL_LIST = "travel_list"
@@ -67,7 +66,7 @@ fun NavGraphBuilder.travelGraph(
         )
     }
 
-    // Pantalla de Detalle del Punto de Interés
+    // Pantalla de Detalle del Punto de Interes
     composable(TravelDestinations.POINT_DETAIL) {
         PointDetailScreen(
             onBack = { navController.popBackStack() },
@@ -81,14 +80,26 @@ fun NavGraphBuilder.travelGraph(
     // Pantalla del formulario para crear un viaje
     composable(TravelDestinations.TRAVEL_CREATE) {
         CreateTravelScreen(
-            onBack = { navController.popBackStack() }
+            onBack = { navController.popBackStack() },
+            onTravelCreated = { travelId ->
+                navController.navigate("travel_detail/$travelId") {
+                    // Eliminar la pantalla de creación del backstack para que al volver atrás no regrese al formulario
+                    popUpTo(TravelDestinations.TRAVEL_CREATE) { inclusive = true }
+                }
+            }
         )
     }
 
     // Pantalla para añadir un punto de interés
-    composable(TravelDestinations.TRAVEL_ADD_POINT) {
+    composable(TravelDestinations.TRAVEL_ADD_POINT) { backStackEntry ->
+        val travelId = backStackEntry.arguments?.getString("travelId") ?: return@composable
         CreatePointScreen(
-            onBack = { navController.popBackStack() }
+            onBack = { navController.popBackStack() },
+            onPointCreated = { pointId ->
+                navController.navigate("travel_details/$travelId/points/$pointId") {
+                    popUpTo(TravelDestinations.TRAVEL_ADD_POINT) { inclusive = true }
+                }
+            }
         )
     }
 }

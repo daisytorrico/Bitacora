@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.catedra.bitacora.features.travel.presentation.navigation.TravelDestinations
 import com.catedra.bitacora.ui.theme.Blanco
@@ -32,19 +31,24 @@ fun AppBottomBar(navController: NavController) {
         NavigationBarItem(
             icon = { Icon(Icons.Default.Person, contentDescription = "Perfil") },
             label = { Text("Perfil") },
-            selected = currentDestination?.hierarchy?.any { it.route == TravelDestinations.TRAVEL_LIST } == true,
+            selected = currentDestination?.hierarchy?.any { destination ->
+                destination.route == TravelDestinations.TRAVEL_LIST ||
+                        destination.route == TravelDestinations.TRAVEL_DETAIL ||
+                        destination.route == TravelDestinations.POINT_DETAIL
+            } == true,
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,
                 selectedTextColor = MaterialTheme.colorScheme.primary,
                 indicatorColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f)
             ),
             onClick = {
-                navController.navigate(TravelDestinations.TRAVEL_LIST) {
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
+                if (currentDestination?.route != TravelDestinations.TRAVEL_LIST) {
+                    navController.navigate(TravelDestinations.TRAVEL_LIST) {
+                        popUpTo(0) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
                     }
-                    launchSingleTop = true
-                    restoreState = true
                 }
             }
         )
