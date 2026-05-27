@@ -10,8 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,8 +21,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.catedra.bitacora.features.auth.presentation.navigation.AuthDestinations
 import com.catedra.bitacora.ui.components.AppTopBar
 import com.catedra.bitacora.ui.components.AppBottomBar
 import com.catedra.bitacora.ui.components.PointOfInterestItem
@@ -47,6 +50,19 @@ fun TravelDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val travel = uiState.travel
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.loadTravelDetails()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -68,7 +84,7 @@ fun TravelDetailScreen(
             }
         }
     ) { paddingValues ->
-        if (uiState.isLoading) {
+        if (uiState.isLoading && travel == null) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
@@ -88,7 +104,9 @@ fun TravelDetailScreen(
 
                 // Item 2: Cabecera del Creador y Píldoras
                 item {
-                    CreatorAndStatsSection(uiState)
+                    CreatorAndStatsSection(uiState) {
+                        navController.navigate(AuthDestinations.EDIT_PROFILE)
+                    }
                 }
 
                 // Item 3: Cabecera de Sección
@@ -103,7 +121,6 @@ fun TravelDetailScreen(
                     )
                 }
 
-                // Lista de Puntos utilizando el nuevo componente global
                 items(uiState.pointsOfInterest) { point ->
                     Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                         PointOfInterestItem(
@@ -170,13 +187,14 @@ private fun BannerSection(travel: com.catedra.bitacora.features.travel.domain.mo
 }
 
 @Composable
-private fun CreatorAndStatsSection(uiState: TravelDetailUiState) {
+private fun CreatorAndStatsSection(uiState: TravelDetailUiState, onProfileClick: () -> Unit) {
     val travel = uiState.travel
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         UserHeader(
             user = uiState.creatorUser,
             avatarSize = 48,
             showBadges = true,
+            onClick = onProfileClick,
             badges = {
                 Badge(containerColor = GrisPildora) { 
                     Text("Privado", fontSize = 10.sp) 

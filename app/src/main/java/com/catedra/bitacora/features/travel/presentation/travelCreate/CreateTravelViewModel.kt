@@ -106,7 +106,8 @@ class CreateTravelViewModel @Inject constructor(
                 val result = saveTravelUseCase(newTravel)
                 
                 if (result.isSuccess) {
-                    _uiState.update { it.copy(loading = false, success = true) }
+                    val id = result.getOrNull()
+                    _uiState.update { it.copy(loading = false, success = true, travelId = id) }
                 } else {
                     _uiState.update { it.copy(loading = false, error = result.exceptionOrNull()?.message ?: "Error al guardar") }
                 }

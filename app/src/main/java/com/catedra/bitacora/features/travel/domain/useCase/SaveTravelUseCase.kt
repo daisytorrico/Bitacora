@@ -7,7 +7,7 @@ import javax.inject.Inject
 class SaveTravelUseCase @Inject constructor(
     private val travelsRepository: TravelsRepository
 ) {
-    suspend operator fun invoke(travel: Travel): Result<Unit> {
+    suspend operator fun invoke(travel: Travel): Result<String> {
         return travelsRepository.saveTravel(travel)
     }
 }

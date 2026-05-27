@@ -29,23 +29,16 @@ class TravelDetailViewModel @Inject constructor(
         loadTravelDetails()
     }
 
-    private fun loadTravelDetails() {
+    fun loadTravelDetails() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            if (uiState.value.travel == null) {
+                _uiState.update { it.copy(isLoading = true) }
+            }
             
             val travelResult = travelsRepository.getTravelById(travelId)
             
             travelResult.onSuccess { travel ->
-                // Obtenemos los puntos de interés
                 val pointsResult = travelsRepository.getPointsOfInterest(travelId)
-                
-                // Aquí el prompt pide el creatorUser desde AuthRepository.
-                // Como AuthRepository.getCurrentUser() devuelve el usuario actual, 
-                // y TravelDetailUiState.creatorUser es para el dueño del viaje,
-                // si el viaje es mío puedo usar getCurrentUser().
-                // Si fuera de otro, necesitaríamos un getUserById en AuthRepository.
-                // Asumiremos por ahora que cargamos el data del dueño si coincide con el actual
-                // o intentamos traer data extendida si el repo lo permite.
                 
                 authRepository.getFullUserData().onSuccess { user ->
                     val points = pointsResult.getOrDefault(emptyList())

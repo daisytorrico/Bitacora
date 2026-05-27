@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -67,33 +68,42 @@ fun TravelListScreen(
             }
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            // Sección de Perfil
-            item {
-                ProfileHeader(
-                    user = uiState.user,
-                    travelCount = uiState.filteredTravels.size,
-                    onEditClick = onEditarPerfilClick
-                )
+        if (uiState.loading && uiState.travels.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxSize().padding(paddingValues),
+                contentAlignment = androidx.compose.ui.Alignment.Center
+            ) {
+                CircularProgressIndicator()
             }
-
-            // Lista de Viajes
-            items(
-                items = uiState.filteredTravels,
-                key = { it.id }
-            ) { travel ->
-                Box {
-                    TravelItem(
-                        travel = travel,
-                        pointsCount = travel.pointsCount,
-                        onClick = { onTravelClick(travel.id) }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Sección de Perfil
+                item {
+                    ProfileHeader(
+                        user = uiState.user,
+                        travelCount = uiState.filteredTravels.size,
+                        onEditClick = onEditarPerfilClick
                     )
+                }
+
+                // Lista de Viajes
+                items(
+                    items = uiState.filteredTravels,
+                    key = { it.id }
+                ) { travel ->
+                    Box {
+                        TravelItem(
+                            travel = travel,
+                            pointsCount = travel.pointsCount,
+                            onClick = { onTravelClick(travel.id) }
+                        )
+                    }
                 }
             }
         }

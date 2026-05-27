@@ -1,5 +1,6 @@
 package com.catedra.bitacora.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
@@ -22,10 +23,13 @@ fun UserHeader(
     modifier: Modifier = Modifier,
     avatarSize: Int = 40,
     showBadges: Boolean = false,
+    onClick: (() -> Unit)? = null,
     badges: @Composable (RowScope.() -> Unit)? = null
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(

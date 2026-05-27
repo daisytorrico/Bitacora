@@ -10,7 +10,8 @@ data class CreateTravelUiState(
     val imageUri: Uri? = null,
     val loading: Boolean = false,
     val error: String? = null,
-    val success: Boolean = false
+    val success: Boolean = false,
+    val travelId: String? = null
 ) {
     // Validaciones derivadas del estado
     val isDateInvalid: Boolean

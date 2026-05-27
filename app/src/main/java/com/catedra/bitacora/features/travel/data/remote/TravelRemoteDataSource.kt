@@ -18,10 +18,11 @@ class TravelRemoteDataSource @Inject constructor(
             .await()
     }
 
-    suspend fun saveTravel(travelData: Map<String, Any?>) {
-        db.collection("trips")
+    suspend fun saveTravel(travelData: Map<String, Any?>): String {
+        val documentReference = db.collection("trips")
             .add(travelData)
             .await()
+        return documentReference.id
     }
 
     suspend fun getTravelById(travelId: String): DocumentSnapshot {

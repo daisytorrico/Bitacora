@@ -1,7 +1,10 @@
 package com.catedra.bitacora.ui.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
@@ -31,7 +34,10 @@ fun AppNavigation(viewModel: AuthViewModel) {
     var showLogOut by remember { mutableStateOf(false) }
 
     val onGoogleSignInClick = crearGoogleSignInHandler(context, coroutineScope, viewModel)
-
+    if (authState is AuthState.Cargando) {
+        Box(modifier = Modifier.fillMaxSize()) // pantalla en blanco sin flash
+        return
+    }
     LaunchedEffect(authState) {
         val currentRoute = navController.currentDestination?.route
         when (authState) {

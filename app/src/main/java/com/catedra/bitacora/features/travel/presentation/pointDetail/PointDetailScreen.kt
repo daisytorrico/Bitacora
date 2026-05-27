@@ -1,6 +1,5 @@
 package com.catedra.bitacora.features.travel.presentation.pointDetail
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -28,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.catedra.bitacora.features.auth.presentation.navigation.AuthDestinations
 import com.catedra.bitacora.ui.components.AppTopBar
 import com.catedra.bitacora.ui.components.AppBottomBar
 import com.catedra.bitacora.ui.components.UserHeader
@@ -133,7 +133,10 @@ fun PointDetailScreen(
                             .fillMaxWidth()
                     ) {
                         // Bloque de Identificación del Creador (Componente reutilizable)
-                        UserHeader(user = uiState.creatorUser)
+                        UserHeader(
+                            user = uiState.creatorUser,
+                            onClick = { navController.navigate(AuthDestinations.EDIT_PROFILE) }
+                        )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
@@ -157,7 +160,9 @@ fun PointDetailScreen(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = point.visitDate?.toString() ?: "Sin fecha",
+                                text = point.visitDate?.format(
+                                    java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+                                ) ?: "Sin fecha",
                                 color = GrisMedio
                             )
                         }

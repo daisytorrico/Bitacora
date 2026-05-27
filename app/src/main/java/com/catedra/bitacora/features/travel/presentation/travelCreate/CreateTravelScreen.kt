@@ -29,15 +29,17 @@ import com.catedra.bitacora.ui.components.AppTopBar
 @Composable
 fun CreateTravelScreen(
     onBack: () -> Unit,
+    onTravelCreated: (String) -> Unit,
     viewModel: CreateTravelViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
 
     // Manejo de eventos de navegación y errores
-    LaunchedEffect(uiState.success) {
-        if (uiState.success) {
-            onBack()
+    LaunchedEffect(uiState.success, uiState.travelId) {
+        val travelId = uiState.travelId
+        if (uiState.success && travelId != null) {
+            onTravelCreated(travelId)
         }
     }
 

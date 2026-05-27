@@ -68,13 +68,13 @@ class TravelRepositoryFirebase @Inject constructor(
         }
     }
 
-    override suspend fun saveTravel(travel: Travel): Result<Unit> {
+    override suspend fun saveTravel(travel: Travel): Result<String> {
         return try {
             val travelData = travel.toData()
             Log.d("TravelRepository", "Guardando viaje: $travelData")
-            remoteDataSource.saveTravel(travelData)
-            Log.d("TravelRepository", "Viaje guardado exitosamente")
-            Result.success(Unit)
+            val travelId = remoteDataSource.saveTravel(travelData)
+            Log.d("TravelRepository", "Viaje guardado exitosamente con ID: $travelId")
+            Result.success(travelId)
         } catch (e: Exception) {
             Log.e("TravelRepository", "Error al guardar viaje", e)
             Result.failure(e)

@@ -10,8 +10,8 @@ interface TravelsRepository {
     suspend fun getPointOfInterest(travelId: String, pointId: String): Result<PointOfInterest>
     suspend fun getPointsCount(travelId: String): Result<Int>
     
-    // Guardar el viaje
-    suspend fun saveTravel(travel: Travel): Result<Unit>
+    // Guardar el viaje y retornar su ID
+    suspend fun saveTravel(travel: Travel): Result<String>
 
     companion object {
         const val DEFAULT_PAGE_SIZE = 10

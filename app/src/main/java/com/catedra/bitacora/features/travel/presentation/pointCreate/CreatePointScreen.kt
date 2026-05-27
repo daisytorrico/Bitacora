@@ -39,12 +39,14 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.catedra.bitacora.ui.components.AppDatePickerField
+import com.catedra.bitacora.ui.components.AppTimePickerField
 import com.catedra.bitacora.ui.components.AppTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreatePointScreen(
     onBack: () -> Unit,
+    onPointCreated: (String) -> Unit,
     viewModel: CreatePointViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -83,10 +85,11 @@ fun CreatePointScreen(
         }
     }
 
-    LaunchedEffect(uiState.isSuccess) {
-        if (uiState.isSuccess) {
+    LaunchedEffect(uiState.isSuccess, uiState.pointId) {
+        val pointId = uiState.pointId
+        if (uiState.isSuccess && pointId != null) {
             Toast.makeText(context, "Punto de interés guardado", Toast.LENGTH_SHORT).show()
-            onBack()
+            onPointCreated(pointId)
         }
     }
 
@@ -191,7 +194,14 @@ fun CreatePointScreen(
                         onDateSelected = { viewModel.onDateSelected(it) },
                         modifier = Modifier.fillMaxWidth()
                     )
-                    
+                    AppTimePickerField(
+                        label = "Hora de visita",
+                        selectedHour = uiState.visitHour,
+                        selectedMinute = uiState.visitMinute,
+                        onTimeSelected = { hour, minute -> viewModel.onTimeSelected(hour, minute) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
                     if (uiState.isDateOutOfRange) {
                         Text(
                             text = "Fuera de rango. $rangeText",
