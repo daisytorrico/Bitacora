@@ -1,6 +1,7 @@
 package com.catedra.bitacora.features.travel.data.mapper
 
 import com.catedra.bitacora.features.travel.domain.model.Travel
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 import java.time.LocalDate
@@ -41,9 +42,12 @@ fun Travel.toData(): Map<String, Any?> {
         "description" to description,
         "ownerId" to ownerId,
         "imageUrl" to imageUrl,
-        "startDate" to startDate?.toDate(),
-        "endDate" to endDate?.toDate(),
-        "pointsCount" to pointsCount,
+        "startDate" to startDate?.let {
+            Timestamp(Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+        },
+        "endDate" to endDate?.let {
+            Timestamp(Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+        },
         "privileges" to privileges
     )
 }

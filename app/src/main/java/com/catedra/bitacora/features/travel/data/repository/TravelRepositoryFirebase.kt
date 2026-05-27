@@ -1,5 +1,6 @@
 package com.catedra.bitacora.features.travel.data.repository
 
+import android.util.Log
 import com.catedra.bitacora.features.travel.data.mapper.toData
 import com.catedra.bitacora.features.travel.data.mapper.toDomain
 import com.catedra.bitacora.features.travel.data.mapper.toPointOfInterest
@@ -70,9 +71,12 @@ class TravelRepositoryFirebase @Inject constructor(
     override suspend fun saveTravel(travel: Travel): Result<Unit> {
         return try {
             val travelData = travel.toData()
+            Log.d("TravelRepository", "Guardando viaje: $travelData")
             remoteDataSource.saveTravel(travelData)
+            Log.d("TravelRepository", "Viaje guardado exitosamente")
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e("TravelRepository", "Error al guardar viaje", e)
             Result.failure(e)
         }
     }

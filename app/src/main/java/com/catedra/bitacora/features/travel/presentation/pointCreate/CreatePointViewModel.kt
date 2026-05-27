@@ -146,7 +146,7 @@ class CreatePointViewModel @Inject constructor(
     }
 
     private fun Long.toLocalDate(): LocalDate {
-        return Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate()
+        return Instant.ofEpochMilli(this).atZone(ZoneId.of("UTC")).toLocalDate()
     }
 
     fun resetError() {
