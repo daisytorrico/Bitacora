@@ -15,7 +15,7 @@ fun PointOfInterest.toData(): Map<String, Any?> {
         "location" to if (latitude != null && longitude != null) GeoPoint(latitude, longitude) else null,
         "notes" to notes,
         "visitDate" to visitDate?.let {
-            val date = Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant())
+            val date = Date.from(it.atZone(ZoneId.systemDefault()).toInstant())
             Timestamp(date)
         },
         "imageUrls" to imageUrls
@@ -31,7 +31,7 @@ fun DocumentSnapshot.toPointOfInterest(): PointOfInterest {
         latitude = geoPoint?.latitude,
         longitude = geoPoint?.longitude,
         visitDate = getTimestamp("visitDate")?.toDate()?.toInstant()
-            ?.atZone(ZoneId.systemDefault())?.toLocalDate(),
+            ?.atZone(ZoneId.systemDefault())?.toLocalDateTime(),
         notes = getString("notes") ?: "",
         imageUrls = get("imageUrls") as? List<String> ?: emptyList()
     )

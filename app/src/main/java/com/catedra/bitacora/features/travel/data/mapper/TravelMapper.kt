@@ -46,7 +46,7 @@ fun Travel.toData(): Map<String, Any?> {
             Timestamp(Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant()))
         },
         "endDate" to endDate?.let {
-            Timestamp(Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+            Timestamp(Date.from(it.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant()))
         },
         "privileges" to privileges
     )
