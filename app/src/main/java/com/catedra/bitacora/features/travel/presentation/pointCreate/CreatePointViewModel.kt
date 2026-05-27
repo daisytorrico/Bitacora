@@ -64,6 +64,7 @@ class CreatePointViewModel @Inject constructor(
     fun onAddressChange(address: String) = _uiState.update { it.copy(address = address) }
     fun onNotesChange(notes: String) = _uiState.update { it.copy(notes = notes) }
     fun onDateSelected(millis: Long?) = _uiState.update { it.copy(visitDateMillis = millis) }
+    fun onTimeSelected(hour: Int, minute: Int) = _uiState.update { it.copy(visitHour = hour, visitMinute = minute) }
 
     fun onImageAdded(uri: Uri) {
         _uiState.update { it.copy(selectedImages = it.selectedImages + uri) }
@@ -127,18 +128,23 @@ class CreatePointViewModel @Inject constructor(
                     address = uiState.value.address,
                     latitude = uiState.value.latitude,
                     longitude = uiState.value.longitude,
-                    visitDate = uiState.value.visitDateMillis?.toLocalDate(),
+                    visitDate = uiState.value.visitDateMillis?.let { millis ->
+                        val date = Instant.ofEpochMilli(millis).atZone(ZoneId.of("UTC")).toLocalDate()
+                        val hour = uiState.value.visitHour ?: 0
+                        val minute = uiState.value.visitMinute ?: 0
+                        date.atTime(hour, minute)
+                    },
                     notes = uiState.value.notes,
                     imageUrls = imageUrls
                 )
 
-                firestore.collection("trips")
+                val docRef = firestore.collection("trips")
                     .document(travelId)
                     .collection("pointsOfInterest")
                     .add(point.toData())
                     .await()
 
-                _uiState.update { it.copy(isLoading = false, isSuccess = true) }
+                _uiState.update { it.copy(isLoading = false, isSuccess = true, pointId = docRef.id) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, error = e.message) }
             }

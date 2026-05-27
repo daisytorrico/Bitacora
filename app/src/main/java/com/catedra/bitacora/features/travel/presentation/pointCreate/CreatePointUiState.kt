@@ -13,16 +13,19 @@ data class CreatePointUiState(
     val latitude: Double? = null,
     val longitude: Double? = null,
     val visitDateMillis: Long? = null,
+    val visitHour: Int? = null,
+    val visitMinute: Int? = null,
     val notes: String = "",
     val selectedImages: List<Uri> = emptyList(),
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
+    val pointId: String? = null,
     val error: String? = null
 ) {
     val isDateOutOfRange: Boolean
         get() {
             if (visitDateMillis == null || travel == null) return false
-            val visitDate = Instant.ofEpochMilli(visitDateMillis).atZone(ZoneId.systemDefault()).toLocalDate()
+            val visitDate = Instant.ofEpochMilli(visitDateMillis).atZone(ZoneId.of("UTC")).toLocalDate()
             val start = travel.startDate
             val end = travel.endDate
             return if (start != null && end != null) {
@@ -33,6 +36,6 @@ data class CreatePointUiState(
     val canSave: Boolean 
         get() = name.isNotBlank() && 
                 address.isNotBlank() && 
-                !isDateOutOfRange && 
+                !isDateOutOfRange &&
                 !isLoading
 }
