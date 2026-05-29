@@ -62,7 +62,7 @@ fun PointDetailScreen(
         bottomBar = {
             AppBottomBar(navController = navController)
         },
-        containerColor = GrisFondoApp
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         if (uiState.isLoading) {
             Box(
@@ -115,7 +115,7 @@ fun PointDetailScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(240.dp)
-                                .background(GrisClaro)
+                                .background(MaterialTheme.colorScheme.background)
                                 .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)),
                             contentAlignment = Alignment.Center
                         ) {
@@ -163,11 +163,10 @@ fun PointDetailScreen(
                                 text = point.visitDate?.format(
                                     java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
                                 ) ?: "Sin fecha",
-                                color = GrisMedio
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                             )
                         }
                         Surface(
-                            color = Blanco,
                             shape = RoundedCornerShape(12.dp),
                             border = androidx.compose.foundation.BorderStroke(1.dp, GrisBorde),
                             modifier = Modifier.fillMaxWidth()
@@ -185,7 +184,7 @@ fun PointDetailScreen(
                                 Text(
                                     text = point.address,
                                     fontSize = 14.sp,
-                                    color = Negro
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
@@ -204,7 +203,7 @@ fun PointDetailScreen(
                                 .fillMaxWidth()
                                 .height(180.dp)
                                 .clip(RoundedCornerShape(12.dp))
-                                .background(Blanco)
+                                .background(MaterialTheme.colorScheme.background)
                                 .border(1.dp, GrisBorde, RoundedCornerShape(12.dp))
                         ) {
                             Icon(
@@ -238,7 +237,7 @@ fun PointDetailScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Surface(
                             modifier = Modifier.fillMaxWidth(),
-                            color = Blanco,
+                            color = MaterialTheme.colorScheme.surface,
                             shape = RoundedCornerShape(12.dp),
                             border = androidx.compose.foundation.BorderStroke(1.dp, GrisBorde)
                         ) {
@@ -246,7 +245,7 @@ fun PointDetailScreen(
                                 text = point.notes.ifEmpty { "No hay notas para este punto." },
                                 modifier = Modifier.padding(16.dp),
                                 fontSize = 16.sp,
-                                color = GrisOscuro
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
 

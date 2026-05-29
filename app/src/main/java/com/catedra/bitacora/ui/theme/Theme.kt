@@ -8,13 +8,14 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val LightColorScheme = lightColorScheme(
     primary = AzulOscuro,
     secondary = AzulProfundo,
     tertiary = Naranja,
-    background = GrisClaro,
+    background = GrisFondoApp,
     surface = Blanco,
     onPrimary = Blanco,
     onSecondary = Blanco,
@@ -26,23 +27,18 @@ private val DarkColorScheme = darkColorScheme(
     primary = AzulClaro,
     secondary = AzulMedio,
     tertiary = Naranja,
-    onPrimary = GrisOscuro,
-    onSecondary = Blanco,
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    background = NegroAzulado,
+    surface = GrisOscuroAzulado,
+    onPrimary = GrisOscuroAzulado,
+    onSecondary = GrisOscuroAzulado,
+    onTertiary = Blanco,
+    onBackground = GrisClaro,
+    onSurface = GrisClaro
 )
 
 @Composable
 fun BitacoraTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
@@ -52,7 +48,7 @@ fun BitacoraTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
+        darkTheme -> LightColorScheme
         else -> LightColorScheme
     }
 

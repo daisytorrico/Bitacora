@@ -110,7 +110,7 @@ fun CreatePointScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .background(Color(0xFFF4F6F8))
+                    .background(MaterialTheme.colorScheme.background)
                     .verticalScroll(rememberScrollState())
                     .padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
@@ -292,10 +292,10 @@ fun AddPhotoButton(onClick: () -> Unit) {
         modifier = Modifier
             .size(80.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.surface)
             .border(
                 width = 1.dp,
-                color = Color.LightGray.copy(alpha = 0.6f),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 shape = RoundedCornerShape(12.dp)
             )
             .clickable { onClick() },

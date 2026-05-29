@@ -22,7 +22,7 @@ fun AppBottomBar(navController: NavController) {
     val currentDestination = navBackStackEntry?.destination
 
     NavigationBar(
-        containerColor = Blanco,
+        containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 0.dp,
         modifier = Modifier
             .navigationBarsPadding()

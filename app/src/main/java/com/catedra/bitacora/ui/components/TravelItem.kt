@@ -43,7 +43,7 @@ fun TravelItem(
             .height(115.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Blanco),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.dp, GrisSeparador),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
@@ -81,7 +81,7 @@ fun TravelItem(
                     Text(
                         text = dateRange,
                         style = MaterialTheme.typography.bodySmall.copy(
-                            color = GrisMedio,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 13.sp
                         )
                     )

@@ -93,7 +93,7 @@ fun TravelDetailScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .background(GrisFondoApp),
+                    .background(MaterialTheme.colorScheme.background),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(bottom = 80.dp)
             ) {
@@ -174,11 +174,11 @@ private fun BannerSection(travel: com.catedra.bitacora.features.travel.domain.mo
                 val dateText = if (travel.startDate != null && travel.endDate != null) {
                     "${travel.startDate.format(formatter)} - ${travel.endDate.format(formatter)}"
                 } else "Sin fechas"
-                Text(text = dateText, color = Blanco, fontSize = 14.sp)
+                Text(text = dateText, color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp)
             }
             Text(
                 text = travel.description,
-                color = Blanco,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 16.sp,
                 maxLines = 2
             )
@@ -196,8 +196,8 @@ private fun CreatorAndStatsSection(uiState: TravelDetailUiState, onProfileClick:
             showBadges = true,
             onClick = onProfileClick,
             badges = {
-                Badge(containerColor = GrisPildora) { 
-                    Text("Privado", fontSize = 10.sp) 
+                Badge(containerColor = MaterialTheme.colorScheme.surface) { 
+                    Text("Privado", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface)
                 }
                 Badge(containerColor = MaterialTheme.colorScheme.secondaryContainer) { 
                     Text(travel?.status?.label ?: "Cargando", fontSize = 10.sp) 

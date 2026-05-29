@@ -7,6 +7,8 @@ val AzulProfundo = Color(0xFF1565C0)
 val AzulMedio = Color(0xFF1E88E5)
 val AzulClaro = Color(0xFF90CAF9)
 
+val Temp = Color.Gray;
+
 val GrisClaro = Color(0xFFF5F5F5)
 val GrisMedio = Color(0xFF9E9E9E)
 val GrisOscuro = Color(0xFF424242)
@@ -23,3 +25,6 @@ val GrisPildora = Color(0xFFE0E0E0).copy(alpha = 0.3f)
 val RojoPin = Color(0xFFE53935)
 val GrisBorde = Color(0xFFEEEEEE)
 val GrisSeparador = Color(0xFFE0E0E0)
+
+val NegroAzulado = Color(0xFF01031C)
+val GrisOscuroAzulado = Color(0xFF0F0F26)
