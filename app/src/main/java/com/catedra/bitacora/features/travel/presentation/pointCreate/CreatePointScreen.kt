@@ -84,6 +84,15 @@ fun CreatePointScreen(
             Toast.makeText(context, "Permiso de ubicación denegado", Toast.LENGTH_SHORT).show()
         }
     }
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            photoLauncher.launch(viewModel.buildPhotoPickerIntent())
+        } else {
+            Toast.makeText(context, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     LaunchedEffect(uiState.isSuccess, uiState.pointId) {
         val pointId = uiState.pointId
@@ -240,7 +249,12 @@ fun CreatePointScreen(
                     ) {
                         item {
                             AddPhotoButton(onClick = {
-                                photoLauncher.launch(viewModel.buildPhotoPickerIntent())
+                                val cameraPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                                if (cameraPermission == PackageManager.PERMISSION_GRANTED) {
+                                    photoLauncher.launch(viewModel.buildPhotoPickerIntent())
+                                } else {
+                                    cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                                }
                             })
                         }
                         items(uiState.selectedImages) { uri ->

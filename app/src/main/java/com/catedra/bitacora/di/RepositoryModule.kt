@@ -8,8 +8,10 @@ import com.catedra.bitacora.features.travel.domain.repository.LocationRepository
 import com.catedra.bitacora.features.travel.domain.repository.TravelsRepository
 import com.catedra.bitacora.core.data.repository.GeocodingRepositoryImpl
 import com.catedra.bitacora.core.domain.repository.GeocodingRepository
-import com.catedra.bitacora.features.travel.data.local.ImageManager
-import com.catedra.bitacora.features.travel.domain.repository.ImageRepository
+import com.catedra.bitacora.core.data.local.ImageManager
+import com.catedra.bitacora.core.domain.repository.ImageRepository
+import com.catedra.bitacora.core.data.remote.CloudinaryDataSource
+import com.catedra.bitacora.core.domain.repository.CloudinaryRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -48,4 +50,10 @@ abstract class RepositoryModule {
     abstract fun bindImageRepository(
         impl: ImageManager
     ): ImageRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCloudinaryRepository(
+        impl: CloudinaryDataSource
+    ): CloudinaryRepository
 }
