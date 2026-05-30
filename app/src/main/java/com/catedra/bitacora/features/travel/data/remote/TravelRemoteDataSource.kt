@@ -55,4 +55,12 @@ class TravelRemoteDataSource @Inject constructor(
             .await()
             .count
     }
+    suspend fun savePoint(travelId: String, pointData: Map<String, Any?>): String {
+        val docRef = db.collection("trips")
+            .document(travelId)
+            .collection("pointsOfInterest")
+            .add(pointData)
+            .await()
+        return docRef.id
+    }
 }

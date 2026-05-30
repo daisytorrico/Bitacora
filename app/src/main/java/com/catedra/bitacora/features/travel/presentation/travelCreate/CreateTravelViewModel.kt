@@ -2,6 +2,7 @@ package com.catedra.bitacora.features.travel.presentation.travelCreate
 
 import android.content.Intent
 import android.net.Uri
+import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.catedra.bitacora.features.auth.domain.repository.AuthRepository

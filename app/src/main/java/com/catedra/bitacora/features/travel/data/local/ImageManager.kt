@@ -12,16 +12,17 @@ import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
+import com.catedra.bitacora.features.travel.domain.repository.ImageRepository
 
 @Singleton
 class ImageManager @Inject constructor(
     @ApplicationContext private val context: Context
-) {
+) : ImageRepository {
     /**
      * Crea un archivo temporal en el caché y retorna su URI.
      * Se usa principalmente para capturar fotos con la cámara.
      */
-    fun createTempPictureUri(): Uri {
+    override fun createTempPictureUri(): Uri {
         val imagesDir = File(context.externalCacheDir, "images")
         if (!imagesDir.exists()) {
             imagesDir.mkdirs()
@@ -47,7 +48,7 @@ class ImageManager @Inject constructor(
      * Toma una URI de imagen, la comprime y devuelve la URI del nuevo archivo optimizado.
      * Se ejecuta en un hilo secundario (IO) para no bloquear la UI.
      */
-    suspend fun compressImage(uri: Uri): Uri? = withContext(Dispatchers.IO) {
+    override suspend fun compressImage(uri: Uri): Uri? = withContext(Dispatchers.IO) {
         try {
             val inputStream = context.contentResolver.openInputStream(uri)
             val bitmap = BitmapFactory.decodeStream(inputStream)
@@ -59,7 +60,7 @@ class ImageManager @Inject constructor(
             val compressedFile = File(context.externalCacheDir, "images/COMPRESSED_${System.currentTimeMillis()}.jpg")
             val outputStream = FileOutputStream(compressedFile)
 
-            // Comprimir: 80% de calidad es el estándar profesional (balance peso/calidad)
+            // Comprimir: 80% de calidad
             bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
             
             outputStream.flush()

@@ -1,13 +1,13 @@
 package com.catedra.bitacora.features.travel.domain.useCase
 
 import android.net.Uri
-import com.catedra.bitacora.features.travel.data.local.ImageManager
+import com.catedra.bitacora.features.travel.domain.repository.ImageRepository
 import javax.inject.Inject
 
 class CompressImageUseCase @Inject constructor(
-    private val imageManager: ImageManager
+    private val imageRepository: ImageRepository
 ) {
     suspend operator fun invoke(uri: Uri): Uri? {
-        return imageManager.compressImage(uri)
+        return imageRepository.compressImage(uri)
     }
 }

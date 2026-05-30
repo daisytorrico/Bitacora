@@ -1,43 +1,36 @@
 package com.catedra.bitacora.features.travel.presentation.pointCreate
 
 import android.annotation.SuppressLint
-import android.app.Application
 import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.catedra.bitacora.features.travel.data.mapper.toData
 import com.catedra.bitacora.features.travel.domain.model.PointOfInterest
 import com.catedra.bitacora.features.travel.domain.repository.TravelsRepository
 import com.catedra.bitacora.features.travel.domain.useCase.CompressImageUseCase
 import com.catedra.bitacora.features.travel.domain.useCase.GetPhotoPickerIntentUseCase
 import com.catedra.bitacora.features.travel.domain.useCase.UploadImageUseCase
-import com.google.firebase.firestore.FirebaseFirestore
 import com.catedra.bitacora.features.travel.domain.useCase.GetCurrentLocationUseCase
+import com.catedra.bitacora.features.travel.domain.useCase.SavePointUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
-import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
 class CreatePointViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val application: Application,
-    private val firestore: FirebaseFirestore,
     private val travelsRepository: TravelsRepository,
     private val getPhotoPickerIntentUseCase: GetPhotoPickerIntentUseCase,
     private val compressImageUseCase: CompressImageUseCase,
     private val uploadImageUseCase: UploadImageUseCase,
+    private val savePointUseCase: SavePointUseCase,
     private val getCurrentLocationUseCase: GetCurrentLocationUseCase
 ) : ViewModel() {
 
@@ -138,21 +131,18 @@ class CreatePointViewModel @Inject constructor(
                     imageUrls = imageUrls
                 )
 
-                val docRef = firestore.collection("trips")
-                    .document(travelId)
-                    .collection("pointsOfInterest")
-                    .add(point.toData())
-                    .await()
+                val result = savePointUseCase(travelId, point)
 
-                _uiState.update { it.copy(isLoading = false, isSuccess = true, pointId = docRef.id) }
+                if (result.isSuccess) {
+                    val id = result.getOrNull()
+                    _uiState.update { it.copy(isLoading = false, isSuccess = true, pointId = id) }
+                } else {
+                    _uiState.update { it.copy(isLoading = false, error = result.exceptionOrNull()?.message ?: "Error al guardar") }
+                }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, error = e.message) }
             }
         }
-    }
-
-    private fun Long.toLocalDate(): LocalDate {
-        return Instant.ofEpochMilli(this).atZone(ZoneId.of("UTC")).toLocalDate()
     }
 
     fun resetError() {
