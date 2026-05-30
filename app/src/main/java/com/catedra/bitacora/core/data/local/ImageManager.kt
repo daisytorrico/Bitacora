@@ -1,4 +1,4 @@
-package com.catedra.bitacora.features.travel.data.local
+package com.catedra.bitacora.core.data.local
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -12,7 +12,7 @@ import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
-import com.catedra.bitacora.features.travel.domain.repository.ImageRepository
+import com.catedra.bitacora.core.domain.repository.ImageRepository
 
 @Singleton
 class ImageManager @Inject constructor(

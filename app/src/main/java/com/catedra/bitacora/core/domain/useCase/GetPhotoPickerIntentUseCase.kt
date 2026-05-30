@@ -1,9 +1,9 @@
-package com.catedra.bitacora.features.travel.domain.useCase
+package com.catedra.bitacora.core.domain.useCase
 
 import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
-import com.catedra.bitacora.features.travel.domain.repository.ImageRepository
+import com.catedra.bitacora.core.domain.repository.ImageRepository
 import javax.inject.Inject
 
 class GetPhotoPickerIntentUseCase @Inject constructor(

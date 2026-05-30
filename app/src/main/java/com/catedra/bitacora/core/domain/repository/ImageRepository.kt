@@ -1,4 +1,4 @@
-package com.catedra.bitacora.features.travel.domain.repository
+package com.catedra.bitacora.core.domain.repository
 
 import android.net.Uri
 
