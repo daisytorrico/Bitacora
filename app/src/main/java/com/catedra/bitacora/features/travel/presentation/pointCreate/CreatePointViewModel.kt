@@ -8,9 +8,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.catedra.bitacora.features.travel.domain.model.PointOfInterest
 import com.catedra.bitacora.features.travel.domain.repository.TravelsRepository
-import com.catedra.bitacora.features.travel.domain.useCase.CompressImageUseCase
-import com.catedra.bitacora.features.travel.domain.useCase.GetPhotoPickerIntentUseCase
-import com.catedra.bitacora.features.travel.domain.useCase.UploadImageUseCase
+import com.catedra.bitacora.core.domain.useCase.CompressImageUseCase
+import com.catedra.bitacora.core.domain.useCase.GetPhotoPickerIntentUseCase
+import com.catedra.bitacora.core.domain.useCase.UploadImageUseCase
 import com.catedra.bitacora.features.travel.domain.useCase.GetCurrentLocationUseCase
 import com.catedra.bitacora.features.travel.domain.useCase.SavePointUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel

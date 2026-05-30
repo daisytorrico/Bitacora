@@ -2,15 +2,14 @@ package com.catedra.bitacora.features.travel.presentation.travelCreate
 
 import android.content.Intent
 import android.net.Uri
-import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.catedra.bitacora.features.auth.domain.repository.AuthRepository
+import com.catedra.bitacora.features.auth.domain.useCase.GetCurrentUserUseCase
 import com.catedra.bitacora.features.travel.domain.model.Travel
-import com.catedra.bitacora.features.travel.domain.useCase.CompressImageUseCase
-import com.catedra.bitacora.features.travel.domain.useCase.GetPhotoPickerIntentUseCase
+import com.catedra.bitacora.core.domain.useCase.CompressImageUseCase
+import com.catedra.bitacora.core.domain.useCase.GetPhotoPickerIntentUseCase
+import com.catedra.bitacora.core.domain.useCase.UploadImageUseCase
 import com.catedra.bitacora.features.travel.domain.useCase.SaveTravelUseCase
-import com.catedra.bitacora.features.travel.domain.useCase.UploadImageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,7 +31,7 @@ class CreateTravelViewModel @Inject constructor(
     private val compressImageUseCase: CompressImageUseCase,
     private val uploadImageUseCase: UploadImageUseCase,
     private val saveTravelUseCase: SaveTravelUseCase,
-    private val authRepository: AuthRepository
+    private val getCurrentUserUseCase: GetCurrentUserUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreateTravelUiState())
@@ -76,7 +75,7 @@ class CreateTravelViewModel @Inject constructor(
     fun getActiveTempUri(): Uri? = currentTempCameraUri
 
     fun saveTravel() {
-        val currentUserId = authRepository.getCurrentUser()?.uid ?: return
+        val currentUserId = getCurrentUserUseCase()?.uid ?: return
         val currentData = uiState.value
         
         viewModelScope.launch {

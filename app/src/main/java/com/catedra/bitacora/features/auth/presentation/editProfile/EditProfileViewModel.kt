@@ -6,9 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.catedra.bitacora.features.auth.domain.repository.AuthRepository
 import com.catedra.bitacora.features.auth.domain.useCase.UpdateProfileUseCase
-import com.catedra.bitacora.features.travel.domain.useCase.CompressImageUseCase
-import com.catedra.bitacora.features.travel.domain.useCase.GetPhotoPickerIntentUseCase
-import com.catedra.bitacora.features.travel.domain.useCase.UploadImageUseCase
+import com.catedra.bitacora.core.domain.useCase.CompressImageUseCase
+import com.catedra.bitacora.core.domain.useCase.GetPhotoPickerIntentUseCase
+import com.catedra.bitacora.core.domain.useCase.UploadImageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
