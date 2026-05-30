@@ -142,6 +142,12 @@ fun LoginScreen(
             enabled = !cargando,
             shape = MaterialTheme.shapes.medium
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_google),
+                contentDescription = null,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
             Text("Continuar con Google")
         }
 
