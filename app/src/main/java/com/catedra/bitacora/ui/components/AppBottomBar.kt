@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.catedra.bitacora.features.map.presentation.navigation.MapDestination
 import com.catedra.bitacora.features.travel.presentation.navigation.TravelDestinations
 import com.catedra.bitacora.ui.theme.Blanco
 
@@ -62,7 +63,11 @@ fun AppBottomBar(navController: NavController) {
                 indicatorColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f)
             ),
             onClick = {
-                // Dejado sin funcionar por ahora
+                if (currentDestination?.route != MapDestination.MAP_VIEW) {
+                    navController.navigate(MapDestination.MAP_VIEW) {
+                        launchSingleTop = true
+                    }
+                }
             }
         )
     }

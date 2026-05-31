@@ -15,6 +15,7 @@ import com.catedra.bitacora.features.auth.presentation.AuthViewModel
 import com.catedra.bitacora.features.auth.presentation.navigation.AuthDestinations
 import com.catedra.bitacora.features.auth.presentation.navigation.authGraph
 import com.catedra.bitacora.features.auth.presentation.util.crearGoogleSignInHandler
+import com.catedra.bitacora.features.map.presentation.navigation.mapGraph
 import com.catedra.bitacora.features.travel.presentation.navigation.TravelDestinations
 import com.catedra.bitacora.features.travel.presentation.navigation.travelGraph
 
@@ -89,6 +90,11 @@ fun AppNavigation(viewModel: AuthViewModel) {
         )
 
         travelGraph(
+            navController = navController,
+            onLogout = { showLogOut = true }
+        )
+
+        mapGraph(
             navController = navController,
             onLogout = { showLogOut = true }
         )

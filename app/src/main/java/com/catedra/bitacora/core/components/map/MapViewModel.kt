@@ -9,23 +9,62 @@ import com.catedra.bitacora.core.domain.model.Coordinates
 import com.catedra.bitacora.core.domain.model.PointOnMap
 import com.catedra.bitacora.core.domain.useCase.GetPointFromCoordinatesUseCase
 import com.catedra.bitacora.core.domain.useCase.SearchLocationUseCase
+import com.catedra.bitacora.features.travel.domain.useCase.CheckLocationEnabledUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val getPointFromCoordinatesUseCase: GetPointFromCoordinatesUseCase,
-    private val searchLocationUseCase: SearchLocationUseCase
+    private val searchLocationUseCase: SearchLocationUseCase,
+    private val checkLocationEnabledUseCase: CheckLocationEnabledUseCase
 ) : ViewModel() {
 
     var uiState by mutableStateOf(MapViewUiState())
         private set
 
-    private var searchJob: Job? = null
+    private val _searchQueryFlow = MutableStateFlow("")
+    
     private var geocodeJob: Job? = null
+
+    init {
+        observeSearchQuery()
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun observeSearchQuery() {
+        viewModelScope.launch {
+            _searchQueryFlow
+                .debounce(500)
+                .distinctUntilChanged()
+                .filter { it.length > 2 }
+                .collectLatest { query ->
+                    uiState = uiState.copy(isSearching = true)
+                    searchLocationUseCase(query)
+                        .onSuccess { results ->
+                            uiState = uiState.copy(
+                                searchResults = results,
+                                isSearching = false
+                            )
+                        }
+                        .onFailure {
+                            uiState = uiState.copy(isSearching = false)
+                        }
+                }
+        }
+    }
+
+    fun isGpsEnabled(): Boolean = checkLocationEnabledUseCase()
 
     fun onMapClick(latitude: Double, longitude: Double) {
         val coordinates = Coordinates(latitude, longitude)
@@ -62,26 +101,10 @@ class MapViewModel @Inject constructor(
 
     fun onSearchQueryChanged(query: String) {
         uiState = uiState.copy(searchQuery = query)
-        
-        searchJob?.cancel()
-        searchJob = viewModelScope.launch {
-            if (query.length > 2) {
-                delay(500)
-                uiState = uiState.copy(isSearching = true)
-                searchLocationUseCase(query)
-                    .onSuccess { results ->
-                        uiState = uiState.copy(
-                            searchResults = results,
-                            isSearching = false
-                        )
-                    }
-                    .onFailure { 
-                        uiState = uiState.copy(isSearching = false)
-                    }
-            } else {
-                uiState = uiState.copy(searchResults = emptyList())
-            }
+        if (query.length <= 2) {
+            uiState = uiState.copy(searchResults = emptyList())
         }
+        _searchQueryFlow.value = query
     }
 
     fun onSearchResultSelected(point: PointOnMap) {

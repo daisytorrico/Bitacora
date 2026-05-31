@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Geocoder
 import android.location.Location
+import android.location.LocationManager
 import com.catedra.bitacora.features.travel.domain.repository.LocationRepository
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -19,6 +20,12 @@ class LocationRepositoryImpl @Inject constructor(
 ) : LocationRepository {
 
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+
+    override fun isLocationEnabled(): Boolean {
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    }
 
     @SuppressLint("MissingPermission")
     override suspend fun getCurrentLocation(): Result<Location?> {
