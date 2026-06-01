@@ -59,6 +59,17 @@ class CreatePointViewModel @Inject constructor(
     fun onDateSelected(millis: Long?) = _uiState.update { it.copy(visitDateMillis = millis) }
     fun onTimeSelected(hour: Int, minute: Int) = _uiState.update { it.copy(visitHour = hour, visitMinute = minute) }
 
+    fun onToggleMap(show: Boolean) = _uiState.update { it.copy(showMapSelector = show) }
+
+    fun onLocationSelected(address: String, latitude: Double, longitude: Double) {
+        _uiState.update { it.copy(
+            address = address,
+            latitude = latitude,
+            longitude = longitude,
+            showMapSelector = false
+        ) }
+    }
+
     fun onImageAdded(uri: Uri) {
         _uiState.update { it.copy(selectedImages = it.selectedImages + uri) }
     }

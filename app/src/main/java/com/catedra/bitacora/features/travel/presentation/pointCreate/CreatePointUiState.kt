@@ -20,7 +20,8 @@ data class CreatePointUiState(
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
     val pointId: String? = null,
-    val error: String? = null
+    val error: String? = null,
+    val showMapSelector: Boolean = false
 ) {
     val isDateOutOfRange: Boolean
         get() {
