@@ -2,6 +2,7 @@ package com.catedra.bitacora.features.travel.data.remote
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import javax.inject.Inject
@@ -13,7 +14,13 @@ class TravelRemoteDataSource @Inject constructor(
 ) {
     suspend fun getTravels(userId: String): QuerySnapshot {
         return db.collection("trips")
-            .whereEqualTo("ownerId", userId)
+            .where(
+                Filter.or(
+                    Filter.equalTo("ownerId", userId),
+                    Filter.equalTo("privileges.$userId", "read"),
+                    Filter.equalTo("privileges.$userId", "edit")
+                )
+            )
             .get()
             .await()
     }
@@ -30,9 +37,11 @@ class TravelRemoteDataSource @Inject constructor(
     }
 
     suspend fun getPointsOfInterest(travelId: String): QuerySnapshot {
+        val currentUserId = auth.currentUser?.uid ?: ""
         return db.collection("trips")
             .document(travelId)
             .collection("pointsOfInterest")
+            .whereArrayContains("authorizedUsers", currentUserId)
             .get()
             .await()
     }

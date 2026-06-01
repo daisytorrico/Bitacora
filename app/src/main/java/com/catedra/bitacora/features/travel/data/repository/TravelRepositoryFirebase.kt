@@ -76,9 +76,18 @@ class TravelRepositoryFirebase @Inject constructor(
             Result.failure(e)
         }
     }
-    override suspend fun savePoint(travelId: String, point: PointOfInterest): Result<String> {
+    override suspend fun savePoint(
+        travelId: String,
+        point: PointOfInterest,
+        geohash: String?,
+        authorizedUsers: List<String>
+    ): Result<String> {
         return try {
-            val pointData = point.toData()
+            val pointData = point.toData().toMutableMap()
+            // Añadir metadatos para el mapa
+            if (geohash != null) pointData["geohash"] = geohash
+            if (authorizedUsers.isNotEmpty()) pointData["authorizedUsers"] = authorizedUsers
+
             val pointId = remoteDataSource.savePoint(travelId, pointData)
             Result.success(pointId)
         } catch (e: Exception) {

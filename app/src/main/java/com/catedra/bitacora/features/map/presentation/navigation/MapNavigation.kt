@@ -16,7 +16,11 @@ fun NavGraphBuilder.mapGraph(
     composable(MapDestination.MAP_VIEW) {
         MapScreen(
             navController = navController,
-            onLogout = onLogout
+            onLogout = onLogout,
+            onNavigateToPoi = { travelId, poiId ->
+                navController.navigate("travel_detail/$travelId")
+                navController.navigate("travel_details/$travelId/points/$poiId")
+            }
         )
     }
 }

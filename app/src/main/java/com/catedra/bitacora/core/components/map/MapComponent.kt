@@ -6,6 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.catedra.bitacora.core.domain.model.Coordinates
 import com.catedra.bitacora.core.domain.model.PointOnMap
 import com.catedra.bitacora.core.utils.LocationPermissionHandler
 
@@ -17,6 +18,7 @@ fun MapComponent(
     externalPois: List<PointOnMap> = emptyList(),
     onExternalPoiSelected: (PointOnMap) -> Unit = {},
     externalPoiButtonText: String? = null,
+    onCameraMoved: (Coordinates) -> Unit = {},
     viewModel: MapViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -40,7 +42,10 @@ fun MapComponent(
         onExternalPoiClicked = viewModel::onExternalPoiClicked,
         onClearSelection = viewModel::clearSelection,
         onMapReady = { viewModel.setMapReady(true) },
-        onCameraMoved = viewModel::onCameraMoved,
+        onCameraMoved = { center, zoom ->
+            viewModel.onCameraMoved(center, zoom)
+            onCameraMoved(center)
+        },
         onPointSelected = onPointSelected,
         buttonText = buttonText,
         onExternalPoiAction = onExternalPoiSelected,

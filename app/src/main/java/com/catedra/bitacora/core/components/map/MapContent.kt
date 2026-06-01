@@ -93,11 +93,6 @@ fun MapContent(
     val mapState = rememberMapState()
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    // Solo se actualiza una vez al inicio, asumiendo que es constante
-    LaunchedEffect(Unit) {
-        mapState.updateExternalPois(uiState.externalPois, onExternalPoiClicked)
-    }
-
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
@@ -182,6 +177,7 @@ fun MapContent(
             }
         }, update = {
             mapState.updateSelection(uiState.selectedPoint, uiState.temporaryCoordinates)
+            mapState.updateExternalPois(uiState.externalPois, onExternalPoiClicked)
         })
 
         if (!uiState.isMapReady) {

@@ -9,7 +9,12 @@ interface TravelsRepository {
     suspend fun getPointsOfInterest(travelId: String): Result<List<PointOfInterest>>
     suspend fun getPointOfInterest(travelId: String, pointId: String): Result<PointOfInterest>
     suspend fun getPointsCount(travelId: String): Result<Int>
-    suspend fun savePoint(travelId: String, point: PointOfInterest): Result<String>
+    suspend fun savePoint(
+        travelId: String,
+        point: PointOfInterest,
+        geohash: String? = null,
+        authorizedUsers: List<String> = emptyList()
+    ): Result<String>
 
 
     // Guardar el viaje y retornar su ID

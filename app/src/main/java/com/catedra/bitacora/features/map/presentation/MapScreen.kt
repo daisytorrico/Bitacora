@@ -8,13 +8,20 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.catedra.bitacora.core.components.map.MapComponent
+import com.catedra.bitacora.features.map.domain.model.ExternalPoi
 import com.catedra.bitacora.ui.components.AppBottomBar
 import com.catedra.bitacora.ui.components.AppTopBar
 
 @Composable
-fun MapScreen(navController: NavController, onLogout: () -> Unit) {
+fun MapScreen(
+    navController: NavController,
+    onLogout: () -> Unit,
+    onNavigateToPoi: (String, String) -> Unit,
+    viewModel: MapScreenViewModel = hiltViewModel()
+) {
     Scaffold(topBar = {
         AppTopBar(
             titulo = "Mapa cerca de tí", actions = {
@@ -30,11 +37,14 @@ fun MapScreen(navController: NavController, onLogout: () -> Unit) {
     }) { paddingValues ->
         MapComponent(
             modifier = Modifier.padding(paddingValues),
-            externalPois = emptyList(),
+            externalPois = viewModel.uiState,
             onExternalPoiSelected = { point ->
-                // Todo: Navegar al detalle si es necesario
+                if (point is ExternalPoi) {
+                    onNavigateToPoi(point.travelId, point.id)
+                }
             },
-            externalPoiButtonText = "Detalles"
+            externalPoiButtonText = "Detalles",
+            onCameraMoved = viewModel::onCameraMoved
         )
     }
 }
