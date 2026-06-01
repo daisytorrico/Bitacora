@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.catedra.bitacora.core.domain.model.Coordinates
 import com.catedra.bitacora.ui.components.AppDatePickerField
 import com.catedra.bitacora.ui.components.AppTimePickerField
 import com.catedra.bitacora.ui.components.AppTopBar
@@ -47,6 +48,7 @@ import com.catedra.bitacora.ui.components.AppTopBar
 fun CreatePointScreen(
     onBack: () -> Unit,
     onPointCreated: (String) -> Unit,
+    onSeeOnMap: (Coordinates) -> Unit = {},
     viewModel: CreatePointViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current

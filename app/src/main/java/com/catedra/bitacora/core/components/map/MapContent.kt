@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,11 +16,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -204,7 +207,7 @@ fun MapContent(
             SearchBar(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = if (searchActive) 0.dp else 16.dp, vertical = if (searchActive) 0.dp else 8.dp)
+                    .padding(horizontal = if (searchActive) 0.dp else 16.dp, vertical = 4.dp)
                     .align(Alignment.TopCenter),
                 query = uiState.searchQuery,
                 onQueryChange = onSearchQueryChanged,
@@ -213,6 +216,7 @@ fun MapContent(
                 onActiveChange = { searchActive = it },
                 placeholder = { Text("Buscar lugar...") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                windowInsets = WindowInsets(0, 0, 0, 0),
                 trailingIcon = {
                     if (uiState.searchQuery.isNotEmpty()) {
                         IconButton(onClick = {
@@ -259,6 +263,28 @@ fun MapContent(
                     onConfirm = { onExternalPoiAction(poi) },
                     modifier = Modifier.align(Alignment.BottomCenter)
                 )
+            }
+
+            FloatingActionButton(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(
+                        bottom = if (uiState.selectedPoint != null || uiState.selectedExternalPoi != null) 200.dp else 16.dp,
+                        end = 16.dp
+                    ),
+                onClick = {
+                    val locationOverlay = mapState.mapView.overlays
+                        .filterIsInstance<MyLocationNewOverlay>()
+                        .firstOrNull()
+                    locationOverlay?.myLocation?.let {
+                        mapState.mapView.controller.animateTo(it)
+                        mapState.mapView.controller.setZoom(18.0)
+                    }
+                },
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(Icons.Default.MyLocation, contentDescription = "Centrar en mi ubicación")
             }
 
             uiState.error?.let { error ->
