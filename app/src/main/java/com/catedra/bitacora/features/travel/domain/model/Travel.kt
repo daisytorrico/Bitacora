@@ -1,6 +1,7 @@
 package com.catedra.bitacora.features.travel.domain.model
 
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class Travel(
     val id: String = "",
@@ -11,7 +12,9 @@ data class Travel(
     val startDate: LocalDate? = null,
     val endDate: LocalDate? = null,
     val pointsCount: Int = 0,
-    val privileges: Map<String, String>? = null
+    val visibility: TravelVisibility = TravelVisibility.PRIVATE,
+    val privileges: Map<String, String>? = null,
+    val updatedAt: LocalDateTime? = null
 ) {
     val status: TravelStatus
         get() {

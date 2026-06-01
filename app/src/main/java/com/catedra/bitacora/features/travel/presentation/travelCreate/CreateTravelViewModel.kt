@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.catedra.bitacora.features.auth.domain.useCase.GetCurrentUserUseCase
 import com.catedra.bitacora.features.travel.domain.model.Travel
+import com.catedra.bitacora.features.travel.domain.model.TravelVisibility
 import com.catedra.bitacora.core.domain.useCase.CompressImageUseCase
 import com.catedra.bitacora.core.domain.useCase.GetPhotoPickerIntentUseCase
 import com.catedra.bitacora.core.domain.useCase.UploadImageUseCase
@@ -59,6 +60,10 @@ class CreateTravelViewModel @Inject constructor(
         _uiState.update { it.copy(endDate = millis) }
     }
 
+    fun onVisibilityChange(newVisibility: TravelVisibility) {
+        _uiState.update { it.copy(visibility = newVisibility) }
+    }
+
     fun formatMillisToDate(millis: Long?): String {
         if (millis == null) return ""
         val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -99,7 +104,8 @@ class CreateTravelViewModel @Inject constructor(
                     ownerId = currentUserId,
                     imageUrl = finalImageUrl,
                     startDate = currentData.startDate?.toLocalDate(),
-                    endDate = currentData.endDate?.toLocalDate()
+                    endDate = currentData.endDate?.toLocalDate(),
+                    visibility = currentData.visibility
                 )
 
                 // 4. Guardar en Firestore

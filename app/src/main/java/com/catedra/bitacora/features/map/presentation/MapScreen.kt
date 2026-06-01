@@ -12,7 +12,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.catedra.bitacora.core.components.map.MapComponent
 import com.catedra.bitacora.features.map.domain.model.ExternalPoi
-import com.catedra.bitacora.ui.components.AppBottomBar
 import com.catedra.bitacora.ui.components.AppTopBar
 
 @Composable
@@ -32,8 +31,6 @@ fun MapScreen(
                     )
                 }
             })
-    }, bottomBar = {
-        AppBottomBar(navController = navController)
     }) { paddingValues ->
         MapComponent(
             modifier = Modifier.padding(paddingValues),

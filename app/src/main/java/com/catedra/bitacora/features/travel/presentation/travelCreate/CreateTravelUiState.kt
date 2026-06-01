@@ -1,6 +1,7 @@
 package com.catedra.bitacora.features.travel.presentation.travelCreate
 
 import android.net.Uri
+import com.catedra.bitacora.features.travel.domain.model.TravelVisibility
 
 data class CreateTravelUiState(
     val name: String = "",
@@ -8,6 +9,7 @@ data class CreateTravelUiState(
     val startDate: Long? = null,
     val endDate: Long? = null,
     val imageUri: Uri? = null,
+    val visibility: TravelVisibility = TravelVisibility.PRIVATE,
     val loading: Boolean = false,
     val error: String? = null,
     val success: Boolean = false,

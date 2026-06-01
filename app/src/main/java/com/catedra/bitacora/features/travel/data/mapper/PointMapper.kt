@@ -9,22 +9,14 @@ import java.time.ZoneId
 import java.util.Date
 
 fun PointOfInterest.toData(): Map<String, Any?> {
-    val data = mutableMapOf<String, Any?>(
+    return mapOf(
         "name" to name,
         "address" to address,
         "notes" to notes,
-        "visitDate" to visitDate?.let {
-            val date = Date.from(it.atZone(ZoneId.systemDefault()).toInstant())
-            Timestamp(date)
-        },
-        "imageUrls" to imageUrls
-    )
-
-    if (latitude != null && longitude != null) {
-        data["location"] = GeoPoint(latitude, longitude)
-    }
-
-    return data
+        "imageUrls" to imageUrls,
+        "location" to if (latitude != null && longitude != null) GeoPoint(latitude, longitude) else null,
+        "visitDate" to visitDate?.let { Timestamp(Date.from(it.atZone(ZoneId.systemDefault()).toInstant())) }
+    ).filterValues { it != null }
 }
 
 fun DocumentSnapshot.toPointOfInterest(): PointOfInterest {

@@ -2,6 +2,10 @@ package com.catedra.bitacora.di
 
 import com.catedra.bitacora.features.auth.data.repository.AuthRepositoryFirebase
 import com.catedra.bitacora.features.auth.domain.repository.AuthRepository
+import com.catedra.bitacora.features.discovery.data.repository.DiscoveryRepositoryImpl
+import com.catedra.bitacora.features.discovery.domain.repository.DiscoveryRepository
+import com.catedra.bitacora.features.social.data.repository.SocialRepositoryImpl
+import com.catedra.bitacora.features.social.domain.repository.SocialRepository
 import com.catedra.bitacora.features.travel.data.repository.LocationRepositoryImpl
 import com.catedra.bitacora.features.travel.data.repository.TravelRepositoryFirebase
 import com.catedra.bitacora.features.travel.domain.repository.LocationRepository
@@ -17,7 +21,6 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
-
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -45,6 +48,7 @@ abstract class RepositoryModule {
     abstract fun bindGeocodingRepository(
         impl: GeocodingRepositoryImpl
     ): GeocodingRepository
+
     @Binds
     @Singleton
     abstract fun bindImageRepository(
@@ -56,4 +60,16 @@ abstract class RepositoryModule {
     abstract fun bindCloudinaryRepository(
         impl: CloudinaryDataSource
     ): CloudinaryRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDiscoveryRepository(
+        impl: DiscoveryRepositoryImpl
+    ): DiscoveryRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSocialRepository(
+        impl: SocialRepositoryImpl
+    ): SocialRepository
 }

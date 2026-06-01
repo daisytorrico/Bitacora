@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.catedra.bitacora.features.travel.domain.model.TravelVisibility
 import com.catedra.bitacora.ui.components.AppDatePickerField
 import com.catedra.bitacora.ui.components.AppTopBar
 
@@ -146,6 +147,39 @@ fun CreateTravelScreen(
                     minLines = 4,
                     enabled = !uiState.loading
                 )
+
+                // Visibilidad
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "Visibilidad",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                        TravelVisibility.entries.forEachIndexed { index, visibility ->
+                            SegmentedButton(
+                                selected = uiState.visibility == visibility,
+                                onClick = { viewModel.onVisibilityChange(visibility) },
+                                shape = SegmentedButtonDefaults.itemShape(
+                                    index = index,
+                                    count = TravelVisibility.entries.size
+                                ),
+                                label = {
+                                    Text(
+                                        when (visibility) {
+                                            TravelVisibility.PUBLIC -> "Público"
+                                            TravelVisibility.PRIVATE -> "Privado"
+                                            TravelVisibility.FOLLOWERS -> "Seguidores"
+                                        }
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.weight(1f))
 

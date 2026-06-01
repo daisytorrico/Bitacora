@@ -42,11 +42,13 @@ class TravelDetailViewModel @Inject constructor(
                 
                 authRepository.getFullUserData().onSuccess { user ->
                     val points = pointsResult.getOrDefault(emptyList())
+                    val currentUserId = authRepository.getCurrentUser()?.uid
                     _uiState.update { state ->
                         state.copy(
                             travel = travel.copy(pointsCount = points.size),
                             creatorUser = user,
                             pointsOfInterest = points,
+                            isOwner = travel.ownerId == currentUserId,
                             isLoading = false
                         )
                     }

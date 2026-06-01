@@ -12,21 +12,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.catedra.bitacora.features.travel.domain.model.Travel
-import com.catedra.bitacora.ui.theme.BitacoraTheme
 import com.catedra.bitacora.ui.theme.GrisMedio
-import com.catedra.bitacora.ui.theme.Blanco
 import com.catedra.bitacora.ui.theme.GrisSeparador
-import com.catedra.bitacora.ui.theme.GrisFondoApp
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 @Composable
 fun TravelItem(
@@ -36,6 +33,7 @@ fun TravelItem(
     modifier: Modifier = Modifier
 ) {
     val dateRange = remember(travel) { getDateRange(travel) }
+    val updateText = remember(travel.updatedAt) { getRelativeUpdateText(travel.updatedAt) }
 
     Card(
         modifier = modifier
@@ -87,20 +85,33 @@ fun TravelItem(
                     )
                 }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "$pointsCount puntos",
-                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, color = GrisMedio)
-                    )
-                    Text(
-                        text = " • ",
-                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp, color = GrisMedio)
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "$pointsCount paradas",
+                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, color = GrisMedio)
+                        )
+                        if (updateText != null) {
+                            Text(
+                                text = " • ",
+                                style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, color = GrisMedio)
+                            )
+                            Text(
+                                text = updateText,
+                                style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, color = GrisMedio)
+                            )
+                        }
+                    }
+                    
                     Text(
                         text = travel.status.label,
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontWeight = FontWeight.Medium,
-                            fontSize = 12.sp,
+                            fontSize = 11.sp,
                             color = MaterialTheme.colorScheme.secondary
                         )
                     )
@@ -117,6 +128,25 @@ fun TravelItem(
     }
 }
 
+private fun getRelativeUpdateText(dateTime: LocalDateTime?): String? {
+    if (dateTime == null) return null
+    val now = LocalDateTime.now()
+    
+    val minutes = ChronoUnit.MINUTES.between(dateTime, now)
+    if (minutes < 1) return "Recién"
+    if (minutes < 60) return "Hace $minutes m"
+    
+    val hours = ChronoUnit.HOURS.between(dateTime, now)
+    if (hours < 24) return "Hace $hours h"
+    
+    val days = ChronoUnit.DAYS.between(dateTime.toLocalDate(), now.toLocalDate())
+    return when {
+        days == 1L -> "Ayer"
+        days < 7L -> "Hace $days d"
+        else -> dateTime.format(DateTimeFormatter.ofPattern("dd/MM"))
+    }
+}
+
 private fun getDateRange(travel: Travel): String {
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     val start = travel.startDate?.format(formatter) ?: ""
@@ -128,24 +158,5 @@ private fun getDateRange(travel: Travel): String {
         start
     } else {
         "Sin fechas"
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFFF4F6F8)
-@Composable
-fun TravelItemPreview() {
-    BitacoraTheme {
-        Box(modifier = Modifier.padding(16.dp)) {
-            TravelItem(
-                travel = Travel(
-                    name = "Viaje a Bariloche",
-                    startDate = LocalDate.now().minusDays(5),
-                    endDate = LocalDate.now().plusDays(5),
-                    ownerId = "123"
-                ),
-                pointsCount = 12,
-                onClick = {}
-            )
-        }
     }
 }

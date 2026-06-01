@@ -21,7 +21,9 @@ fun DocumentSnapshot.toUser(): User {
         displayName = getString("nombre") ?: getString("displayName"),
         username = getString("username"),
         photoUrl = getString("photoUrl"),
-        bio = getString("bio")
+        bio = getString("bio"),
+        followersCount = getLong("followersCount")?.toInt() ?: 0,
+        followingCount = getLong("followingCount")?.toInt() ?: 0
     )
 }
 
@@ -31,6 +33,8 @@ fun User.toData(): Map<String, Any?> {
         "email" to email,
         "username" to username,
         "photoUrl" to photoUrl,
-        "bio" to bio
+        "bio" to bio,
+        "followersCount" to followersCount,
+        "followingCount" to followingCount
     )
 }
