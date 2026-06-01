@@ -38,21 +38,23 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.catedra.bitacora.core.domain.model.Coordinates
+import com.catedra.bitacora.core.utils.LocationPermissionHandler
+import com.catedra.bitacora.core.utils.LocationPermissionUtils
 import com.catedra.bitacora.ui.components.AppDatePickerField
 import com.catedra.bitacora.ui.components.AppTimePickerField
 import com.catedra.bitacora.ui.components.AppTopBar
+import com.catedra.bitacora.ui.components.LocationPicker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreatePointScreen(
     onBack: () -> Unit,
     onPointCreated: (String) -> Unit,
-    onSeeOnMap: (Coordinates) -> Unit = {},
     viewModel: CreatePointViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
+    var showLocationPermissionHandler by remember { mutableStateOf(false) }
 
     val photoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -75,17 +77,6 @@ fun CreatePointScreen(
         }
     }
 
-    val locationPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
-                      permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-        if (granted) {
-            viewModel.obtenerUbicacionActual()
-        } else {
-            Toast.makeText(context, "Permiso de ubicación denegado", Toast.LENGTH_SHORT).show()
-        }
-    }
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -93,6 +84,15 @@ fun CreatePointScreen(
             photoLauncher.launch(viewModel.buildPhotoPickerIntent())
         } else {
             Toast.makeText(context, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    if (showLocationPermissionHandler) {
+        LocationPermissionHandler { granted ->
+            showLocationPermissionHandler = false
+            if (granted) {
+                viewModel.obtenerUbicacionActual()
+            }
         }
     }
 
@@ -158,15 +158,10 @@ fun CreatePointScreen(
                     ) {
                         OutlinedButton(
                             onClick = {
-                                val fineLoc = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-                                val coarseLoc = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
-                                
-                                if (fineLoc == PackageManager.PERMISSION_GRANTED || coarseLoc == PackageManager.PERMISSION_GRANTED) {
+                                if (LocationPermissionUtils.hasLocationPermission(context)) {
                                     viewModel.obtenerUbicacionActual()
                                 } else {
-                                    locationPermissionLauncher.launch(
-                                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
-                                    )
+                                    showLocationPermissionHandler = true
                                 }
                             },
                             modifier = Modifier.weight(1f),
@@ -179,7 +174,7 @@ fun CreatePointScreen(
                         }
 
                         OutlinedButton(
-                            onClick = { /* Ver en mapa estético */ },
+                            onClick = { viewModel.onToggleMap(true) },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(8.dp),
                             contentPadding = PaddingValues(horizontal = 8.dp)
@@ -297,6 +292,19 @@ fun CreatePointScreen(
                     modifier = Modifier.fillMaxSize(),
                     color = Color.Black.copy(alpha = 0.12f)
                 ) {}
+            }
+
+            if (uiState.showMapSelector) {
+                LocationPicker(
+                    onLocationSelected = { point ->
+                        viewModel.onLocationSelected(
+                            address = point.address,
+                            latitude = point.coordinates.latitude,
+                            longitude = point.coordinates.longitude
+                        )
+                    },
+                    onDismiss = { viewModel.onToggleMap(false) }
+                )
             }
         }
     }
