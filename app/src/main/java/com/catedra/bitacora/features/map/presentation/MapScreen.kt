@@ -12,7 +12,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.catedra.bitacora.core.components.map.MapComponent
 import com.catedra.bitacora.core.domain.model.ExternalPoi
-import com.catedra.bitacora.ui.components.AppBottomBar
 import com.catedra.bitacora.ui.components.AppTopBar
 
 @Composable
@@ -22,19 +21,21 @@ fun MapScreen(
     onNavigateToPoi: (String, String) -> Unit,
     viewModel: MapScreenViewModel = hiltViewModel()
 ) {
-    Scaffold(topBar = {
-        AppTopBar(
-            titulo = "Mapa cerca de tí", actions = {
-                IconButton(onClick = onLogout) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Logout,
-                        contentDescription = "Cerrar Sesión"
-                    )
+    Scaffold(
+        topBar = {
+            AppTopBar(
+                titulo = "Mapa cerca de tí",
+                actions = {
+                    IconButton(onClick = onLogout) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Logout,
+                            contentDescription = "Cerrar Sesión"
+                        )
+                    }
                 }
-            })
-    }, bottomBar = {
-        AppBottomBar(navController = navController)
-    }) { paddingValues ->
+            )
+        }
+    ) { paddingValues ->
         MapComponent(
             modifier = Modifier.padding(paddingValues),
             externalPois = viewModel.uiState,

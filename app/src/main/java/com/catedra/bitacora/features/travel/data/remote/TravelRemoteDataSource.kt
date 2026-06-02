@@ -2,6 +2,7 @@ package com.catedra.bitacora.features.travel.data.remote
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
@@ -17,7 +18,6 @@ class TravelRemoteDataSource @Inject constructor(
             .where(
                 Filter.or(
                     Filter.equalTo("ownerId", userId),
-                    Filter.equalTo("privileges.$userId", "read"),
                     Filter.equalTo("privileges.$userId", "edit")
                 )
             )
@@ -37,11 +37,9 @@ class TravelRemoteDataSource @Inject constructor(
     }
 
     suspend fun getPointsOfInterest(travelId: String): QuerySnapshot {
-        val currentUserId = auth.currentUser?.uid ?: ""
         return db.collection("trips")
             .document(travelId)
             .collection("pointsOfInterest")
-            .whereArrayContains("authorizedUsers", currentUserId)
             .get()
             .await()
     }
@@ -64,12 +62,20 @@ class TravelRemoteDataSource @Inject constructor(
             .await()
             .count
     }
+    
     suspend fun savePoint(travelId: String, pointData: Map<String, Any?>): String {
-        val docRef = db.collection("trips")
+        val batch = db.batch()
+        
+        val pointRef = db.collection("trips")
             .document(travelId)
             .collection("pointsOfInterest")
-            .add(pointData)
-            .await()
-        return docRef.id
+            .document()
+        batch.set(pointRef, pointData)
+        
+        val tripRef = db.collection("trips").document(travelId)
+        batch.update(tripRef, "updatedAt", FieldValue.serverTimestamp())
+        
+        batch.commit().await()
+        return pointRef.id
     }
 }

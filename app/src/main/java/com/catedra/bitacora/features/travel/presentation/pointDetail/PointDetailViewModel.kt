@@ -4,12 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.catedra.bitacora.features.auth.domain.repository.AuthRepository
+import com.catedra.bitacora.features.social.domain.useCase.*
 import com.catedra.bitacora.features.travel.domain.useCase.GetPointOfInterestUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,6 +15,11 @@ import javax.inject.Inject
 class PointDetailViewModel @Inject constructor(
     private val getPointOfInterestUseCase: GetPointOfInterestUseCase,
     private val authRepository: AuthRepository,
+    private val giveLikeUseCase: GiveLikeUseCase,
+    private val removeLikeUseCase: RemoveLikeUseCase,
+    private val getLikesCountUseCase: GetLikesCountUseCase,
+    private val getIsLikedUseCase: GetIsLikedUseCase,
+    private val getCommentsCountUseCase: GetCommentsCountUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -28,6 +31,7 @@ class PointDetailViewModel @Inject constructor(
 
     init {
         loadPointDetail()
+        observeSocialData()
     }
 
     private fun loadPointDetail() {
@@ -38,10 +42,13 @@ class PointDetailViewModel @Inject constructor(
             val userResult = authRepository.getFullUserData()
 
             if (pointResult.isSuccess) {
+                val user = userResult.getOrNull()
+                val currentUserId = authRepository.getCurrentUser()?.uid
                 _uiState.update { it.copy(
                     isLoading = false, 
                     point = pointResult.getOrNull(),
-                    creatorUser = userResult.getOrNull(),
+                    creatorUser = user,
+                    isOwner = user?.uid == currentUserId,
                     error = null
                 ) }
             } else {
@@ -49,6 +56,31 @@ class PointDetailViewModel @Inject constructor(
                     isLoading = false, 
                     error = pointResult.exceptionOrNull()?.message 
                 ) }
+            }
+        }
+    }
+
+    private fun observeSocialData() {
+        getLikesCountUseCase(travelId, pointId)
+            .onEach { count -> _uiState.update { it.copy(likesCount = count) } }
+            .launchIn(viewModelScope)
+
+        getIsLikedUseCase(travelId, pointId)
+            .onEach { isLiked -> _uiState.update { it.copy(isLiked = isLiked) } }
+            .launchIn(viewModelScope)
+
+        getCommentsCountUseCase(travelId, pointId)
+            .onEach { count -> _uiState.update { it.copy(commentsCount = count) } }
+            .launchIn(viewModelScope)
+    }
+
+    fun toggleLike() {
+        viewModelScope.launch {
+            val isLiked = uiState.value.isLiked
+            if (isLiked) {
+                removeLikeUseCase(travelId, pointId)
+            } else {
+                giveLikeUseCase(travelId, pointId)
             }
         }
     }

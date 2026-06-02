@@ -16,7 +16,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,14 +27,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.catedra.bitacora.core.components.map.MapComponent
-import com.catedra.bitacora.core.domain.model.Coordinates
-import com.catedra.bitacora.core.domain.model.PointOnMap
 import com.catedra.bitacora.features.auth.presentation.navigation.AuthDestinations
 import com.catedra.bitacora.ui.components.AppTopBar
 import com.catedra.bitacora.ui.components.AppBottomBar
 import com.catedra.bitacora.ui.components.UserHeader
-import com.catedra.bitacora.ui.components.LocationViewer
 import com.catedra.bitacora.ui.theme.GrisFondoApp
 import com.catedra.bitacora.ui.theme.VerdeMentaFondo
 import com.catedra.bitacora.ui.theme.VerdeMentaTexto
@@ -211,41 +206,23 @@ fun PointDetailScreen(
                                 .background(MaterialTheme.colorScheme.background)
                                 .border(1.dp, GrisBorde, RoundedCornerShape(12.dp))
                         ) {
-                            if (point.latitude != null && point.longitude != null) {
-                                val pointOnMap = remember(point) {
-                                    PointOnMap(
-                                        name = point.name,
-                                        address = point.address,
-                                        coordinates = Coordinates(point.latitude, point.longitude)
-                                    )
-                                }
-                                MapComponent(
-                                    modifier = Modifier.fillMaxSize(),
-                                    initialPoint = pointOnMap,
-                                    showSearch = false,
-                                    showControls = false,
-                                    isInteractive = false,
-                                    showSelectionCard = false
-                                )
-                            } else {
-                                Icon(
-                                    Icons.Default.LocationOn,
-                                    contentDescription = "Pin",
-                                    tint = RojoPin,
-                                    modifier = Modifier
-                                        .size(40.dp)
-                                        .align(Alignment.Center)
-                                )
-                            }
+                            Icon(
+                                Icons.Default.LocationOn,
+                                contentDescription = "Pin",
+                                tint = RojoPin,
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .align(Alignment.Center)
+                            )
                             OutlinedButton(
-                                onClick = { viewModel.onToggleMap(true) },
+                                onClick = { /* Abrir Google Maps */ },
                                 modifier = Modifier
                                     .align(Alignment.BottomStart)
                                     .padding(8.dp),
                                 shape = RoundedCornerShape(8.dp),
                                 colors = ButtonDefaults.outlinedButtonColors(containerColor = Blanco)
                             ) {
-                                Text("Ver en grande", fontSize = 12.sp)
+                                Text("Ver en Maps", fontSize = 12.sp)
                             }
                         }
 
@@ -287,20 +264,6 @@ fun PointDetailScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
-            }
-        }
-
-        if (uiState.showMap && uiState.point != null) {
-            val point = uiState.point!!
-            if (point.latitude != null && point.longitude != null) {
-                LocationViewer(
-                    point = PointOnMap(
-                        name = point.name,
-                        address = point.address,
-                        coordinates = Coordinates(point.latitude, point.longitude)
-                    ),
-                    onDismiss = { viewModel.onToggleMap(false) }
-                )
             }
         }
     }

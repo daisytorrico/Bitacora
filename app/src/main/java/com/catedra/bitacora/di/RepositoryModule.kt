@@ -2,6 +2,10 @@ package com.catedra.bitacora.di
 
 import com.catedra.bitacora.features.auth.data.repository.AuthRepositoryFirebase
 import com.catedra.bitacora.features.auth.domain.repository.AuthRepository
+import com.catedra.bitacora.features.discovery.data.repository.DiscoveryRepositoryImpl
+import com.catedra.bitacora.features.discovery.domain.repository.DiscoveryRepository
+import com.catedra.bitacora.features.social.data.repository.SocialRepositoryImpl
+import com.catedra.bitacora.features.social.domain.repository.SocialRepository
 import com.catedra.bitacora.features.travel.data.repository.LocationRepositoryImpl
 import com.catedra.bitacora.features.travel.data.repository.TravelRepositoryFirebase
 import com.catedra.bitacora.features.travel.domain.repository.LocationRepository
@@ -64,4 +68,16 @@ abstract class RepositoryModule {
     abstract fun bindNearbyPointsRepository(
         impl: NearbyPointsRepositoryImpl
     ): NearbyPointsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDiscoveryRepository(
+        impl: DiscoveryRepositoryImpl
+    ): DiscoveryRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSocialRepository(
+        impl: SocialRepositoryImpl
+    ): SocialRepository
 }

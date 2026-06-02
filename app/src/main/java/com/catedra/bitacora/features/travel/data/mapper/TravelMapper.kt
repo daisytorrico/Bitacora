@@ -1,6 +1,7 @@
 package com.catedra.bitacora.features.travel.data.mapper
 
 import com.catedra.bitacora.features.travel.domain.model.Travel
+import com.catedra.bitacora.features.travel.domain.model.TravelVisibility
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
@@ -20,6 +21,9 @@ fun DocumentSnapshot.toTravel(): Travel? {
         val firestoreEndDate = getTimestamp("endDate")
             ?.toDate()?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDate()
 
+        val updatedAt = getTimestamp("updatedAt")
+            ?.toDate()?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDateTime()
+
         Travel(
             id = id,
             name = getString("name") ?: "Viaje sin nombre",
@@ -29,7 +33,9 @@ fun DocumentSnapshot.toTravel(): Travel? {
             startDate = firestoreStartDate,
             endDate = firestoreEndDate,
             pointsCount = getLong("pointsCount")?.toInt() ?: 0,
-            privileges = get("privileges") as? Map<String, String>
+            visibility = getString("visibility")?.uppercase()?.let { TravelVisibility.valueOf(it) } ?: TravelVisibility.PRIVATE,
+            privileges = get("privileges") as? Map<String, String>,
+            updatedAt = updatedAt
         )
     } catch (e: Exception) {
         null
@@ -48,11 +54,11 @@ fun Travel.toData(): Map<String, Any?> {
         "endDate" to endDate?.let {
             Timestamp(Date.from(it.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant()))
         },
+        "visibility" to visibility.name.lowercase(),
         "privileges" to privileges
     )
 }
 
-// Helpers privados para conversión de fechas
 private fun LocalDate.toDate(): Date {
     return Date.from(atStartOfDay(ZoneId.systemDefault()).toInstant())
 }

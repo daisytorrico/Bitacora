@@ -1,35 +1,31 @@
 package com.catedra.bitacora.ui.components.profile
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.TravelExplore
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.catedra.bitacora.features.auth.domain.model.User
+import com.catedra.bitacora.ui.components.ProfileImage
 import com.catedra.bitacora.ui.theme.GrisMedio
-
-//Componente de cabecera de perfil reutilizable.
 
 @Composable
 fun ProfileHeader(
     user: User?,
     travelCount: Int,
     modifier: Modifier = Modifier,
-    onEditClick: (() -> Unit)? = null, // Si es null, el botón de edición desaparece
-    actions: @Composable (RowScope.() -> Unit)? = null // Slot para botones extra (ej: Follow)
+    onEditClick: (() -> Unit)? = null,
+    actions: @Composable (RowScope.() -> Unit)? = null
 ) {
     Column(
         modifier = modifier
@@ -37,20 +33,10 @@ fun ProfileHeader(
             .padding(16.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            // Foto
-            AsyncImage(
-                model = user?.photoUrl ?: "https://via.placeholder.com/150",
-                contentDescription = "Foto de perfil",
-                modifier = Modifier
-                    .size(72.dp)
-                    .clip(CircleShape)
-                    .background(Color.LightGray),
-                contentScale = ContentScale.Crop
-            )
+            ProfileImage(imageUrl = user?.photoUrl, size = 72)
             
             Spacer(modifier = Modifier.width(16.dp))
             
-            // Textos
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = user?.displayName ?: "Cargando...",
@@ -61,9 +47,7 @@ fun ProfileHeader(
                 )
                 Text(
                     text = "@${user?.username ?: "usuario"}",
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = GrisMedio
-                    )
+                    style = MaterialTheme.typography.bodyMedium.copy(color = GrisMedio)
                 )
                 if (!user?.bio.isNullOrBlank()) {
                     Text(
@@ -76,7 +60,6 @@ fun ProfileHeader(
                 }
             }
 
-            // Acciones dinámicas
             if (onEditClick != null) {
                 IconButton(onClick = onEditClick) {
                     Icon(
@@ -92,22 +75,35 @@ fun ProfileHeader(
 
         Spacer(modifier = Modifier.height(16.dp))
         
-        // Contador simplificado
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = Icons.Default.TravelExplore,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "$travelCount",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            )
+        // Fila de Contadores
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            CounterItem(Icons.Default.TravelExplore, travelCount, "Viajes")
+            CounterItem(Icons.Default.People, user?.followersCount ?: 0, "Seguidores")
+            CounterItem(Icons.Default.PersonAdd, user?.followingCount ?: 0, "Seguidos")
         }
+    }
+}
+
+@Composable
+private fun CounterItem(icon: ImageVector, count: Int, label: String) {
+    val color = MaterialTheme.colorScheme.primary
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            tint = color,
+            modifier = Modifier.size(22.dp)
+        )
+        Spacer(modifier = Modifier.width(6.dp))
+        Text(
+            text = "$count",
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.Bold,
+                color = color
+            )
+        )
     }
 }

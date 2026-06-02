@@ -20,11 +20,6 @@ class TravelListViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TravelListUiState())
     val uiState: StateFlow<TravelListUiState> = _uiState.asStateFlow()
 
-    init {
-        loadUserData()
-        loadTravels()
-    }
-
     fun loadUserData() {
         viewModelScope.launch {
             getFullUserDataUseCase().onSuccess { user ->
