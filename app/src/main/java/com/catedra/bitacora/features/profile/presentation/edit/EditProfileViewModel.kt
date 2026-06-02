@@ -1,11 +1,11 @@
-package com.catedra.bitacora.features.auth.presentation.editProfile
+package com.catedra.bitacora.features.profile.presentation.edit
 
-import android.content.Intent
 import android.net.Uri
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.catedra.bitacora.features.auth.domain.repository.AuthRepository
-import com.catedra.bitacora.features.auth.domain.useCase.UpdateProfileUseCase
+import com.catedra.bitacora.core.domain.repository.SessionRepository
+import com.catedra.bitacora.features.profile.domain.useCase.UpdateProfileUseCase
 import com.catedra.bitacora.core.domain.useCase.CompressImageUseCase
 import com.catedra.bitacora.core.domain.useCase.GetPhotoPickerIntentUseCase
 import com.catedra.bitacora.core.domain.useCase.UploadImageUseCase
@@ -29,7 +29,7 @@ data class EditProfileUiState(
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
+    private val sessionRepository: SessionRepository,
     private val updateProfileUseCase: UpdateProfileUseCase,
     private val uploadImageUseCase: UploadImageUseCase,
     private val getPhotoPickerIntentUseCase: GetPhotoPickerIntentUseCase,
@@ -47,7 +47,7 @@ class EditProfileViewModel @Inject constructor(
 
     private fun loadUserData() {
         viewModelScope.launch {
-            authRepository.getFullUserData().onSuccess { user ->
+            sessionRepository.getFullUserData().onSuccess { user ->
                 _uiState.update { it.copy(
                     name = user.displayName ?: "",
                     bio = user.bio ?: "",

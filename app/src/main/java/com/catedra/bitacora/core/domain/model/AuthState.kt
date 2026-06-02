@@ -1,4 +1,4 @@
-package com.catedra.bitacora.features.auth.domain.model
+package com.catedra.bitacora.core.domain.model
 
 sealed class AuthState {
     object Cargando : AuthState()

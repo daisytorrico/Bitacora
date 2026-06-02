@@ -11,7 +11,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.catedra.bitacora.features.auth.presentation.navigation.AuthDestinations
+import com.catedra.bitacora.features.profile.presentation.navigation.ProfileDestinations
 import com.catedra.bitacora.features.travel.presentation.pointCreate.CreatePointScreen
 import com.catedra.bitacora.features.travel.presentation.pointDetail.PointDetailScreen
 import com.catedra.bitacora.features.travel.presentation.travelCreate.CreateTravelScreen
@@ -43,7 +43,7 @@ fun NavGraphBuilder.travelGraph(
                 navController.navigate(TravelDestinations.TRAVEL_CREATE)
             },
             onEditarPerfilClick = {
-                navController.navigate(AuthDestinations.EDIT_PROFILE)
+                navController.navigate(ProfileDestinations.EDIT_PROFILE)
             },
             onTravelClick = { travelId ->
                 navController.navigate("travel_detail/$travelId")

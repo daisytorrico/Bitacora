@@ -2,6 +2,9 @@ package com.catedra.bitacora.di
 
 import com.catedra.bitacora.features.auth.data.repository.AuthRepositoryFirebase
 import com.catedra.bitacora.features.auth.domain.repository.AuthRepository
+import com.catedra.bitacora.core.domain.repository.SessionRepository
+import com.catedra.bitacora.features.profile.data.repository.ProfileRepositoryImpl
+import com.catedra.bitacora.features.profile.domain.repository.ProfileRepository
 import com.catedra.bitacora.features.discovery.data.repository.DiscoveryRepositoryImpl
 import com.catedra.bitacora.features.discovery.domain.repository.DiscoveryRepository
 import com.catedra.bitacora.features.social.data.repository.SocialRepositoryImpl
@@ -39,6 +42,18 @@ abstract class RepositoryModule {
     abstract fun bindAuthRepository(
         impl: AuthRepositoryFirebase
     ): AuthRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSessionRepository(
+        impl: AuthRepositoryFirebase
+    ): SessionRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindProfileRepository(
+        impl: ProfileRepositoryImpl
+    ): ProfileRepository
 
     @Binds
     @Singleton

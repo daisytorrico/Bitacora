@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.catedra.bitacora.features.auth.domain.model.AuthState
+import com.catedra.bitacora.core.domain.model.AuthState
 
 @Composable
 fun UsernameScreen(

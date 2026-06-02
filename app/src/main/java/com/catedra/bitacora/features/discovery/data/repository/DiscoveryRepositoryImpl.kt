@@ -1,6 +1,6 @@
 package com.catedra.bitacora.features.discovery.data.repository
 
-import com.catedra.bitacora.features.auth.domain.model.User
+import com.catedra.bitacora.core.domain.model.User
 import com.catedra.bitacora.features.discovery.data.remote.DiscoveryRemoteDataSource
 import com.catedra.bitacora.features.discovery.domain.model.TravelPage
 import com.catedra.bitacora.features.discovery.domain.repository.DiscoveryRepository

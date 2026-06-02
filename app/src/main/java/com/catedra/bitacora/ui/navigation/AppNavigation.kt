@@ -15,11 +15,13 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.catedra.bitacora.features.auth.domain.model.AuthState
+import com.catedra.bitacora.core.domain.model.AuthState
 import com.catedra.bitacora.features.auth.presentation.AuthViewModel
 import com.catedra.bitacora.features.auth.presentation.navigation.AuthDestinations
 import com.catedra.bitacora.features.auth.presentation.navigation.authGraph
 import com.catedra.bitacora.features.auth.presentation.util.crearGoogleSignInHandler
+import com.catedra.bitacora.features.profile.presentation.navigation.ProfileDestinations
+import com.catedra.bitacora.features.profile.presentation.navigation.profileGraph
 import com.catedra.bitacora.features.discovery.presentation.navigation.discoveryGraph
 import com.catedra.bitacora.features.map.presentation.navigation.MapDestination
 import com.catedra.bitacora.features.map.presentation.navigation.mapGraph
@@ -46,7 +48,7 @@ fun AppNavigation(viewModel: AuthViewModel) {
     val currentDestination = navBackStackEntry?.destination
 
     val showBottomBar = currentDestination?.hierarchy?.any { 
-        it.route in listOf(Rutas.LOGIN, Rutas.REGISTRO, Rutas.USERNAME, AuthDestinations.EDIT_PROFILE, TravelDestinations.TRAVEL_CREATE, TravelDestinations.TRAVEL_ADD_POINT)
+        it.route in listOf(Rutas.LOGIN, Rutas.REGISTRO, Rutas.USERNAME, ProfileDestinations.EDIT_PROFILE, TravelDestinations.TRAVEL_CREATE, TravelDestinations.TRAVEL_ADD_POINT)
     } == false && authState is AuthState.Autenticado
 
     val animatedBottomPadding by animateDpAsState(
@@ -89,6 +91,7 @@ fun AppNavigation(viewModel: AuthViewModel) {
             authGraph(navController, viewModel, crearGoogleSignInHandler(context, coroutineScope, viewModel))
             travelGraph(navController) { showLogOut = true }
             discoveryGraph(navController)
+            profileGraph(navController)
             mapGraph(navController) { showLogOut = true }
         }
 
@@ -101,17 +104,19 @@ fun AppNavigation(viewModel: AuthViewModel) {
             AppBottomBar(
                 currentDestination = currentDestination,
                 onNavigateToProfile = {
+                    val onProfile= currentDestination?.hierarchy?.any { it.route?.startsWith("travel") == true } == true
                     navController.navigate(TravelDestinations.TRAVEL_LIST) {
                         popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                         launchSingleTop = true
-                        restoreState = true
+                        restoreState = !onProfile
                     }
                 },
                 onNavigateToExplorer = {
+                    val onExplorer = currentDestination?.hierarchy?.any { it.route == "discovery_graph" } == true
                     navController.navigate("discovery_graph") {
                         popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                         launchSingleTop = true
-                        restoreState = true
+                        restoreState = !onExplorer
                     }
                 },
                 onNavigateToMap = {

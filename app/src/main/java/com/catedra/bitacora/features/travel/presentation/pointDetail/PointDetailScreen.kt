@@ -14,7 +14,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.catedra.bitacora.core.domain.model.Coordinates
 import com.catedra.bitacora.core.domain.model.PointOnMap
-import com.catedra.bitacora.features.auth.presentation.navigation.AuthDestinations
+import com.catedra.bitacora.features.profile.presentation.navigation.ProfileDestinations
 import com.catedra.bitacora.ui.components.AppTopBar
 import com.catedra.bitacora.ui.components.LocationViewer
 import com.catedra.bitacora.ui.components.PointDetailContent
@@ -58,7 +58,7 @@ fun PointDetailScreen(
         } else {
             PointDetailContent(
                 uiState = uiState,
-                onProfileClick = { navController.navigate(AuthDestinations.EDIT_PROFILE) },
+                onProfileClick = { navController.navigate(ProfileDestinations.EDIT_PROFILE) },
                 onLikeClick = { viewModel.toggleLike() },
                 onCommentsClick = { /* TODO: Implementar comentarios */ },
                 onToggleMap = { viewModel.onToggleMap(it) },

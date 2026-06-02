@@ -3,8 +3,8 @@ package com.catedra.bitacora.features.auth.data.repository
 import android.util.Log
 import com.catedra.bitacora.features.auth.data.mapper.toDomain
 import com.catedra.bitacora.features.auth.data.remote.AuthRemoteDataSource
-import com.catedra.bitacora.features.auth.domain.model.AuthState
-import com.catedra.bitacora.features.auth.domain.model.User
+import com.catedra.bitacora.core.domain.model.AuthState
+import com.catedra.bitacora.core.domain.model.User
 import com.catedra.bitacora.features.auth.domain.repository.AuthRepository
 import com.catedra.bitacora.features.auth.data.mapper.toData
 import com.catedra.bitacora.features.auth.data.mapper.toUser

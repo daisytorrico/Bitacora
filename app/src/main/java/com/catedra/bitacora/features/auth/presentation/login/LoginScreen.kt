@@ -24,7 +24,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.catedra.bitacora.R
-import com.catedra.bitacora.features.auth.domain.model.AuthState
+import com.catedra.bitacora.core.domain.model.AuthState
 
 @Composable
 fun LoginScreen(

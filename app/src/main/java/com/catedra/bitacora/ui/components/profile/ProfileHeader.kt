@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.catedra.bitacora.features.auth.domain.model.User
+import com.catedra.bitacora.core.domain.model.User
 import com.catedra.bitacora.ui.components.ProfileImage
 import com.catedra.bitacora.ui.theme.GrisMedio
 

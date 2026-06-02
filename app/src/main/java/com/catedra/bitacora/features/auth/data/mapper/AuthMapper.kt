@@ -1,6 +1,6 @@
 package com.catedra.bitacora.features.auth.data.mapper
 
-import com.catedra.bitacora.features.auth.domain.model.User
+import com.catedra.bitacora.core.domain.model.User
 import com.google.firebase.auth.FirebaseUser
 
 import com.google.firebase.firestore.DocumentSnapshot

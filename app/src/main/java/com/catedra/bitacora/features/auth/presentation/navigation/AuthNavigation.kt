@@ -6,7 +6,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.catedra.bitacora.features.auth.presentation.AuthViewModel
-import com.catedra.bitacora.features.auth.presentation.editProfile.EditProfileScreen
 import com.catedra.bitacora.features.auth.presentation.login.LoginScreen
 import com.catedra.bitacora.features.auth.presentation.register.RegisterScreen
 import com.catedra.bitacora.features.auth.presentation.username.UsernameScreen
@@ -15,7 +14,6 @@ object AuthDestinations {
     const val LOGIN = "login"
     const val REGISTRO = "registro"
     const val USERNAME = "username"
-    const val EDIT_PROFILE = "edit_profile"
 }
 
 /**
@@ -54,12 +52,6 @@ fun NavGraphBuilder.authGraph(
             usernameError = usernameError,
             onConfirmarClick = { username -> viewModel.guardarUsername(username) },
             onResetError = { viewModel.limpiarUsernameError() }
-        )
-    }
-
-    composable(AuthDestinations.EDIT_PROFILE) {
-        EditProfileScreen(
-            onBack = { navController.popBackStack() }
         )
     }
 }

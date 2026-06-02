@@ -1,7 +1,7 @@
 package com.catedra.bitacora.features.discovery.data.remote
 
 import com.catedra.bitacora.features.auth.data.mapper.toUser
-import com.catedra.bitacora.features.auth.domain.model.User
+import com.catedra.bitacora.core.domain.model.User
 import com.catedra.bitacora.features.discovery.data.remote.model.TravelPageRemote
 import com.catedra.bitacora.features.travel.data.mapper.toPointOfInterest
 import com.catedra.bitacora.features.travel.data.mapper.toPointsDomain

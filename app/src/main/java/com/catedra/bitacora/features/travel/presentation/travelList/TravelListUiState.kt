@@ -1,6 +1,6 @@
 package com.catedra.bitacora.features.travel.presentation.travelList
 
-import com.catedra.bitacora.features.auth.domain.model.User
+import com.catedra.bitacora.core.domain.model.User
 import com.catedra.bitacora.features.travel.domain.model.Travel
 
 data class TravelListUiState(

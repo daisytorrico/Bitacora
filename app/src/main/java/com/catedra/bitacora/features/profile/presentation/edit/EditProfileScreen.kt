@@ -1,4 +1,4 @@
-package com.catedra.bitacora.features.auth.presentation.editProfile
+package com.catedra.bitacora.features.profile.presentation.edit
 
 import android.Manifest
 import android.app.Activity
@@ -140,7 +140,7 @@ fun EditProfileScreen(
                 OutlinedTextField(
                     value = uiState.bio,
                     onValueChange = { viewModel.onBioChange(it) },
-                    label = { Text("Biografía / Muro") },
+                    label = { Text("Biografía") },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     minLines = 3,

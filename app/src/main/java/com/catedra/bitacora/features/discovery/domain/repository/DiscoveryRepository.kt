@@ -1,6 +1,6 @@
 package com.catedra.bitacora.features.discovery.domain.repository
 
-import com.catedra.bitacora.features.auth.domain.model.User
+import com.catedra.bitacora.core.domain.model.User
 import com.catedra.bitacora.features.travel.domain.model.PointOfInterest
 import com.catedra.bitacora.features.discovery.domain.model.TravelPage
 import com.catedra.bitacora.features.travel.domain.model.Travel

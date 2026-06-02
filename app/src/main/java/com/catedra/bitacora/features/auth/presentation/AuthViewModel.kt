@@ -2,7 +2,7 @@ package com.catedra.bitacora.features.auth.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.catedra.bitacora.features.auth.domain.model.AuthState
+import com.catedra.bitacora.core.domain.model.AuthState
 import com.catedra.bitacora.features.auth.domain.useCase.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
