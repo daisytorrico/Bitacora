@@ -103,6 +103,8 @@ fun MapContent(
     val lifecycleOwner = LocalLifecycleOwner.current
     val currentUiState by rememberUpdatedState(uiState)
     val currentOnCameraMoved by rememberUpdatedState(onCameraMoved)
+    val currentOnMapClick by rememberUpdatedState(onMapClick)
+    val currentOnMapReady by rememberUpdatedState(onMapReady)
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -138,7 +140,7 @@ fun MapContent(
 
                     locationOverlay.runOnFirstFix {
                         val myLocation = locationOverlay.myLocation
-                        if (myLocation != null && uiState.cameraCenter == null) {
+                        if (myLocation != null && currentUiState.cameraCenter == null) {
                             post {
                                 controller.animateTo(myLocation)
                                 controller.setZoom(18.0)
@@ -173,7 +175,7 @@ fun MapContent(
 
                     val mapEventsReceiver = object : MapEventsReceiver {
                         override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
-                            p?.let { onMapClick(it.latitude, it.longitude) }
+                            p?.let { currentOnMapClick(it.latitude, it.longitude) }
                             return true
                         }
 
@@ -183,7 +185,7 @@ fun MapContent(
                 }
 
                 post {
-                    onMapReady()
+                    currentOnMapReady()
                 }
             }
         }, update = {
