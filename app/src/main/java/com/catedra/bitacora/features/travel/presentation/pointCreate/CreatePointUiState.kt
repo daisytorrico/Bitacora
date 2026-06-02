@@ -7,7 +7,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 data class CreatePointUiState(
-    val travel: Travel? = null, // Datos del viaje padre para validar
+    val travel: Travel? = null,
     val name: String = "",
     val address: String = "",
     val latitude: Double? = null,

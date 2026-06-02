@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 data class PointOfInterest(
     val id: String = "",
     val name: String,
-    val address: String, // Dirección legible (Calle 123...)
+    val address: String,
     val latitude: Double? = null,
     val longitude: Double? = null,
     val visitDate: LocalDateTime?,

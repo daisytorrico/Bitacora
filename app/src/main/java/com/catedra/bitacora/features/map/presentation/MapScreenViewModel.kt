@@ -30,7 +30,7 @@ class MapScreenViewModel @Inject constructor(
     fun onCameraMoved(center: Coordinates) {
         fetchJob?.cancel()
         fetchJob = viewModelScope.launch {
-            delay(500) // Debounce para no saturar Firestore
+            delay(500)
             loadPoints(center)
         }
     }

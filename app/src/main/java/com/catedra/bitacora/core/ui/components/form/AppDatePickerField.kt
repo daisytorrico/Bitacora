@@ -26,7 +26,7 @@ fun AppDatePickerField(
     val dateText = remember(selectedDateMillis) {
         if (selectedDateMillis != null) {
             val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            sdf.timeZone = TimeZone.getTimeZone("UTC") // Forzamos UTC para evitar el salto de día
+            sdf.timeZone = TimeZone.getTimeZone("UTC")
             sdf.format(Date(selectedDateMillis))
         } else ""
     }

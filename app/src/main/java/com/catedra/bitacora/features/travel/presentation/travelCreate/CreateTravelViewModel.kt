@@ -67,7 +67,7 @@ class CreateTravelViewModel @Inject constructor(
     fun formatMillisToDate(millis: Long?): String {
         if (millis == null) return ""
         val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        formatter.timeZone = TimeZone.getTimeZone("UTC") // Evita que reste un día
+        formatter.timeZone = TimeZone.getTimeZone("UTC")
         return formatter.format(Date(millis))
     }
 

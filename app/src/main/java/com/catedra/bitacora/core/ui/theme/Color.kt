@@ -18,8 +18,8 @@ val Blanco = Color(0xFFFFFFFF)
 val Negro = Color(0xFF000000)
 
 val GrisFondoApp = Color(0xFFF4F6F8)
-val VerdeMentaFondo = Color(0xFFE8F5E9)   // Fondo del chip de puntos
-val VerdeMentaTexto = Color(0xFF2E7D32)   // Texto del chip de puntos
+val VerdeMentaFondo = Color(0xFFE8F5E9)
+val VerdeMentaTexto = Color(0xFF2E7D32)
 
 val GrisPildora = Color(0xFFE0E0E0).copy(alpha = 0.3f)
 val RojoPin = Color(0xFFE53935)

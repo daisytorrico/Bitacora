@@ -56,10 +56,10 @@ object GeohashUtils {
     fun getSearchRange(lat: Double, lng: Double, radiusKm: Double): Pair<String, String> {
         // Reducimos precisión según el radio para cubrir el área
         val precision = when {
-            radiusKm <= 0.05 -> 9 // 50m
-            radiusKm <= 0.5 -> 7  // 500m
-            radiusKm <= 5.0 -> 5  // 5km
-            radiusKm <= 50.0 -> 4 // 50km
+            radiusKm <= 0.05 -> 9
+            radiusKm <= 0.5 -> 7
+            radiusKm <= 5.0 -> 5
+            radiusKm <= 50.0 -> 4
             else -> 3
         }
         val hash = encode(lat, lng, precision)

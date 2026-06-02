@@ -2,6 +2,7 @@ package com.catedra.bitacora.core.data.remote
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import com.catedra.bitacora.core.domain.repository.CloudinaryRepository
 import com.cloudinary.android.MediaManager
 import com.cloudinary.android.callback.ErrorInfo
@@ -29,7 +30,7 @@ class CloudinaryDataSource @Inject constructor(
             )
             MediaManager.init(context, config)
         } catch (e: Exception) {
-            // Ya inicializado o error
+            Log.e("CloudinaryDataSource", "Error al inicializar", e)
         }
     }
 

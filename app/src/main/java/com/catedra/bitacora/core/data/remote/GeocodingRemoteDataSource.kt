@@ -15,7 +15,6 @@ class GeocodingRemoteDataSource @Inject constructor(
     suspend fun getPointFromCoordinates(coordinates: Coordinates): PointOnMap? = withContext(Dispatchers.IO) {
         try {
             @Suppress("DEPRECATION")
-            // Pedimos 5 resultados para poder elegir el más descriptivo (POI vs Calle)
             val addresses = geocoder.getFromLocation(coordinates.latitude, coordinates.longitude, 5)
             
             addresses?.toBestDomain(coordinates)

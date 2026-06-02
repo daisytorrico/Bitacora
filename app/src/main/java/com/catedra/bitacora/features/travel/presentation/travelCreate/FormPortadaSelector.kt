@@ -23,7 +23,7 @@ import coil.compose.AsyncImage
 @Composable
 fun FormPortadaSelector(
     imageUri: Uri?,
-    onClickAddFoto: () -> Unit, // Exponemos solo el click
+    onClickAddFoto: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(

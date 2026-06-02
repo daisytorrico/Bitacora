@@ -20,7 +20,7 @@ fun LocationPicker(
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(
-            usePlatformDefaultWidth = false // Para que ocupe toda la pantalla
+            usePlatformDefaultWidth = false
         )
     ) {
         Card(

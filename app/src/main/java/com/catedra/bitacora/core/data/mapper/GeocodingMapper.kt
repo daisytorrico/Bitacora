@@ -11,17 +11,14 @@ import com.catedra.bitacora.core.domain.model.PointOnMap
 fun List<Address>.toBestDomain(coordinates: Coordinates): PointOnMap? {
     if (isEmpty()) return null
 
-    // 1. Intentar encontrar un POI (donde el nombre no sea igual a la calle o altura)
     val poiAddress = firstOrNull { address ->
         val feature = address.featureName
         val street = address.thoroughfare
         feature != null && feature != street && !feature.isPurelyNumeric()
     }
 
-    // 2. Si no hay POI, intentar encontrar una dirección con calle y número
     val addressWithStreet = poiAddress ?: firstOrNull { it.thoroughfare != null }
 
-    // 3. Mapear el resultado seleccionado
     return (addressWithStreet ?: first()).toDomain(coordinates)
 }
 
@@ -37,7 +34,6 @@ fun Address.toDomain(coordinates: Coordinates): PointOnMap {
     val address = if (isPOI) {
         buildStreetAddress() ?: getAddressLine(0) ?: ""
     } else {
-        // Para no-POIs, la dirección es el resto de la info (ciudad, país)
         buildLocationDetails()
     }
 

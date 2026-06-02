@@ -62,7 +62,7 @@ fun NavGraphBuilder.travelGraph(
             onPointClick = { travelId, pointId ->
                 navController.navigate("travel_details/$travelId/points/$pointId")
             },
-            navController = navController // Pasar el navController
+            navController = navController
         )
     }
 
@@ -73,7 +73,7 @@ fun NavGraphBuilder.travelGraph(
             onEdit = { pointId ->
                 // TODO: Navegar a editar punto
             },
-            navController = navController // Pasar el navController
+            navController = navController
         )
     }
 

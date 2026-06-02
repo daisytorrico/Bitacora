@@ -130,9 +130,8 @@ fun MapContent(
                     controller.setCenter(GeoPoint(savedCenter.latitude, savedCenter.longitude))
                     controller.setZoom(uiState.cameraZoom)
                 } ?: run {
-                    // Default center (0,0) si no hay ubicación guardada
                     controller.setCenter(GeoPoint(0.0, 0.0))
-                    controller.setZoom(18.0)
+                    controller.setZoom(10.0)
 
                     locationOverlay.runOnFirstFix {
                         val myLocation = locationOverlay.myLocation

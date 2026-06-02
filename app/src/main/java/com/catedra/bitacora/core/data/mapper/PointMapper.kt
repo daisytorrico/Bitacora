@@ -14,7 +14,6 @@ fun DocumentSnapshot.toPointOnMap(): PointOnMap {
         longitude = geoPoint?.longitude ?: 0.0
     )
 
-    // Si es un documento de la subcolección de puntos de interés, podemos obtener el travelId
     val travelId = reference.parent.parent?.id
     
     return if (travelId != null) {
