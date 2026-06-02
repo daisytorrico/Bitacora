@@ -15,8 +15,8 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.catedra.bitacora.ui.components.AppTopBar
-import com.catedra.bitacora.ui.components.TravelListContent
+import com.catedra.bitacora.core.ui.components.common.AppTopBar
+import com.catedra.bitacora.core.ui.components.travel.TravelListContent
 import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)

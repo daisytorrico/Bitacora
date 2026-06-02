@@ -15,9 +15,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.catedra.bitacora.core.domain.model.Coordinates
 import com.catedra.bitacora.core.domain.model.PointOnMap
 import com.catedra.bitacora.features.profile.presentation.navigation.ProfileDestinations
-import com.catedra.bitacora.ui.components.AppTopBar
-import com.catedra.bitacora.ui.components.LocationViewer
-import com.catedra.bitacora.ui.components.PointDetailContent
+import com.catedra.bitacora.core.ui.components.common.AppTopBar
+import com.catedra.bitacora.core.ui.components.form.LocationViewer
+import com.catedra.bitacora.core.ui.components.travel.PointDetailContent
 
 @Composable
 fun PointDetailScreen(

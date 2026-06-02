@@ -16,9 +16,9 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.catedra.bitacora.features.travel.presentation.navigation.TravelDestinations
-import com.catedra.bitacora.ui.components.AppTopBar
-import com.catedra.bitacora.ui.components.TravelDetailContent
-import com.catedra.bitacora.ui.theme.Blanco
+import com.catedra.bitacora.core.ui.components.common.AppTopBar
+import com.catedra.bitacora.core.ui.components.travel.TravelDetailContent
+import com.catedra.bitacora.core.ui.theme.Blanco
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -23,8 +23,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.catedra.bitacora.ui.components.AppTopBar
-import com.catedra.bitacora.ui.components.TravelItem
+import com.catedra.bitacora.core.ui.components.common.AppTopBar
+import com.catedra.bitacora.core.ui.components.travel.TravelItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

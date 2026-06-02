@@ -40,10 +40,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.catedra.bitacora.core.utils.LocationPermissionHandler
 import com.catedra.bitacora.core.utils.LocationPermissionUtils
-import com.catedra.bitacora.ui.components.AppDatePickerField
-import com.catedra.bitacora.ui.components.AppTimePickerField
-import com.catedra.bitacora.ui.components.AppTopBar
-import com.catedra.bitacora.ui.components.LocationPicker
+import com.catedra.bitacora.core.ui.components.form.AppDatePickerField
+import com.catedra.bitacora.core.ui.components.form.AppTimePickerField
+import com.catedra.bitacora.core.ui.components.common.AppTopBar
+import com.catedra.bitacora.core.ui.components.form.LocationPicker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

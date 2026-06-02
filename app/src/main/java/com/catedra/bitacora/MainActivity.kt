@@ -7,8 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import com.catedra.bitacora.features.auth.presentation.AuthViewModel
-import com.catedra.bitacora.ui.navigation.AppNavigation
-import com.catedra.bitacora.ui.theme.BitacoraTheme
+import com.catedra.bitacora.core.ui.theme.BitacoraTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

@@ -9,8 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.catedra.bitacora.ui.components.AppTopBar
-import com.catedra.bitacora.ui.components.TravelDetailContent
+import com.catedra.bitacora.core.ui.components.common.AppTopBar
+import com.catedra.bitacora.core.ui.components.travel.TravelDetailContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

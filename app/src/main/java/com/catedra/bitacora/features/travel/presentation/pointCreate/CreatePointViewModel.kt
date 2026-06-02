@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.catedra.bitacora.features.travel.domain.model.PointOfInterest
 import com.catedra.bitacora.features.travel.domain.repository.TravelsRepository
 import com.catedra.bitacora.core.domain.useCase.CompressImageUseCase
-import com.catedra.bitacora.core.domain.useCase.GetPhotoPickerIntentUseCase
+import com.catedra.bitacora.core.ui.util.PhotoPickerHelper
 import com.catedra.bitacora.core.domain.useCase.UploadImageUseCase
 import com.catedra.bitacora.features.travel.domain.useCase.GetCurrentLocationUseCase
 import com.catedra.bitacora.features.travel.domain.useCase.SavePointUseCase
@@ -27,7 +27,7 @@ import javax.inject.Inject
 class CreatePointViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val travelsRepository: TravelsRepository,
-    private val getPhotoPickerIntentUseCase: GetPhotoPickerIntentUseCase,
+    private val photoPickerHelper: PhotoPickerHelper,
     private val compressImageUseCase: CompressImageUseCase,
     private val uploadImageUseCase: UploadImageUseCase,
     private val savePointUseCase: SavePointUseCase,
@@ -83,7 +83,7 @@ class CreatePointViewModel @Inject constructor(
     }
 
     fun buildPhotoPickerIntent(): Intent {
-        val (intent, tempUri) = getPhotoPickerIntentUseCase(
+        val (intent, tempUri) = photoPickerHelper(
             title = "Seleccionar fotos del lugar",
             allowMultiple = true
         )

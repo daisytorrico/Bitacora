@@ -11,8 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.catedra.bitacora.ui.components.AppTopBar
-import com.catedra.bitacora.ui.components.TravelListContent
+import com.catedra.bitacora.core.ui.components.common.AppTopBar
+import com.catedra.bitacora.core.ui.components.travel.TravelListContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +51,7 @@ fun PublicProfileScreen(
                             tint = if (uiState.isFollowing) 
                                 MaterialTheme.colorScheme.primary 
                             else 
-                                com.catedra.bitacora.ui.theme.GrisMedio,
+                                com.catedra.bitacora.core.ui.theme.GrisMedio,
                             modifier = Modifier.size(28.dp)
                         )
                     }

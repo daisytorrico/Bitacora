@@ -10,9 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.catedra.bitacora.core.components.map.MapComponent
+import com.catedra.bitacora.core.ui.components.map.MapComponent
 import com.catedra.bitacora.core.domain.model.ExternalPoi
-import com.catedra.bitacora.ui.components.AppTopBar
+import com.catedra.bitacora.core.ui.components.common.AppTopBar
 
 @Composable
 fun MapScreen(

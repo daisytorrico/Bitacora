@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.catedra.bitacora.ui.components.AppTopBar
+import com.catedra.bitacora.core.ui.components.common.AppTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

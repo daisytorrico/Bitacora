@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.catedra.bitacora.features.travel.domain.model.TravelVisibility
-import com.catedra.bitacora.ui.components.AppDatePickerField
-import com.catedra.bitacora.ui.components.AppTopBar
+import com.catedra.bitacora.core.ui.components.form.AppDatePickerField
+import com.catedra.bitacora.core.ui.components.common.AppTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

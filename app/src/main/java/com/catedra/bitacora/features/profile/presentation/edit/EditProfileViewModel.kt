@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.catedra.bitacora.core.domain.repository.SessionRepository
 import com.catedra.bitacora.features.profile.domain.useCase.UpdateProfileUseCase
 import com.catedra.bitacora.core.domain.useCase.CompressImageUseCase
-import com.catedra.bitacora.core.domain.useCase.GetPhotoPickerIntentUseCase
+import com.catedra.bitacora.core.ui.util.PhotoPickerHelper
 import com.catedra.bitacora.core.domain.useCase.UploadImageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +32,7 @@ class EditProfileViewModel @Inject constructor(
     private val sessionRepository: SessionRepository,
     private val updateProfileUseCase: UpdateProfileUseCase,
     private val uploadImageUseCase: UploadImageUseCase,
-    private val getPhotoPickerIntentUseCase: GetPhotoPickerIntentUseCase,
+    private val photoPickerHelper: PhotoPickerHelper,
     private val compressImageUseCase: CompressImageUseCase
 ) : ViewModel() {
 
@@ -58,7 +58,7 @@ class EditProfileViewModel @Inject constructor(
     }
 
     fun buildSystemChooserIntent(): Intent {
-        val (intent, tempUri) = getPhotoPickerIntentUseCase("Seleccionar Foto")
+        val (intent, tempUri) = photoPickerHelper("Seleccionar Foto")
         currentTempCameraUri = tempUri
         return intent
     }

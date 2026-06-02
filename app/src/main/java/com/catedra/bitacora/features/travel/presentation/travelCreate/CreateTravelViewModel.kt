@@ -8,7 +8,7 @@ import com.catedra.bitacora.features.auth.domain.useCase.GetCurrentUserUseCase
 import com.catedra.bitacora.features.travel.domain.model.Travel
 import com.catedra.bitacora.features.travel.domain.model.TravelVisibility
 import com.catedra.bitacora.core.domain.useCase.CompressImageUseCase
-import com.catedra.bitacora.core.domain.useCase.GetPhotoPickerIntentUseCase
+import com.catedra.bitacora.core.ui.util.PhotoPickerHelper
 import com.catedra.bitacora.core.domain.useCase.UploadImageUseCase
 import com.catedra.bitacora.features.travel.domain.useCase.SaveTravelUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +28,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateTravelViewModel @Inject constructor(
-    private val getPhotoPickerIntentUseCase: GetPhotoPickerIntentUseCase,
+    private val photoPickerHelper: PhotoPickerHelper,
     private val compressImageUseCase: CompressImageUseCase,
     private val uploadImageUseCase: UploadImageUseCase,
     private val saveTravelUseCase: SaveTravelUseCase,
@@ -72,7 +72,7 @@ class CreateTravelViewModel @Inject constructor(
     }
 
     fun buildSystemChooserIntent(): Intent {
-        val (intent, tempUri) = getPhotoPickerIntentUseCase("Selecciona una foto o usa la cámara")
+        val (intent, tempUri) = photoPickerHelper("Selecciona una foto o usa la cámara")
         currentTempCameraUri = tempUri
         return intent
     }
