@@ -50,6 +50,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.catedra.bitacora.core.domain.model.Coordinates
 import com.catedra.bitacora.core.domain.model.PointOnMap
+import kotlin.math.abs
 import org.osmdroid.events.DelayedMapListener
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.events.MapListener
@@ -188,10 +189,15 @@ fun MapContent(
             mapState.updateSelection(uiState.selectedPoint, uiState.temporaryCoordinates)
             mapState.updateExternalPois(uiState.externalPois, onExternalPoiClicked)
             
-            // Sincronizar cámara desde el estado si cambió (ej: por setInitialPoint)
+            // Sincronizar cámara desde el estado si cambió significativamente (ej: por setInitialPoint)
             uiState.cameraCenter?.let { center ->
                 val currentMapCenter = mapState.mapView.mapCenter
-                if (currentMapCenter.latitude != center.latitude || currentMapCenter.longitude != center.longitude) {
+                val latDiff = kotlin.math.abs(currentMapCenter.latitude - center.latitude)
+                val lonDiff = kotlin.math.abs(currentMapCenter.longitude - center.longitude)
+                val zoomDiff = kotlin.math.abs(mapState.mapView.zoomLevelDouble - uiState.cameraZoom)
+
+                // Usamos un umbral pequeño para evitar bucles infinitos por errores de precisión
+                if (latDiff > 0.00001 || lonDiff > 0.00001 || zoomDiff > 0.1) {
                     mapState.mapView.controller.setCenter(GeoPoint(center.latitude, center.longitude))
                     mapState.mapView.controller.setZoom(uiState.cameraZoom)
                 }
