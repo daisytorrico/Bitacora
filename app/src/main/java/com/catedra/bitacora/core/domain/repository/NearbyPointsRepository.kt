@@ -1,8 +1,8 @@
-package com.catedra.bitacora.features.map.domain.repository
+package com.catedra.bitacora.core.domain.repository
 
 import com.catedra.bitacora.core.domain.model.PointOnMap
 
-interface MapRepository {
+interface NearbyPointsRepository {
     suspend fun getNearbyPoints(
         userId: String,
         latitude: Double,

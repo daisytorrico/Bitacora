@@ -145,6 +145,14 @@ class MapViewModel @Inject constructor(
         uiState = uiState.copy(isMapReady = ready)
     }
 
+    fun setInitialPoint(point: PointOnMap) {
+        uiState = uiState.copy(
+            selectedPoint = point,
+            cameraCenter = point.coordinates,
+            cameraZoom = 18.0
+        )
+    }
+
     fun onCameraMoved(center: Coordinates, zoom: Double) {
         uiState = uiState.copy(
             cameraCenter = center,

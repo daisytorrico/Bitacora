@@ -1,6 +1,5 @@
-package com.catedra.bitacora.features.map.data.util
+package com.catedra.bitacora.core.utils
 
-import com.catedra.bitacora.core.domain.model.Coordinates
 import kotlin.math.*
 
 object GeohashUtils {

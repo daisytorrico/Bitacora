@@ -12,6 +12,8 @@ import com.catedra.bitacora.core.data.local.ImageManager
 import com.catedra.bitacora.core.domain.repository.ImageRepository
 import com.catedra.bitacora.core.data.remote.CloudinaryDataSource
 import com.catedra.bitacora.core.domain.repository.CloudinaryRepository
+import com.catedra.bitacora.core.data.repository.NearbyPointsRepositoryImpl
+import com.catedra.bitacora.core.domain.repository.NearbyPointsRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -56,4 +58,10 @@ abstract class RepositoryModule {
     abstract fun bindCloudinaryRepository(
         impl: CloudinaryDataSource
     ): CloudinaryRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNearbyPointsRepository(
+        impl: NearbyPointsRepositoryImpl
+    ): NearbyPointsRepository
 }

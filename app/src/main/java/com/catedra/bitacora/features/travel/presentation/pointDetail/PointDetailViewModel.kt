@@ -52,4 +52,8 @@ class PointDetailViewModel @Inject constructor(
             }
         }
     }
+
+    fun onToggleMap(show: Boolean) {
+        _uiState.update { it.copy(showMap = show) }
+    }
 }

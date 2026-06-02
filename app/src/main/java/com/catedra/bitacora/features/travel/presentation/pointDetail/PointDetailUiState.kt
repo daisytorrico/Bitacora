@@ -7,5 +7,6 @@ data class PointDetailUiState(
     val isLoading: Boolean = true,
     val point: PointOfInterest? = null,
     val creatorUser: User? = null,
-    val error: String? = null
+    val error: String? = null,
+    val showMap: Boolean = false
 )

@@ -1,8 +1,8 @@
-package com.catedra.bitacora.features.map.data.mapper
+package com.catedra.bitacora.core.data.mapper
 
 import com.catedra.bitacora.core.domain.model.Coordinates
 import com.catedra.bitacora.core.domain.model.PointOnMap
-import com.catedra.bitacora.features.map.domain.model.ExternalPoi
+import com.catedra.bitacora.core.domain.model.ExternalPoi
 import com.google.firebase.firestore.DocumentSnapshot
 
 fun DocumentSnapshot.toPointOnMap(): PointOnMap {

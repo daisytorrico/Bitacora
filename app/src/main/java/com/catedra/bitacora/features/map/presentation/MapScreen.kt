@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.catedra.bitacora.core.components.map.MapComponent
-import com.catedra.bitacora.features.map.domain.model.ExternalPoi
+import com.catedra.bitacora.core.domain.model.ExternalPoi
 import com.catedra.bitacora.ui.components.AppBottomBar
 import com.catedra.bitacora.ui.components.AppTopBar
 

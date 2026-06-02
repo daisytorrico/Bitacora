@@ -13,12 +13,17 @@ import com.catedra.bitacora.core.utils.LocationPermissionHandler
 @Composable
 fun MapComponent(
     modifier: Modifier = Modifier,
+    initialPoint: PointOnMap? = null,
     buttonText: String? = null,
     onPointSelected: (PointOnMap) -> Unit = {},
     externalPois: List<PointOnMap> = emptyList(),
     onExternalPoiSelected: (PointOnMap) -> Unit = {},
     externalPoiButtonText: String? = null,
     onCameraMoved: (Coordinates) -> Unit = {},
+    showSearch: Boolean = true,
+    showControls: Boolean = true,
+    isInteractive: Boolean = true,
+    showSelectionCard: Boolean = true,
     viewModel: MapViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -32,6 +37,13 @@ fun MapComponent(
     // Sincronizar POIs externos con el ViewModel
     LaunchedEffect(externalPois) {
         viewModel.setExternalPois(externalPois)
+    }
+
+    // Establecer punto inicial si se proporciona
+    LaunchedEffect(initialPoint) {
+        initialPoint?.let {
+            viewModel.setInitialPoint(it)
+        }
     }
 
     MapContent(
@@ -50,6 +62,10 @@ fun MapComponent(
         buttonText = buttonText,
         onExternalPoiAction = onExternalPoiSelected,
         externalPoiButtonText = externalPoiButtonText,
-        modifier = modifier
+        modifier = modifier,
+        showSearch = showSearch,
+        showControls = showControls,
+        isInteractive = isInteractive,
+        showSelectionCard = showSelectionCard
     )
 }

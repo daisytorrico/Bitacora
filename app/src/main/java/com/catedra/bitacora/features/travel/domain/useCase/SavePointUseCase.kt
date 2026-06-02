@@ -1,6 +1,6 @@
 package com.catedra.bitacora.features.travel.domain.useCase
 
-import com.catedra.bitacora.features.map.data.util.GeohashUtils
+import com.catedra.bitacora.core.utils.GeohashUtils
 import com.catedra.bitacora.features.travel.domain.model.PointOfInterest
 import com.catedra.bitacora.features.travel.domain.repository.TravelsRepository
 import javax.inject.Inject

@@ -1,11 +1,11 @@
-package com.catedra.bitacora.features.map.domain.useCase
+package com.catedra.bitacora.core.domain.useCase
 
 import com.catedra.bitacora.core.domain.model.PointOnMap
-import com.catedra.bitacora.features.map.domain.repository.MapRepository
+import com.catedra.bitacora.core.domain.repository.NearbyPointsRepository
 import javax.inject.Inject
 
 class GetNearbyPointsUseCase @Inject constructor(
-    private val repository: MapRepository
+    private val repository: NearbyPointsRepository
 ) {
     suspend operator fun invoke(
         userId: String,

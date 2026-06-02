@@ -1,11 +1,11 @@
-package com.catedra.bitacora.features.map.data.remote
+package com.catedra.bitacora.core.data.remote
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
-class MapRemoteDataSource @Inject constructor(
+class NearbyPointsRemoteDataSource @Inject constructor(
     private val db: FirebaseFirestore
 ) {
     suspend fun getNearbyPointsByGeohash(

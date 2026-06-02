@@ -90,7 +90,11 @@ fun MapContent(
     buttonText: String?,
     onExternalPoiAction: (PointOnMap) -> Unit,
     externalPoiButtonText: String?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showSearch: Boolean = true,
+    showControls: Boolean = true,
+    isInteractive: Boolean = true,
+    showSelectionCard: Boolean = true
 ) {
     val context = LocalContext.current
     val mapState = rememberMapState()
@@ -115,7 +119,7 @@ fun MapContent(
         AndroidView(modifier = Modifier.fillMaxSize(), factory = { _ ->
             mapState.mapView.apply {
                 setTileSource(TileSourceFactory.MAPNIK)
-                setMultiTouchControls(true)
+                setMultiTouchControls(isInteractive)
 
                 val locationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(context), this)
                 locationOverlay.enableMyLocation()
@@ -131,7 +135,8 @@ fun MapContent(
 
                     locationOverlay.runOnFirstFix {
                         val myLocation = locationOverlay.myLocation
-                        if (myLocation != null) {
+                        // Solo centrar automáticamente si NO se ha establecido un centro en la UI (por initialPoint por ej)
+                        if (myLocation != null && uiState.cameraCenter == null) {
                             post {
                                 controller.animateTo(myLocation)
                                 controller.setZoom(18.0)
@@ -141,38 +146,39 @@ fun MapContent(
                     }
                 }
 
-                val mapListener = object : MapListener {
-                    override fun onScroll(event: ScrollEvent?): Boolean {
-                        // Evitar loop: No actualizar ViewModel si es un micro-movimiento o ya estamos en esa posición
-                        val center = mapCenter
-                        if (uiState.cameraCenter?.latitude != center.latitude || 
-                            uiState.cameraCenter?.longitude != center.longitude) {
+                if (isInteractive) {
+                    val mapListener = object : MapListener {
+                        override fun onScroll(event: ScrollEvent?): Boolean {
+                            val center = mapCenter
+                            if (uiState.cameraCenter?.latitude != center.latitude || 
+                                uiState.cameraCenter?.longitude != center.longitude) {
+                                onCameraMoved(
+                                    Coordinates(center.latitude, center.longitude), zoomLevelDouble
+                                )
+                            }
+                            return true
+                        }
+
+                        override fun onZoom(event: ZoomEvent?): Boolean {
+                            val center = mapCenter
                             onCameraMoved(
                                 Coordinates(center.latitude, center.longitude), zoomLevelDouble
                             )
+                            return true
                         }
-                        return true
                     }
+                    addMapListener(DelayedMapListener(mapListener, 500))
 
-                    override fun onZoom(event: ZoomEvent?): Boolean {
-                        val center = mapCenter
-                        onCameraMoved(
-                            Coordinates(center.latitude, center.longitude), zoomLevelDouble
-                        )
-                        return true
+                    val mapEventsReceiver = object : MapEventsReceiver {
+                        override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
+                            p?.let { onMapClick(it.latitude, it.longitude) }
+                            return true
+                        }
+
+                        override fun longPressHelper(p: GeoPoint?): Boolean = false
                     }
+                    overlays.add(MapEventsOverlay(mapEventsReceiver))
                 }
-                addMapListener(DelayedMapListener(mapListener, 500))
-
-                val mapEventsReceiver = object : MapEventsReceiver {
-                    override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
-                        p?.let { onMapClick(it.latitude, it.longitude) }
-                        return true
-                    }
-
-                    override fun longPressHelper(p: GeoPoint?): Boolean = false
-                }
-                overlays.add(MapEventsOverlay(mapEventsReceiver))
 
                 post {
                     onMapReady()
@@ -181,6 +187,15 @@ fun MapContent(
         }, update = {
             mapState.updateSelection(uiState.selectedPoint, uiState.temporaryCoordinates)
             mapState.updateExternalPois(uiState.externalPois, onExternalPoiClicked)
+            
+            // Sincronizar cámara desde el estado si cambió (ej: por setInitialPoint)
+            uiState.cameraCenter?.let { center ->
+                val currentMapCenter = mapState.mapView.mapCenter
+                if (currentMapCenter.latitude != center.latitude || currentMapCenter.longitude != center.longitude) {
+                    mapState.mapView.controller.setCenter(GeoPoint(center.latitude, center.longitude))
+                    mapState.mapView.controller.setZoom(uiState.cameraZoom)
+                }
+            }
         })
 
         if (!uiState.isMapReady) {
@@ -202,41 +217,43 @@ fun MapContent(
         }
 
         if (uiState.isMapReady) {
-            var searchActive by remember { mutableStateOf(false) }
+            if (showSearch) {
+                var searchActive by remember { mutableStateOf(false) }
 
-            SearchBar(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = if (searchActive) 0.dp else 16.dp, vertical = 4.dp)
-                    .align(Alignment.TopCenter),
-                query = uiState.searchQuery,
-                onQueryChange = onSearchQueryChanged,
-                onSearch = { searchActive = false },
-                active = searchActive,
-                onActiveChange = { searchActive = it },
-                placeholder = { Text("Buscar lugar...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                windowInsets = WindowInsets(0, 0, 0, 0),
-                trailingIcon = {
-                    if (uiState.searchQuery.isNotEmpty()) {
-                        IconButton(onClick = {
-                            onClearSelection()
-                            if (!searchActive) onSearchQueryChanged("")
-                        }) {
-                            Icon(Icons.Default.Close, contentDescription = null)
+                SearchBar(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = if (searchActive) 0.dp else 16.dp, vertical = 4.dp)
+                        .align(Alignment.TopCenter),
+                    query = uiState.searchQuery,
+                    onQueryChange = onSearchQueryChanged,
+                    onSearch = { searchActive = false },
+                    active = searchActive,
+                    onActiveChange = { searchActive = it },
+                    placeholder = { Text("Buscar lugar...") },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    windowInsets = WindowInsets(0, 0, 0, 0),
+                    trailingIcon = {
+                        if (uiState.searchQuery.isNotEmpty()) {
+                            IconButton(onClick = {
+                                onClearSelection()
+                                if (!searchActive) onSearchQueryChanged("")
+                            }) {
+                                Icon(Icons.Default.Close, contentDescription = null)
+                            }
                         }
-                    }
-                }) {
-                LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                    items(uiState.searchResults) { point ->
-                        ListItem(
-                            headlineContent = { Text(point.name) },
-                            supportingContent = { Text(point.address) },
-                            modifier = Modifier.clickable {
-                                onSearchResultSelected(point)
-                                mapState.animateTo(point.coordinates)
-                                searchActive = false
-                            })
+                    }) {
+                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                        items(uiState.searchResults) { point ->
+                            ListItem(
+                                headlineContent = { Text(point.name) },
+                                supportingContent = { Text(point.address) },
+                                modifier = Modifier.clickable {
+                                    onSearchResultSelected(point)
+                                    mapState.animateTo(point.coordinates)
+                                    searchActive = false
+                                })
+                        }
                     }
                 }
             }
@@ -245,46 +262,50 @@ fun MapContent(
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
 
-            uiState.selectedPoint?.let { point ->
-                PointDetailCard(
-                    point = point,
-                    buttonText = buttonText,
-                    onCancel = onClearSelection,
-                    onConfirm = { onPointSelected(point) },
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                )
+            if (showSelectionCard) {
+                uiState.selectedPoint?.let { point ->
+                    PointDetailCard(
+                        point = point,
+                        buttonText = buttonText,
+                        onCancel = onClearSelection,
+                        onConfirm = { onPointSelected(point) },
+                        modifier = Modifier.align(Alignment.BottomCenter)
+                    )
+                }
+
+                uiState.selectedExternalPoi?.let { poi ->
+                    PointDetailCard(
+                        point = poi,
+                        buttonText = externalPoiButtonText,
+                        onCancel = onClearSelection,
+                        onConfirm = { onExternalPoiAction(poi) },
+                        modifier = Modifier.align(Alignment.BottomCenter)
+                    )
+                }
             }
 
-            uiState.selectedExternalPoi?.let { poi ->
-                PointDetailCard(
-                    point = poi,
-                    buttonText = externalPoiButtonText,
-                    onCancel = onClearSelection,
-                    onConfirm = { onExternalPoiAction(poi) },
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                )
-            }
-
-            FloatingActionButton(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(
-                        bottom = if (uiState.selectedPoint != null || uiState.selectedExternalPoi != null) 200.dp else 16.dp,
-                        end = 16.dp
-                    ),
-                onClick = {
-                    val locationOverlay = mapState.mapView.overlays
-                        .filterIsInstance<MyLocationNewOverlay>()
-                        .firstOrNull()
-                    locationOverlay?.myLocation?.let {
-                        mapState.mapView.controller.animateTo(it)
-                        mapState.mapView.controller.setZoom(18.0)
-                    }
-                },
-                containerColor = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(Icons.Default.MyLocation, contentDescription = "Centrar en mi ubicación")
+            if (showControls) {
+                FloatingActionButton(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(
+                            bottom = if (showSelectionCard && (uiState.selectedPoint != null || uiState.selectedExternalPoi != null)) 200.dp else 16.dp,
+                            end = 16.dp
+                        ),
+                    onClick = {
+                        val locationOverlay = mapState.mapView.overlays
+                            .filterIsInstance<MyLocationNewOverlay>()
+                            .firstOrNull()
+                        locationOverlay?.myLocation?.let {
+                            mapState.mapView.controller.animateTo(it)
+                            mapState.mapView.controller.setZoom(18.0)
+                        }
+                    },
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Icon(Icons.Default.MyLocation, contentDescription = "Centrar en mi ubicación")
+                }
             }
 
             uiState.error?.let { error ->

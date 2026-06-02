@@ -1,7 +1,4 @@
-package com.catedra.bitacora.features.map.domain.model
-
-import com.catedra.bitacora.core.domain.model.Coordinates
-import com.catedra.bitacora.core.domain.model.PointOnMap
+package com.catedra.bitacora.core.domain.model
 
 data class ExternalPoi(
     val id: String,
