@@ -25,7 +25,7 @@ class SavePointUseCase @Inject constructor(
 
         // Recolectar todos los usuarios autorizados (dueño + privilegios)
         val authorizedUsers = mutableSetOf(travel.ownerId)
-        travel.privileges?.keys?.let { authorizedUsers.addAll(it) }
+        travel.privileges?.let { authorizedUsers.addAll(it) }
 
         // Calcular geohash si hay coordenadas
         val geohash = if (point.latitude != null && point.longitude != null) {

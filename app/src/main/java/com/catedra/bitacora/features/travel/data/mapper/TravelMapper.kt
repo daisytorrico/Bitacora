@@ -10,7 +10,11 @@ import java.time.ZoneId
 import java.util.Date
 
 fun QuerySnapshot.toDomain(): List<Travel> {
-    return documents.mapNotNull { it.toTravel() }
+    return documents.toDomain()
+}
+
+fun List<DocumentSnapshot>.toDomain(): List<Travel> {
+    return this.mapNotNull { it.toTravel() }
 }
 
 fun DocumentSnapshot.toTravel(): Travel? {
@@ -34,7 +38,7 @@ fun DocumentSnapshot.toTravel(): Travel? {
             endDate = firestoreEndDate,
             pointsCount = getLong("pointsCount")?.toInt() ?: 0,
             visibility = getString("visibility")?.uppercase()?.let { TravelVisibility.valueOf(it) } ?: TravelVisibility.PRIVATE,
-            privileges = get("privileges") as? Map<String, String>,
+            privileges = get("privileges") as? List<String>,
             updatedAt = updatedAt
         )
     } catch (e: Exception) {
@@ -55,8 +59,8 @@ fun Travel.toData(): Map<String, Any?> {
             Timestamp(Date.from(it.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant()))
         },
         "visibility" to visibility.name.lowercase(),
-        "privileges" to privileges
-    )
+        "privileges" to (privileges ?: emptyList<String>())
+    ).filterValues { it != null }
 }
 
 private fun LocalDate.toDate(): Date {

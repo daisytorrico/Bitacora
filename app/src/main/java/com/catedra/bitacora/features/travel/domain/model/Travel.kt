@@ -13,7 +13,7 @@ data class Travel(
     val endDate: LocalDate? = null,
     val pointsCount: Int = 0,
     val visibility: TravelVisibility = TravelVisibility.PRIVATE,
-    val privileges: Map<String, String>? = null,
+    val privileges: List<String>? = null,
     val updatedAt: LocalDateTime? = null
 ) {
     val status: TravelStatus

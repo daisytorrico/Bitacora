@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.semantics
@@ -75,13 +76,17 @@ fun LoginScreen(
             label = { Text("Email") },
             modifier = Modifier
                 .fillMaxWidth()
-                .semantics{
+                .semantics {
                     contentType = ContentType.EmailAddress
                 },
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
-            enabled = !cargando
+            enabled = !cargando,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -101,7 +106,11 @@ fun LoginScreen(
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
-            enabled = !cargando
+            enabled = !cargando,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+            )
         )
 
         Spacer(modifier = Modifier.height(24.dp))

@@ -15,7 +15,6 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import com.catedra.bitacora.features.discovery.presentation.navigation.DiscoveryDestinations
 import com.catedra.bitacora.features.map.presentation.navigation.MapDestination
 import com.catedra.bitacora.features.travel.presentation.navigation.TravelDestinations
-import com.catedra.bitacora.ui.theme.Blanco
 
 @Composable
 fun AppBottomBar(
@@ -25,7 +24,7 @@ fun AppBottomBar(
     onNavigateToMap: () -> Unit
 ) {
     NavigationBar(
-        containerColor = Blanco,
+        containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 0.dp,
         modifier = Modifier
             .navigationBarsPadding() 

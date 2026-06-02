@@ -56,7 +56,7 @@ fun PointOfInterestItem(
                             .align(Alignment.TopEnd)
                             .padding(12.dp),
                         shape = RoundedCornerShape(8.dp),
-                        color = Blanco.copy(alpha = 0.9f)
+                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
                     ) {
                         Text(
                             text = date.format(DateTimeFormatter.ofPattern("dd MMM")),

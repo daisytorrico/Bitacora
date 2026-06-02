@@ -7,7 +7,7 @@ val AzulProfundo = Color(0xFF1565C0)
 val AzulMedio = Color(0xFF1E88E5)
 val AzulClaro = Color(0xFF90CAF9)
 
-val Temp = Color.Gray;
+val Temp = Color(0xFFCCCCCC);
 
 val GrisClaro = Color(0xFFF5F5F5)
 val GrisMedio = Color(0xFF9E9E9E)

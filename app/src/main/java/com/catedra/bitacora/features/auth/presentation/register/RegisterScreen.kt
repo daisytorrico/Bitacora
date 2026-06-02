@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -80,7 +81,11 @@ fun RegisterScreen(
             label = { Text("Nombre Completo") },
             modifier = Modifier.fillMaxWidth(),
             leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-            singleLine = true
+            singleLine = true,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -94,7 +99,11 @@ fun RegisterScreen(
             isError = email.isNotEmpty() && !emailValido,
             supportingText = { if (email.isNotEmpty() && !emailValido) Text("Email no válido") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            singleLine = true
+            singleLine = true,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -115,7 +124,11 @@ fun RegisterScreen(
             supportingText = { if (password.isNotEmpty() && !passwordValida) Text("Mínimo 6 caracteres") },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            singleLine = true
+            singleLine = true,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -128,7 +141,11 @@ fun RegisterScreen(
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            singleLine = true
+            singleLine = true,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+            )
         )
 
         Spacer(modifier = Modifier.height(24.dp))

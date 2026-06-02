@@ -59,9 +59,6 @@ fun PointDetailScreen(
                 onBack = onBack
             )
         },
-        bottomBar = {
-            AppBottomBar(navController = navController)
-        },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         if (uiState.isLoading) {

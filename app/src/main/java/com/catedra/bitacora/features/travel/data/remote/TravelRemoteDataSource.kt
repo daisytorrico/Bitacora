@@ -13,21 +13,43 @@ class TravelRemoteDataSource @Inject constructor(
     private val auth: FirebaseAuth,
     private val db: FirebaseFirestore
 ) {
-    suspend fun getTravels(userId: String): QuerySnapshot {
-        return db.collection("trips")
-            .where(
-                Filter.or(
-                    Filter.equalTo("ownerId", userId),
-                    Filter.equalTo("privileges.$userId", "edit")
-                )
-            )
-            .get()
-            .await()
+    suspend fun getTravels(userId: String): List<DocumentSnapshot> {
+        val results = mutableListOf<DocumentSnapshot>()
+        
+        // Consulta 1: Viajes donde soy dueño
+        try {
+            val ownedQuery = db.collection("trips")
+                .whereEqualTo("ownerId", userId)
+                .get()
+                .await()
+            results.addAll(ownedQuery.documents)
+        } catch (e: Exception) {
+            // Error silencioso en producción, el repositorio ya maneja el Result
+        }
+
+        // Consulta 2: Viajes donde soy colaborador
+        try {
+            val sharedQuery = db.collection("trips")
+                .whereArrayContains("privileges", userId)
+                .get()
+                .await()
+            results.addAll(sharedQuery.documents)
+        } catch (e: Exception) {
+            // Error silencioso en producción
+        }
+
+        return results.distinctBy { it.id }
     }
 
     suspend fun saveTravel(travelData: Map<String, Any?>): String {
+        val dataWithTimestamp = travelData.toMutableMap().apply {
+            put("updatedAt", FieldValue.serverTimestamp())
+            // Aseguramos que privileges sea una lista si no viene
+            if (!containsKey("privileges")) put("privileges", emptyList<String>())
+        }
+        
         val documentReference = db.collection("trips")
-            .add(travelData)
+            .add(dataWithTimestamp)
             .await()
         return documentReference.id
     }

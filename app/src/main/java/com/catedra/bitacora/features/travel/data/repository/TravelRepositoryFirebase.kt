@@ -17,8 +17,8 @@ class TravelRepositoryFirebase @Inject constructor(
 
     override suspend fun getTravels(userId: String, page: Int): Result<List<Travel>> {
         return try {
-            val querySnapshot = remoteDataSource.getTravels(userId)
-            val travels = querySnapshot.toDomain()
+            val documents = remoteDataSource.getTravels(userId)
+            val travels = documents.toDomain()
             Result.success(travels)
         } catch (e: Exception) {
             Result.failure(e)

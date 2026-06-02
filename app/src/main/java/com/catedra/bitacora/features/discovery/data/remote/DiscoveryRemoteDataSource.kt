@@ -48,7 +48,9 @@ class DiscoveryRemoteDataSource @Inject constructor(
 
         for (doc in snapshot.documents) {
             val travel = doc.toTravel()
-            if (travel != null && travel.ownerId !in allExcluded) {
+            // Quitamos el filtro de travel.ownerId !in allExcluded para que el usuario 
+            // pueda ver sus propios viajes públicos en la pestaña de exploración.
+            if (travel != null) {
                 travels.add(travel)
                 lastProcessedDoc = doc
                 if (travels.size >= limit) break
