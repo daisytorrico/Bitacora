@@ -39,6 +39,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -100,6 +101,8 @@ fun MapContent(
     val context = LocalContext.current
     val mapState = rememberMapState()
     val lifecycleOwner = LocalLifecycleOwner.current
+    val currentUiState by rememberUpdatedState(uiState)
+    val currentOnCameraMoved by rememberUpdatedState(onCameraMoved)
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -135,7 +138,6 @@ fun MapContent(
 
                     locationOverlay.runOnFirstFix {
                         val myLocation = locationOverlay.myLocation
-                        // Solo centrar automáticamente si NO se ha establecido un centro en la UI (por initialPoint por ej)
                         if (myLocation != null && uiState.cameraCenter == null) {
                             post {
                                 controller.animateTo(myLocation)
@@ -150,9 +152,9 @@ fun MapContent(
                     val mapListener = object : MapListener {
                         override fun onScroll(event: ScrollEvent?): Boolean {
                             val center = mapCenter
-                            if (uiState.cameraCenter?.latitude != center.latitude || 
-                                uiState.cameraCenter?.longitude != center.longitude) {
-                                onCameraMoved(
+                            if (currentUiState.cameraCenter?.latitude != center.latitude || 
+                                currentUiState.cameraCenter?.longitude != center.longitude) {
+                                currentOnCameraMoved(
                                     Coordinates(center.latitude, center.longitude), zoomLevelDouble
                                 )
                             }
@@ -161,7 +163,7 @@ fun MapContent(
 
                         override fun onZoom(event: ZoomEvent?): Boolean {
                             val center = mapCenter
-                            onCameraMoved(
+                            currentOnCameraMoved(
                                 Coordinates(center.latitude, center.longitude), zoomLevelDouble
                             )
                             return true
@@ -188,14 +190,12 @@ fun MapContent(
             mapState.updateSelection(uiState.selectedPoint, uiState.temporaryCoordinates)
             mapState.updateExternalPois(uiState.externalPois, onExternalPoiClicked)
             
-            // Sincronizar cámara desde el estado si cambió significativamente (ej: por setInitialPoint)
             uiState.cameraCenter?.let { center ->
                 val currentMapCenter = mapState.mapView.mapCenter
                 val latDiff = kotlin.math.abs(currentMapCenter.latitude - center.latitude)
                 val lonDiff = kotlin.math.abs(currentMapCenter.longitude - center.longitude)
                 val zoomDiff = kotlin.math.abs(mapState.mapView.zoomLevelDouble - uiState.cameraZoom)
 
-                // Usamos un umbral pequeño para evitar bucles infinitos por errores de precisión
                 if (latDiff > 0.00001 || lonDiff > 0.00001 || zoomDiff > 0.1) {
                     mapState.mapView.controller.setCenter(GeoPoint(center.latitude, center.longitude))
                     mapState.mapView.controller.setZoom(uiState.cameraZoom)

@@ -40,11 +40,9 @@ class MapState(
     }
 
     fun updateExternalPois(pois: List<PointOnMap>, onPoiClicked: (PointOnMap) -> Unit) {
-        // Eliminar marcadores antiguos
         poiMarkers.forEach { mapView.overlays.remove(it) }
         poiMarkers.clear()
 
-        // Crear nuevos marcadores
         pois.forEach { poi ->
             val marker = Marker(mapView).apply {
                 position = GeoPoint(poi.coordinates.latitude, poi.coordinates.longitude)

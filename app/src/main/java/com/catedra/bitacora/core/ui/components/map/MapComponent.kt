@@ -34,12 +34,10 @@ fun MapComponent(
         }
     }
 
-    // Sincronizar POIs externos con el ViewModel
     LaunchedEffect(externalPois) {
         viewModel.setExternalPois(externalPois)
     }
 
-    // Establecer punto inicial si se proporciona
     LaunchedEffect(initialPoint) {
         initialPoint?.let {
             viewModel.setInitialPoint(it)
