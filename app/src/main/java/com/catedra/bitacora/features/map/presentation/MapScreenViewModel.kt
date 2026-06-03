@@ -48,7 +48,7 @@ class MapScreenViewModel @Inject constructor(
     private suspend fun loadPoints(center: Coordinates) {
         val userId = auth.currentUser?.uid ?: return
 
-        getNearbyPointsUseCase(userId, center.latitude, center.longitude, radiusKm = 10.0)
+        getNearbyPointsUseCase(userId, center.latitude, center.longitude, radiusKm = 100.0)
             .onSuccess { points ->
                 uiState = points
                 lastFetchedLocation = center
