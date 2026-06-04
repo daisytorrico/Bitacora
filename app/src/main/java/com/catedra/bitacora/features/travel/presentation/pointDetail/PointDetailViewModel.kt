@@ -1,5 +1,6 @@
 package com.catedra.bitacora.features.travel.presentation.pointDetail
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,18 +16,20 @@ import javax.inject.Inject
 class PointDetailViewModel @Inject constructor(
     private val getPointOfInterestUseCase: GetPointOfInterestUseCase,
     private val authRepository: AuthRepository,
-    private val giveLikeUseCase: GiveLikeUseCase,
-    private val removeLikeUseCase: RemoveLikeUseCase,
-    private val getLikesCountUseCase: GetLikesCountUseCase,
-    private val getIsLikedUseCase: GetIsLikedUseCase,
-    private val getCommentsCountUseCase: GetCommentsCountUseCase,
+    private val sessionRepository: com.catedra.bitacora.core.domain.repository.SessionRepository,
+    private val likeUseCases: LikeUseCases,
+    private val commentUseCases: CommentUseCases,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val travelId: String = checkNotNull(savedStateHandle["travelId"])
     private val pointId: String = checkNotNull(savedStateHandle["pointId"])
 
-    private val _uiState = MutableStateFlow(PointDetailUiState())
+    private val _uiState = MutableStateFlow(PointDetailUiState(
+        travelId = travelId,
+        pointId = pointId,
+        currentUserId = sessionRepository.getCurrentUser()?.uid
+    ))
     val uiState: StateFlow<PointDetailUiState> = _uiState.asStateFlow()
 
     init {
@@ -37,7 +40,7 @@ class PointDetailViewModel @Inject constructor(
     private fun loadPointDetail() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            
+
             val pointResult = getPointOfInterestUseCase(travelId, pointId)
             val userResult = authRepository.getFullUserData()
 
@@ -45,7 +48,7 @@ class PointDetailViewModel @Inject constructor(
                 val user = userResult.getOrNull()
                 val currentUserId = authRepository.getCurrentUser()?.uid
                 _uiState.update { it.copy(
-                    isLoading = false, 
+                    isLoading = false,
                     point = pointResult.getOrNull(),
                     creatorUser = user,
                     isOwner = user?.uid == currentUserId,
@@ -53,34 +56,53 @@ class PointDetailViewModel @Inject constructor(
                 ) }
             } else {
                 _uiState.update { it.copy(
-                    isLoading = false, 
-                    error = pointResult.exceptionOrNull()?.message 
+                    isLoading = false,
+                    error = pointResult.exceptionOrNull()?.message
                 ) }
             }
         }
     }
 
     private fun observeSocialData() {
-        getLikesCountUseCase(travelId, pointId)
+        likeUseCases.getLikesCount(travelId, pointId)
             .onEach { count -> _uiState.update { it.copy(likesCount = count) } }
             .launchIn(viewModelScope)
 
-        getIsLikedUseCase(travelId, pointId)
-            .onEach { isLiked -> _uiState.update { it.copy(isLiked = isLiked) } }
-            .launchIn(viewModelScope)
+        // Carga el estado inicial una sola vez para evitar race condition con el optimistic update
+        viewModelScope.launch {
+            likeUseCases.isLiked(LikeTarget.POI, travelId, pointId)
+                .first()
+                .let { isLiked -> _uiState.update { it.copy(isLiked = isLiked) } }
+        }
 
-        getCommentsCountUseCase(travelId, pointId)
-            .onEach { count -> _uiState.update { it.copy(commentsCount = count) } }
+        commentUseCases.getComments(travelId, pointId)
+            .onEach { list -> _uiState.update { it.copy(commentsCount = list.size) } }
             .launchIn(viewModelScope)
     }
 
     fun toggleLike() {
+        val currentIsLiked = uiState.value.isLiked
+        val currentLikesCount = uiState.value.likesCount
+
+        _uiState.update { it.copy(
+            isLiked = !currentIsLiked,
+            likesCount = if (currentIsLiked) currentLikesCount - 1 else currentLikesCount + 1
+        ) }
+
         viewModelScope.launch {
-            val isLiked = uiState.value.isLiked
-            if (isLiked) {
-                removeLikeUseCase(travelId, pointId)
-            } else {
-                giveLikeUseCase(travelId, pointId)
+            val result = likeUseCases.toggleLike(
+                target = LikeTarget.POI,
+                tripId = travelId,
+                poiId = pointId,
+                isLiked = currentIsLiked
+            )
+
+            if (result.isFailure) {
+                Log.e("POI_LIKE", "Error: ${result.exceptionOrNull()?.message}", result.exceptionOrNull())
+                _uiState.update { it.copy(
+                    isLiked = currentIsLiked,
+                    likesCount = currentLikesCount
+                ) }
             }
         }
     }
