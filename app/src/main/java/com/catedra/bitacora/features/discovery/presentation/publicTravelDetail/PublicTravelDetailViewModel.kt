@@ -38,7 +38,7 @@ class PublicTravelDetailViewModel @Inject constructor(
             travelResult.onSuccess { travel ->
                 val pointsResult = useCase.getPoints(travelId)
                 val userResult = profileUseCase.getUser(travel.ownerId)
-                
+
                 _uiState.update { it.copy(
                     travel = travel,
                     pointsOfInterest = pointsResult.getOrDefault(emptyList()),

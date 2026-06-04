@@ -9,6 +9,7 @@ data class PublicProfileUiState(
     val user: User? = null,
     val travels: List<Travel> = emptyList(),
     val isFollowing: Boolean = false,
+    val isMe: Boolean = false,
     val error: String? = null
 ) {
     fun toTravelListUiState() = TravelListUiState(
