@@ -10,5 +10,6 @@ data class TravelDetailUiState(
     val creatorUser: User? = null,
     val pointsOfInterest: List<PointOfInterest> = emptyList(),
     val isOwner: Boolean = false,
+    val canEdit: Boolean = false,
     val error: String? = null
 )

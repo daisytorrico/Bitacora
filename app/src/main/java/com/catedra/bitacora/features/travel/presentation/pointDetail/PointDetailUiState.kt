@@ -8,6 +8,7 @@ data class PointDetailUiState(
     val point: PointOfInterest? = null,
     val creatorUser: User? = null,
     val isOwner: Boolean = false,
+    val canEdit: Boolean = false,
     val likesCount: Int = 0,
     val isLiked: Boolean = false,
     val commentsCount: Int = 0,

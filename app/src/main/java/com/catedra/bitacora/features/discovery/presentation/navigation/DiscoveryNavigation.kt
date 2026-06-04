@@ -68,6 +68,12 @@ fun NavGraphBuilder.discoveryGraph(navController: NavController) {
                 onProfileClick = { userId ->
                     navController.navigate(DiscoveryDestinations.publicProfile(userId))
                 },
+                onEditClick = { travelId ->
+                    navController.navigate("travel_edit/$travelId")
+                },
+                onPrivilegesClick = { travelId ->
+                    navController.navigate("travel_privileges/$travelId")
+                },
                 navController = navController
             )
         }
@@ -78,6 +84,9 @@ fun NavGraphBuilder.discoveryGraph(navController: NavController) {
                 viewModel = viewModel,
                 onProfileClick = { userId ->
                     navController.navigate(DiscoveryDestinations.publicProfile(userId))
+                },
+                onEditClick = { travelId, pointId ->
+                    navController.navigate("travel_details/$travelId/points/$pointId/edit")
                 },
                 navController = navController
             )

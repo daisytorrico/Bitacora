@@ -3,6 +3,8 @@ package com.catedra.bitacora.features.travel.presentation.travelDetail
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -26,6 +28,8 @@ fun TravelDetailScreen(
     onBack: () -> Unit,
     onAddPointClick: (String) -> Unit,
     onPointClick: (String, String) -> Unit,
+    onEditClick: (String) -> Unit,
+    onPrivilegesClick: (String) -> Unit,
     navController: androidx.navigation.NavController,
     viewModel: TravelDetailViewModel = hiltViewModel()
 ) {
@@ -49,7 +53,19 @@ fun TravelDetailScreen(
         topBar = {
             AppTopBar(
                 titulo = travel?.name ?: "Detalle del Viaje",
-                onBack = onBack
+                onBack = onBack,
+                actions = {
+                    if (uiState.isOwner) {
+                        IconButton(onClick = { travel?.id?.let { onPrivilegesClick(it) } }) {
+                            Icon(Icons.Default.Group, contentDescription = "Privilegios")
+                        }
+                    }
+                    if (uiState.canEdit) {
+                        IconButton(onClick = { travel?.id?.let { onEditClick(it) } }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Editar")
+                        }
+                    }
+                }
             )
         },
         floatingActionButton = {

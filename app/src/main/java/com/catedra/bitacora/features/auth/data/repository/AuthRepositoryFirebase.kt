@@ -175,6 +175,24 @@ class AuthRepositoryFirebase @Inject constructor(
         }
     }
 
+    override suspend fun searchUsers(query: String): Result<List<User>> {
+        return try {
+            val docs = remoteDataSource.searchUsers(query)
+            Result.success(docs.map { it.toUser() })
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getUsersByIds(uids: List<String>): Result<List<User>> {
+        return try {
+            val docs = remoteDataSource.getUsersByIds(uids)
+            Result.success(docs.map { it.toUser() })
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override fun getCurrentUser(): User? {
         return remoteDataSource.currentUser?.toDomain()
     }

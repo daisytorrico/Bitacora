@@ -66,4 +66,24 @@ class AuthRemoteDataSource @Inject constructor(
     suspend fun saveUserDocument(uid: String, data: Map<String, Any?>) {
         db.collection("users").document(uid).set(data).await()
     }
+
+    suspend fun searchUsers(query: String): List<DocumentSnapshot> {
+        val q = query.lowercase()
+        return db.collection("users")
+            .whereGreaterThanOrEqualTo("username", q)
+            .whereLessThanOrEqualTo("username", q + "\uf8ff")
+            .limit(10)
+            .get()
+            .await()
+            .documents
+    }
+
+    suspend fun getUsersByIds(uids: List<String>): List<DocumentSnapshot> {
+        if (uids.isEmpty()) return emptyList()
+        return db.collection("users")
+            .whereIn("uid", uids)
+            .get()
+            .await()
+            .documents
+    }
 }

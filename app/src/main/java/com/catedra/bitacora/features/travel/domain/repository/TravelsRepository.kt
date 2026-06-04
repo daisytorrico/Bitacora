@@ -20,6 +20,14 @@ interface TravelsRepository {
     // Guardar el viaje y retornar su ID
     suspend fun saveTravel(travel: Travel): Result<String>
 
+    suspend fun updateTravel(travel: Travel): Result<Unit>
+    suspend fun updatePoint(
+        travelId: String,
+        point: PointOfInterest,
+        geohash: String? = null,
+        authorizedUsers: List<String> = emptyList()
+    ): Result<Unit>
+
     companion object {
         const val DEFAULT_PAGE_SIZE = 10
     }

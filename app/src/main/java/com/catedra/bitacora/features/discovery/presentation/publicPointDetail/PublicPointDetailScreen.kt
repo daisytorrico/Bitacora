@@ -1,11 +1,15 @@
 package com.catedra.bitacora.features.discovery.presentation.publicPointDetail
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.catedra.bitacora.core.domain.model.Coordinates
@@ -19,6 +23,7 @@ import com.catedra.bitacora.core.ui.components.travel.PointDetailContent
 fun PublicPointDetailScreen(
     viewModel: PublicPointDetailViewModel,
     onProfileClick: (String) -> Unit,
+    onEditClick: (String, String) -> Unit,
     navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -43,7 +48,20 @@ fun PublicPointDetailScreen(
                 onCommentsClick = { },
                 onToggleMap = { viewModel.onToggleMap(it) },
                 paddingValues = paddingValues,
-                actions = null
+                actions = {
+                    if (uiState.canEdit) {
+                        Spacer(modifier = Modifier.height(32.dp))
+                        OutlinedButton(
+                            onClick = { uiState.point?.id?.let { onEditClick(viewModel.travelId, it) } },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Icon(Icons.Default.Edit, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Editar Entrada")
+                        }
+                    }
+                }
             )
         }
 

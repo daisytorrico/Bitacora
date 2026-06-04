@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.catedra.bitacora.features.travel.domain.model.TravelVisibility
-import com.catedra.bitacora.core.ui.components.form.AppDatePickerField
+import com.catedra.bitacora.core.ui.components.form.TravelFormContent
 import com.catedra.bitacora.core.ui.components.common.AppTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,7 +72,18 @@ fun CreateTravelScreen(
 
     Scaffold(
         topBar = {
-            AppTopBar(titulo = "Nuevo Viaje", onBack = onBack)
+            AppTopBar(
+                titulo = "Nuevo Viaje",
+                onBack = onBack,
+                actions = {
+                    IconButton(
+                        onClick = { viewModel.saveTravel() },
+                        enabled = uiState.canSave && !uiState.loading
+                    ) {
+                        Icon(Icons.Default.Check, contentDescription = "Guardar")
+                    }
+                }
+            )
         }
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
@@ -78,14 +91,20 @@ fun CreateTravelScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(24.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                // Selector de Imagen
-                FormPortadaSelector(
+                TravelFormContent(
+                    name = uiState.name,
+                    onNameChange = { viewModel.onNameChange(it) },
+                    description = uiState.description,
+                    onDescriptionChange = { viewModel.onDescriptionChange(it) },
+                    startDate = uiState.startDate,
+                    onStartDateSelected = { viewModel.onStartDateSelected(it) },
+                    endDate = uiState.endDate,
+                    onEndDateSelected = { viewModel.onEndDateSelected(it) },
+                    visibility = uiState.visibility,
+                    onVisibilityChange = { viewModel.onVisibilityChange(it) },
                     imageUri = uiState.imageUri,
+                    imageUrl = null,
                     onClickAddFoto = {
                         val permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
                         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
@@ -93,112 +112,14 @@ fun CreateTravelScreen(
                         } else {
                             permissionLauncher.launch(Manifest.permission.CAMERA)
                         }
-                    }
+                    },
+                    isDateInvalid = uiState.isDateInvalid,
+                    isLoading = uiState.loading,
+                    modifier = Modifier.weight(1f)
                 )
 
-                // Nombre
-                OutlinedTextField(
-                    value = uiState.name,
-                    onValueChange = { viewModel.onNameChange(it) },
-                    label = { Text("Nombre del viaje") },
-                    placeholder = { Text("Ej. Verano en la Toscana") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    isError = uiState.name.isBlank() && uiState.name.isNotEmpty(),
-                    enabled = !uiState.loading
-                )
-
-                // Fechas
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    AppDatePickerField(
-                        label = "Inicio",
-                        selectedDateMillis = uiState.startDate,
-                        onDateSelected = { viewModel.onStartDateSelected(it) },
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    AppDatePickerField(
-                        label = "Fin",
-                        selectedDateMillis = uiState.endDate,
-                        onDateSelected = { viewModel.onEndDateSelected(it) },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-                
-                if (uiState.isDateInvalid) {
-                    Text(
-                        text = "La fecha de fin no puede ser anterior al inicio",
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-
-                // Descripción
-                OutlinedTextField(
-                    value = uiState.description,
-                    onValueChange = { viewModel.onDescriptionChange(it) },
-                    label = { Text("Descripción") },
-                    placeholder = { Text("¿Qué esperas de esta aventura?") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    minLines = 4,
-                    enabled = !uiState.loading
-                )
-
-                // Visibilidad
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "Visibilidad",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                        TravelVisibility.entries.forEachIndexed { index, visibility ->
-                            SegmentedButton(
-                                selected = uiState.visibility == visibility,
-                                onClick = { viewModel.onVisibilityChange(visibility) },
-                                shape = SegmentedButtonDefaults.itemShape(
-                                    index = index,
-                                    count = TravelVisibility.entries.size
-                                ),
-                                label = {
-                                    Text(
-                                        when (visibility) {
-                                            TravelVisibility.PUBLIC -> "Público"
-                                            TravelVisibility.PRIVATE -> "Privado"
-                                            TravelVisibility.FOLLOWERS -> "Seguidores"
-                                        }
-                                    )
-                                }
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                // Botón Guardar
-                Button(
-                    onClick = { viewModel.saveTravel() },
-                    modifier = Modifier.fillMaxWidth().height(50.dp),
-                    enabled = uiState.canSave,
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    if (uiState.loading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = Color.White,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text("Guardar Viaje", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    }
+                if (uiState.loading) {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                 }
             }
             

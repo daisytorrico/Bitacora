@@ -15,6 +15,8 @@ interface AuthRepository : SessionRepository {
     suspend fun saveUsername(username: String): Result<Unit>
     override suspend fun getFullUserData(): Result<User>
     suspend fun updateProfile(name: String, bio: String, photoUrl: String?): Result<Unit>
+    suspend fun searchUsers(query: String): Result<List<User>>
+    suspend fun getUsersByIds(uids: List<String>): Result<List<User>>
     override fun getCurrentUser(): User?
     override fun isUserLoggedIn(): Boolean
 }

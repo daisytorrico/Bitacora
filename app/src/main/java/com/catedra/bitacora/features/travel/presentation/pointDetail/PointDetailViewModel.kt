@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.catedra.bitacora.features.auth.domain.repository.AuthRepository
 import com.catedra.bitacora.features.social.domain.useCase.*
+import com.catedra.bitacora.features.travel.domain.repository.TravelsRepository
 import com.catedra.bitacora.features.travel.domain.useCase.GetPointOfInterestUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -14,6 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PointDetailViewModel @Inject constructor(
     private val getPointOfInterestUseCase: GetPointOfInterestUseCase,
+    private val travelsRepository: TravelsRepository,
     private val authRepository: AuthRepository,
     private val giveLikeUseCase: GiveLikeUseCase,
     private val removeLikeUseCase: RemoveLikeUseCase,
@@ -39,22 +41,28 @@ class PointDetailViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             
             val pointResult = getPointOfInterestUseCase(travelId, pointId)
+            val travelResult = travelsRepository.getTravelById(travelId)
             val userResult = authRepository.getFullUserData()
 
-            if (pointResult.isSuccess) {
+            if (pointResult.isSuccess && travelResult.isSuccess) {
+                val travel = travelResult.getOrNull()!!
                 val user = userResult.getOrNull()
                 val currentUserId = authRepository.getCurrentUser()?.uid
+                val isOwner = travel.ownerId == currentUserId
+                val canEdit = isOwner || travel.privileges?.contains(currentUserId) == true
+                
                 _uiState.update { it.copy(
                     isLoading = false, 
                     point = pointResult.getOrNull(),
                     creatorUser = user,
-                    isOwner = user?.uid == currentUserId,
+                    isOwner = isOwner,
+                    canEdit = canEdit,
                     error = null
                 ) }
             } else {
                 _uiState.update { it.copy(
                     isLoading = false, 
-                    error = pointResult.exceptionOrNull()?.message 
+                    error = pointResult.exceptionOrNull()?.message ?: travelResult.exceptionOrNull()?.message
                 ) }
             }
         }

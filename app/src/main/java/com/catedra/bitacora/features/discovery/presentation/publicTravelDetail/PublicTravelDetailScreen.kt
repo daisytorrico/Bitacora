@@ -1,6 +1,9 @@
 package com.catedra.bitacora.features.discovery.presentation.publicTravelDetail
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -18,6 +21,8 @@ fun PublicTravelDetailScreen(
     viewModel: PublicTravelDetailViewModel,
     onPointClick: (String, String) -> Unit,
     onProfileClick: (String) -> Unit,
+    onEditClick: (String) -> Unit,
+    onPrivilegesClick: (String) -> Unit,
     navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -26,7 +31,19 @@ fun PublicTravelDetailScreen(
         topBar = {
             AppTopBar(
                 titulo = uiState.travel?.name ?: "Detalle",
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                actions = {
+                    if (uiState.isOwner) {
+                        IconButton(onClick = { uiState.travel?.id?.let { onPrivilegesClick(it) } }) {
+                            Icon(Icons.Default.Group, contentDescription = "Privilegios")
+                        }
+                    }
+                    if (uiState.canEdit) {
+                        IconButton(onClick = { uiState.travel?.id?.let { onEditClick(it) } }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Editar")
+                        }
+                    }
+                }
             )
         }
     ) { paddingValues ->

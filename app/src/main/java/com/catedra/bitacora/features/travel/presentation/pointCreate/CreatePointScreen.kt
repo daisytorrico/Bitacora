@@ -11,19 +11,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Map
-import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.material.icons.filled.PinDrop
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -40,10 +33,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.catedra.bitacora.core.utils.LocationPermissionHandler
 import com.catedra.bitacora.core.utils.LocationPermissionUtils
-import com.catedra.bitacora.core.ui.components.form.AppDatePickerField
-import com.catedra.bitacora.core.ui.components.form.AppTimePickerField
 import com.catedra.bitacora.core.ui.components.common.AppTopBar
 import com.catedra.bitacora.core.ui.components.form.LocationPicker
+import com.catedra.bitacora.core.ui.components.form.PointFormContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +54,6 @@ fun CreatePointScreen(
         if (result.resultCode == Activity.RESULT_OK) {
             val data = result.data
             if (data?.clipData != null) {
-                // Selección multiple
                 val uris = mutableListOf<Uri>()
                 val count = data.clipData!!.itemCount
                 for (i in 0 until count) {
@@ -70,7 +61,6 @@ fun CreatePointScreen(
                 }
                 viewModel.onImagesAdded(uris)
             } else {
-                // Selección única o cámara
                 val selectedUri = data?.data ?: viewModel.getActiveTempUri()
                 selectedUri?.let { viewModel.onImageAdded(it) }
             }
@@ -113,7 +103,18 @@ fun CreatePointScreen(
 
     Scaffold(
         topBar = {
-            AppTopBar(titulo = "Añadir Punto", onBack = onBack)
+            AppTopBar(
+                titulo = "Añadir Punto",
+                onBack = onBack,
+                actions = {
+                    IconButton(
+                        onClick = { viewModel.savePoint() },
+                        enabled = uiState.canSave && !uiState.isLoading
+                    ) {
+                        Icon(Icons.Default.Check, contentDescription = "Guardar")
+                    }
+                }
+            )
         }
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
@@ -121,169 +122,47 @@ fun CreatePointScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .background(MaterialTheme.colorScheme.background)
-                    .verticalScroll(rememberScrollState())
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                // Nombre
-                OutlinedTextField(
-                    value = uiState.name,
-                    onValueChange = { viewModel.onNameChange(it) },
-                    label = { Text("Nombre del lugar") },
-                    placeholder = { Text("Ej. Fontana di Trevi") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    enabled = !uiState.isLoading
+                PointFormContent(
+                    name = uiState.name,
+                    onNameChange = { viewModel.onNameChange(it) },
+                    address = uiState.address,
+                    onAddressChange = { viewModel.onAddressChange(it) },
+                    onMyLocationClick = {
+                        if (LocationPermissionUtils.hasLocationPermission(context)) {
+                            viewModel.obtenerUbicacionActual()
+                        } else {
+                            showLocationPermissionHandler = true
+                        }
+                    },
+                    onMapPickerClick = { viewModel.onToggleMap(true) },
+                    visitDateMillis = uiState.visitDateMillis,
+                    onDateSelected = { viewModel.onDateSelected(it) },
+                    visitHour = uiState.visitHour,
+                    visitMinute = uiState.visitMinute,
+                    onTimeSelected = { h, m -> viewModel.onTimeSelected(h, m) },
+                    notes = uiState.notes,
+                    onNotesChange = { viewModel.onNotesChange(it) },
+                    selectedImages = uiState.selectedImages,
+                    remoteImageUrls = emptyList(),
+                    onAddPhotoClick = {
+                        val cameraPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                        if (cameraPermission == PackageManager.PERMISSION_GRANTED) {
+                            photoLauncher.launch(viewModel.buildPhotoPickerIntent())
+                        } else {
+                            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                        }
+                    },
+                    onRemovePhoto = { viewModel.onImageRemoved(it) },
+                    onRemoveRemotePhoto = {},
+                    isLoading = uiState.isLoading,
+                    travel = uiState.travel,
+                    isDateOutOfRange = uiState.isDateOutOfRange,
+                    modifier = Modifier.weight(1f)
                 )
 
-                // Dirección / Ubicación
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(
-                        value = uiState.address,
-                        onValueChange = { viewModel.onAddressChange(it) },
-                        label = { Text("Dirección") },
-                        placeholder = { Text("Calle o coordenadas") },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        trailingIcon = {
-                            Icon(Icons.Default.LocationOn, contentDescription = null)
-                        },
-                        enabled = !uiState.isLoading
-                    )
-                    
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        OutlinedButton(
-                            onClick = {
-                                if (LocationPermissionUtils.hasLocationPermission(context)) {
-                                    viewModel.obtenerUbicacionActual()
-                                } else {
-                                    showLocationPermissionHandler = true
-                                }
-                            },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(8.dp),
-                            contentPadding = PaddingValues(horizontal = 8.dp)
-                        ) {
-                            Icon(Icons.Default.MyLocation, contentDescription = null, modifier = Modifier.size(18.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Usar ubicación actual", fontSize = 12.sp)
-                        }
-
-                        OutlinedButton(
-                            onClick = { viewModel.onToggleMap(true) },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(8.dp),
-                            contentPadding = PaddingValues(horizontal = 8.dp)
-                        ) {
-                            Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(18.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Ver en mapa", fontSize = 12.sp)
-                        }
-                    }
-                }
-
-                // Fecha de Visita
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    val formatter = remember { java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy") }
-                    val travel = uiState.travel
-                    val rangeText = if (travel?.startDate != null && travel.endDate != null) {
-                        "Rango del viaje: ${travel.startDate.format(formatter)} al ${travel.endDate.format(formatter)}"
-                    } else ""
-
-                    AppDatePickerField(
-                        label = "Fecha de visita",
-                        selectedDateMillis = uiState.visitDateMillis,
-                        onDateSelected = { viewModel.onDateSelected(it) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    AppTimePickerField(
-                        label = "Hora de visita",
-                        selectedHour = uiState.visitHour,
-                        selectedMinute = uiState.visitMinute,
-                        onTimeSelected = { hour, minute -> viewModel.onTimeSelected(hour, minute) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    if (uiState.isDateOutOfRange) {
-                        Text(
-                            text = "Fuera de rango. $rangeText",
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(start = 12.dp)
-                        )
-                    } else if (rangeText.isNotEmpty()) {
-                        Text(
-                            text = rangeText,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(start = 12.dp)
-                        )
-                    }
-                }
-
-                // Notas
-                OutlinedTextField(
-                    value = uiState.notes,
-                    onValueChange = { viewModel.onNotesChange(it) },
-                    label = { Text("Notas") },
-                    placeholder = { Text("¿Qué lo hace especial?") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    minLines = 3,
-                    enabled = !uiState.isLoading
-                )
-
-                // Fotos del Lugar
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Fotos del lugar", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(vertical = 4.dp)
-                    ) {
-                        item {
-                            AddPhotoButton(onClick = {
-                                val cameraPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
-                                if (cameraPermission == PackageManager.PERMISSION_GRANTED) {
-                                    photoLauncher.launch(viewModel.buildPhotoPickerIntent())
-                                } else {
-                                    cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-                                }
-                            })
-                        }
-                        items(uiState.selectedImages) { uri ->
-                            PhotoItem(
-                                uri = uri,
-                                onRemove = { viewModel.onImageRemoved(uri) }
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Botón Guardar
-                Button(
-                    onClick = { viewModel.savePoint() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = CircleShape,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary
-                    ),
-                    enabled = uiState.canSave
-                ) {
-                    if (uiState.isLoading) {
-                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
-                    } else {
-                        Icon(Icons.Default.PinDrop, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Añadir al viaje", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    }
+                if (uiState.isLoading) {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                 }
             }
             

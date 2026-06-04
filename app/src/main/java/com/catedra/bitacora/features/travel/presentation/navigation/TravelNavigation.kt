@@ -14,8 +14,11 @@ import androidx.navigation.compose.composable
 import com.catedra.bitacora.features.profile.presentation.navigation.ProfileDestinations
 import com.catedra.bitacora.features.travel.presentation.pointCreate.CreatePointScreen
 import com.catedra.bitacora.features.travel.presentation.pointDetail.PointDetailScreen
+import com.catedra.bitacora.features.travel.presentation.pointEdit.EditPointScreen
+import com.catedra.bitacora.features.travel.presentation.privileges.ManagePrivilegesScreen
 import com.catedra.bitacora.features.travel.presentation.travelCreate.CreateTravelScreen
 import com.catedra.bitacora.features.travel.presentation.travelDetail.TravelDetailScreen
+import com.catedra.bitacora.features.travel.presentation.travelEdit.EditTravelScreen
 import com.catedra.bitacora.features.travel.presentation.travelList.TravelListScreen
 import com.catedra.bitacora.features.travel.presentation.travelList.TravelListViewModel
 
@@ -23,9 +26,12 @@ import com.catedra.bitacora.features.travel.presentation.travelList.TravelListVi
 object TravelDestinations {
     const val TRAVEL_LIST = "travel_list"
     const val TRAVEL_CREATE = "travel_create"
+    const val TRAVEL_EDIT = "travel_edit/{travelId}"
+    const val TRAVEL_PRIVILEGES = "travel_privileges/{travelId}"
     const val TRAVEL_DETAIL = "travel_detail/{travelId}"
     const val TRAVEL_ADD_POINT = "travel_details/{travelId}/add_point"
     const val POINT_DETAIL = "travel_details/{travelId}/points/{pointId}"
+    const val POINT_EDIT = "travel_details/{travelId}/points/{pointId}/edit"
     const val MAP = "map"
 }
 
@@ -33,7 +39,6 @@ fun NavGraphBuilder.travelGraph(
     navController: NavController,
     onLogout: () -> Unit
 ) {
-    // La pantalla de la lista de viajes
     composable(TravelDestinations.TRAVEL_LIST) {
         val viewModel: TravelListViewModel = hiltViewModel()
         TravelListScreen(
@@ -52,7 +57,6 @@ fun NavGraphBuilder.travelGraph(
         )
     }
 
-    // Pantalla de Detalle del Viaje
     composable(TravelDestinations.TRAVEL_DETAIL) {
         TravelDetailScreen(
             onBack = { navController.popBackStack() },
@@ -62,22 +66,47 @@ fun NavGraphBuilder.travelGraph(
             onPointClick = { travelId, pointId ->
                 navController.navigate("travel_details/$travelId/points/$pointId")
             },
-            navController = navController
-        )
-    }
-
-    // Pantalla de Detalle del Punto de Interes
-    composable(TravelDestinations.POINT_DETAIL) {
-        PointDetailScreen(
-            onBack = { navController.popBackStack() },
-            onEdit = { pointId ->
-                // TODO: Navegar a editar punto
+            onEditClick = { travelId ->
+                navController.navigate("travel_edit/$travelId")
+            },
+            onPrivilegesClick = { travelId ->
+                navController.navigate("travel_privileges/$travelId")
             },
             navController = navController
         )
     }
 
-    // Pantalla del formulario para crear un viaje
+    composable(TravelDestinations.TRAVEL_EDIT) {
+        EditTravelScreen(
+            onBack = { navController.popBackStack() },
+            onTravelUpdated = { navController.popBackStack() }
+        )
+    }
+
+    composable(TravelDestinations.TRAVEL_PRIVILEGES) {
+        ManagePrivilegesScreen(
+            onBack = { navController.popBackStack() }
+        )
+    }
+
+    composable(TravelDestinations.POINT_DETAIL) { backStackEntry ->
+        val travelId = backStackEntry.arguments?.getString("travelId") ?: return@composable
+        PointDetailScreen(
+            onBack = { navController.popBackStack() },
+            onEdit = { pointId ->
+                navController.navigate("travel_details/$travelId/points/$pointId/edit")
+            },
+            navController = navController
+        )
+    }
+
+    composable(TravelDestinations.POINT_EDIT) {
+        EditPointScreen(
+            onBack = { navController.popBackStack() },
+            onPointUpdated = { navController.popBackStack() }
+        )
+    }
+
     composable(TravelDestinations.TRAVEL_CREATE) {
         CreateTravelScreen(
             onBack = { navController.popBackStack() },
@@ -90,7 +119,6 @@ fun NavGraphBuilder.travelGraph(
         )
     }
 
-    // Pantalla para añadir un punto de interés
     composable(TravelDestinations.TRAVEL_ADD_POINT) { backStackEntry ->
         val travelId = backStackEntry.arguments?.getString("travelId") ?: return@composable
         CreatePointScreen(
