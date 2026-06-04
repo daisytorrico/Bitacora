@@ -24,7 +24,6 @@ class TravelRemoteDataSource @Inject constructor(
                 .await()
             results.addAll(ownedQuery.documents)
         } catch (e: Exception) {
-            // Error silencioso en producción, el repositorio ya maneja el Result
         }
 
         // Consulta 2: Viajes donde soy colaborador
@@ -35,7 +34,6 @@ class TravelRemoteDataSource @Inject constructor(
                 .await()
             results.addAll(sharedQuery.documents)
         } catch (e: Exception) {
-            // Error silencioso en producción
         }
 
         return results.distinctBy { it.id }
@@ -44,7 +42,6 @@ class TravelRemoteDataSource @Inject constructor(
     suspend fun saveTravel(travelData: Map<String, Any?>): String {
         val dataWithTimestamp = travelData.toMutableMap().apply {
             put("updatedAt", FieldValue.serverTimestamp())
-            // Aseguramos que privileges sea una lista si no viene
             if (!containsKey("privileges")) put("privileges", emptyList<String>())
         }
         

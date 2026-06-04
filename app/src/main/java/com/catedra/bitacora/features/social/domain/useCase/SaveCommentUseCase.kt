@@ -1,9 +1,0 @@
-package com.catedra.bitacora.features.social.domain.useCase
-
-import com.catedra.bitacora.features.social.domain.repository.SocialRepository
-import javax.inject.Inject
-
-class SaveCommentUseCase @Inject constructor(private val repository: SocialRepository) {
-    suspend operator fun invoke(tripId: String, poiId: String, content: String) = 
-        repository.saveComment(tripId, poiId, content)
-}
