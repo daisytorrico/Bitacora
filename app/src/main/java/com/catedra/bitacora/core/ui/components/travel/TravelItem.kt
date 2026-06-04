@@ -20,7 +20,6 @@ import coil.compose.AsyncImage
 import com.catedra.bitacora.features.travel.domain.model.Travel
 import com.catedra.bitacora.core.ui.theme.GrisMedio
 import com.catedra.bitacora.core.ui.theme.GrisSeparador
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -154,9 +153,7 @@ private fun getDateRange(travel: Travel): String {
     
     return if (start.isNotEmpty() && end.isNotEmpty()) {
         "$start - $end"
-    } else if (start.isNotEmpty()) {
-        start
-    } else {
+    } else start.ifEmpty {
         "Sin fechas"
     }
 }
