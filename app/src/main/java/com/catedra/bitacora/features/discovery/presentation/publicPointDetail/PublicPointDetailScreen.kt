@@ -32,7 +32,14 @@ fun PublicPointDetailScreen(
         topBar = {
             AppTopBar(
                 titulo = uiState.point?.name ?: "Punto de Interés",
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                actions = {
+                    if (uiState.canEdit) {
+                        IconButton(onClick = { uiState.point?.id?.let { onEditClick(viewModel.travelId, it) } }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Editar")
+                        }
+                    }
+                }
             )
         }
     ) { paddingValues ->
@@ -47,21 +54,7 @@ fun PublicPointDetailScreen(
                 onLikeClick = { viewModel.toggleLike() },
                 onCommentsClick = { },
                 onToggleMap = { viewModel.onToggleMap(it) },
-                paddingValues = paddingValues,
-                actions = {
-                    if (uiState.canEdit) {
-                        Spacer(modifier = Modifier.height(32.dp))
-                        OutlinedButton(
-                            onClick = { uiState.point?.id?.let { onEditClick(viewModel.travelId, it) } },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Icon(Icons.Default.Edit, contentDescription = null)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Editar Entrada")
-                        }
-                    }
-                }
+                paddingValues = paddingValues
             )
         }
 

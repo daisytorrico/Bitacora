@@ -69,12 +69,14 @@ fun TravelDetailScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { travel?.let { onAddPointClick(it.id) } },
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = Blanco
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Añadir punto")
+            if (uiState.canEdit) {
+                FloatingActionButton(
+                    onClick = { travel?.let { onAddPointClick(it.id) } },
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = Blanco
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Añadir punto")
+                }
             }
         }
     ) { paddingValues ->

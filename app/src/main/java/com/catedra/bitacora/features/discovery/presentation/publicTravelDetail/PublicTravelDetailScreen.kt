@@ -2,6 +2,7 @@ package com.catedra.bitacora.features.discovery.presentation.publicTravelDetail
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material3.*
@@ -14,6 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.catedra.bitacora.core.ui.components.common.AppTopBar
 import com.catedra.bitacora.core.ui.components.travel.TravelDetailContent
+import com.catedra.bitacora.core.ui.theme.Blanco
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,6 +25,7 @@ fun PublicTravelDetailScreen(
     onProfileClick: (String) -> Unit,
     onEditClick: (String) -> Unit,
     onPrivilegesClick: (String) -> Unit,
+    onAddPointClick: (String) -> Unit,
     navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -45,6 +48,17 @@ fun PublicTravelDetailScreen(
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            if (uiState.canEdit) {
+                FloatingActionButton(
+                    onClick = { uiState.travel?.id?.let { onAddPointClick(it) } },
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = Blanco
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Añadir punto")
+                }
+            }
         }
     ) { paddingValues ->
         if (uiState.isLoading && uiState.travel == null) {

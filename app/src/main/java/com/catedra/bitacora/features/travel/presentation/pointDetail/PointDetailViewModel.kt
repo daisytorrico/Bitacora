@@ -25,7 +25,7 @@ class PointDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val travelId: String = checkNotNull(savedStateHandle["travelId"])
+    val travelId: String = checkNotNull(savedStateHandle["travelId"])
     private val pointId: String = checkNotNull(savedStateHandle["pointId"])
 
     private val _uiState = MutableStateFlow(PointDetailUiState())

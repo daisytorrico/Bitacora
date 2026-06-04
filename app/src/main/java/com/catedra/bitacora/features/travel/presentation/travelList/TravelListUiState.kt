@@ -6,14 +6,22 @@ import com.catedra.bitacora.features.travel.domain.model.Travel
 data class TravelListUiState(
     val user: User? = null,
     val searchQuery: String = "",
-    val travels: List<Travel> = emptyList(),
+    val myTravels: List<Travel> = emptyList(),
+    val sharedTravels: List<Travel> = emptyList(),
     val page: Int = 0,
     val loading: Boolean = true
 ) {
-    val filteredTravels: List<Travel>
+    val filteredMyTravels: List<Travel>
         get() = if (searchQuery.isBlank()) {
-            travels
+            myTravels
         } else {
-            travels.filter { it.name.contains(searchQuery, ignoreCase = true) }
+            myTravels.filter { it.name.contains(searchQuery, ignoreCase = true) }
+        }
+
+    val filteredSharedTravels: List<Travel>
+        get() = if (searchQuery.isBlank()) {
+            sharedTravels
+        } else {
+            sharedTravels.filter { it.name.contains(searchQuery, ignoreCase = true) }
         }
 }

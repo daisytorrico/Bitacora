@@ -72,7 +72,7 @@ fun TravelListScreen(
             }
         }
     ) { paddingValues ->
-        if (uiState.loading && uiState.travels.isEmpty()) {
+        if (uiState.loading && uiState.myTravels.isEmpty() && uiState.sharedTravels.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize().padding(paddingValues),
                 contentAlignment = Alignment.Center

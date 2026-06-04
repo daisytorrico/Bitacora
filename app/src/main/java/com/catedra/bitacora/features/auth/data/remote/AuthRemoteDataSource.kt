@@ -81,7 +81,7 @@ class AuthRemoteDataSource @Inject constructor(
     suspend fun getUsersByIds(uids: List<String>): List<DocumentSnapshot> {
         if (uids.isEmpty()) return emptyList()
         return db.collection("users")
-            .whereIn("uid", uids)
+            .whereIn(com.google.firebase.firestore.FieldPath.documentId(), uids)
             .get()
             .await()
             .documents

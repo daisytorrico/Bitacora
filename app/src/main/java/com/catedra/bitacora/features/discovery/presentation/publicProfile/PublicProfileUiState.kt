@@ -13,7 +13,7 @@ data class PublicProfileUiState(
 ) {
     fun toTravelListUiState() = TravelListUiState(
         user = user,
-        travels = travels,
+        myTravels = travels,
         loading = isLoading
     )
 }

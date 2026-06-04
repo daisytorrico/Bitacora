@@ -74,6 +74,9 @@ fun NavGraphBuilder.discoveryGraph(navController: NavController) {
                 onPrivilegesClick = { travelId ->
                     navController.navigate("travel_privileges/$travelId")
                 },
+                onAddPointClick = { travelId ->
+                    navController.navigate("travel_details/$travelId/add_point")
+                },
                 navController = navController
             )
         }

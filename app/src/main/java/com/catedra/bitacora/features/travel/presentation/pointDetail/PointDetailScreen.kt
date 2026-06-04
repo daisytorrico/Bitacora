@@ -32,7 +32,14 @@ fun PointDetailScreen(
         topBar = {
             AppTopBar(
                 titulo = uiState.point?.name ?: "Detalle del Punto",
-                onBack = onBack
+                onBack = onBack,
+                actions = {
+                    if (uiState.canEdit) {
+                        IconButton(onClick = { uiState.point?.id?.let { onEdit(it) } }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Editar")
+                        }
+                    }
+                }
             )
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -62,21 +69,7 @@ fun PointDetailScreen(
                 onLikeClick = { viewModel.toggleLike() },
                 onCommentsClick = { /* TODO: Implementar comentarios */ },
                 onToggleMap = { viewModel.onToggleMap(it) },
-                paddingValues = paddingValues,
-                actions = {
-                    if (uiState.canEdit) {
-                        Spacer(modifier = Modifier.height(32.dp))
-                        OutlinedButton(
-                            onClick = { uiState.point?.id?.let { onEdit(it) } },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Icon(Icons.Default.Edit, contentDescription = null)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Editar Entrada")
-                        }
-                    }
-                }
+                paddingValues = paddingValues
             )
         }
 
