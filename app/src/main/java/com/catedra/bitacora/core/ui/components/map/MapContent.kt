@@ -29,13 +29,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -194,9 +194,9 @@ fun MapContent(
             
             uiState.cameraCenter?.let { center ->
                 val currentMapCenter = mapState.mapView.mapCenter
-                val latDiff = kotlin.math.abs(currentMapCenter.latitude - center.latitude)
-                val lonDiff = kotlin.math.abs(currentMapCenter.longitude - center.longitude)
-                val zoomDiff = kotlin.math.abs(mapState.mapView.zoomLevelDouble - uiState.cameraZoom)
+                val latDiff = abs(currentMapCenter.latitude - center.latitude)
+                val lonDiff = abs(currentMapCenter.longitude - center.longitude)
+                val zoomDiff = abs(mapState.mapView.zoomLevelDouble - uiState.cameraZoom)
 
                 if (latDiff > 0.00001 || lonDiff > 0.00001 || zoomDiff > 0.1) {
                     mapState.mapView.controller.setCenter(GeoPoint(center.latitude, center.longitude))
@@ -232,24 +232,31 @@ fun MapContent(
                         .fillMaxWidth()
                         .padding(horizontal = if (searchActive) 0.dp else 16.dp, vertical = 4.dp)
                         .align(Alignment.TopCenter),
-                    query = uiState.searchQuery,
-                    onQueryChange = onSearchQueryChanged,
-                    onSearch = { searchActive = false },
-                    active = searchActive,
-                    onActiveChange = { searchActive = it },
-                    placeholder = { Text("Buscar lugar...") },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    inputField = {
+                        SearchBarDefaults.InputField(
+                            query = uiState.searchQuery,
+                            onQueryChange = onSearchQueryChanged,
+                            onSearch = { searchActive = false },
+                            expanded = searchActive,
+                            onExpandedChange = { searchActive = it },
+                            placeholder = { Text("Buscar lugar...") },
+                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                            trailingIcon = {
+                                if (uiState.searchQuery.isNotEmpty()) {
+                                    IconButton(onClick = {
+                                        onClearSelection()
+                                        if (!searchActive) onSearchQueryChanged("")
+                                    }) {
+                                        Icon(Icons.Default.Close, contentDescription = null)
+                                    }
+                                }
+                            },
+                        )
+                    },
+                    expanded = searchActive,
+                    onExpandedChange = { searchActive = it },
                     windowInsets = WindowInsets(0, 0, 0, 0),
-                    trailingIcon = {
-                        if (uiState.searchQuery.isNotEmpty()) {
-                            IconButton(onClick = {
-                                onClearSelection()
-                                if (!searchActive) onSearchQueryChanged("")
-                            }) {
-                                Icon(Icons.Default.Close, contentDescription = null)
-                            }
-                        }
-                    }) {
+                ) {
                     LazyColumn(modifier = Modifier.fillMaxWidth()) {
                         items(uiState.searchResults) { point ->
                             ListItem(
