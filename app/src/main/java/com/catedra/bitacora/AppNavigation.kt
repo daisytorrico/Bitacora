@@ -23,6 +23,7 @@ import com.catedra.bitacora.features.auth.presentation.util.crearGoogleSignInHan
 import com.catedra.bitacora.features.profile.presentation.navigation.ProfileDestinations
 import com.catedra.bitacora.features.profile.presentation.navigation.profileGraph
 import com.catedra.bitacora.features.discovery.presentation.navigation.discoveryGraph
+import com.catedra.bitacora.features.social.presentation.navigation.socialGraph
 import com.catedra.bitacora.features.map.presentation.navigation.MapDestination
 import com.catedra.bitacora.features.map.presentation.navigation.mapGraph
 import com.catedra.bitacora.features.travel.presentation.navigation.TravelDestinations
@@ -48,7 +49,14 @@ fun AppNavigation(viewModel: AuthViewModel) {
     val currentDestination = navBackStackEntry?.destination
 
     val showBottomBar = currentDestination?.hierarchy?.any { 
-        it.route in listOf(Rutas.LOGIN, Rutas.REGISTRO, Rutas.USERNAME, ProfileDestinations.EDIT_PROFILE, TravelDestinations.TRAVEL_CREATE, TravelDestinations.TRAVEL_ADD_POINT)
+        it.route in listOf(
+            Rutas.LOGIN, 
+            Rutas.REGISTRO, 
+            Rutas.USERNAME, 
+            ProfileDestinations.EDIT_PROFILE, 
+            TravelDestinations.TRAVEL_CREATE, 
+            TravelDestinations.TRAVEL_ADD_POINT
+        )
     } == false && authState is AuthState.Autenticado
 
     val animatedBottomPadding by animateDpAsState(
@@ -92,6 +100,7 @@ fun AppNavigation(viewModel: AuthViewModel) {
             travelGraph(navController) { showLogOut = true }
             discoveryGraph(navController)
             profileGraph(navController)
+            socialGraph(navController)
             mapGraph(navController) { showLogOut = true }
         }
 
@@ -104,19 +113,25 @@ fun AppNavigation(viewModel: AuthViewModel) {
             AppBottomBar(
                 currentDestination = currentDestination,
                 onNavigateToProfile = {
-                    val onProfile= currentDestination?.hierarchy?.any { it.route?.startsWith("travel") == true } == true
-                    navController.navigate(TravelDestinations.TRAVEL_LIST) {
-                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = !onProfile
+                    val rutaActual = navController.currentDestination?.route
+                    if (rutaActual != TravelDestinations.TRAVEL_LIST) {
+                        val onProfileHierarchy = currentDestination?.hierarchy?.any { it.route?.startsWith("travel") == true } == true
+                        navController.navigate(TravelDestinations.TRAVEL_LIST) {
+                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = !onProfileHierarchy
+                        }
                     }
                 },
                 onNavigateToExplorer = {
-                    val onExplorer = currentDestination?.hierarchy?.any { it.route == "discovery_graph" } == true
-                    navController.navigate("discovery_graph") {
-                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = !onExplorer
+                    val rutaActual = navController.currentDestination?.route
+                    if (rutaActual != "discovery_graph") {
+                        val onExplorerHierarchy = currentDestination?.hierarchy?.any { it.route == "discovery_graph" } == true
+                        navController.navigate("discovery_graph") {
+                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = !onExplorerHierarchy
+                        }
                     }
                 },
                 onNavigateToMap = {

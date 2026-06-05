@@ -13,9 +13,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Comment
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.ThumbUp
-import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -221,17 +221,17 @@ fun PointDetailContent(
                         modifier = Modifier.clickable { onLikeClick() }
                     ) {
                         Icon(
-                            imageVector = if (uiState.isLiked) Icons.Filled.ThumbUp else Icons.Outlined.ThumbUp,
+                            imageVector = if (uiState.isLiked) Icons.Filled.Favorite else Icons.Default.FavoriteBorder,
                             contentDescription = "Me gusta",
                             modifier = Modifier.size(24.dp),
-                            tint = if (uiState.isLiked) MaterialTheme.colorScheme.primary else GrisMedio
+                            tint = if (uiState.isLiked) Color.Red else GrisMedio
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = uiState.likesCount.toString(),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
-                            color = GrisMedio
+                            color = if (uiState.isLiked) Color.Red else GrisMedio
                         )
                     }
 

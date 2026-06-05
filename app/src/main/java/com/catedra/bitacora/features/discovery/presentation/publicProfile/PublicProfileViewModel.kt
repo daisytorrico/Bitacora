@@ -3,10 +3,9 @@ package com.catedra.bitacora.features.discovery.presentation.publicProfile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.catedra.bitacora.core.domain.repository.SessionRepository
 import com.catedra.bitacora.features.discovery.domain.useCase.GetPublicProfileUseCase
-import com.catedra.bitacora.features.social.domain.useCase.FollowUserUseCase
-import com.catedra.bitacora.features.social.domain.useCase.GetIsFollowingUseCase
-import com.catedra.bitacora.features.social.domain.useCase.UnfollowUserUseCase
+import com.catedra.bitacora.features.social.domain.useCase.FollowUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,10 +17,9 @@ import javax.inject.Inject
 @HiltViewModel
 class PublicProfileViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
+    private val sessionRepository: SessionRepository,
     private val useCase: GetPublicProfileUseCase,
-    private val followUseCase: FollowUserUseCase,
-    private val unfollowUseCase: UnfollowUserUseCase,
-    private val isFollowingUseCase: GetIsFollowingUseCase
+    private val followUseCases: FollowUseCases
 ) : ViewModel() {
     private val userId: String = checkNotNull(savedStateHandle["userId"])
 
@@ -35,15 +33,19 @@ class PublicProfileViewModel @Inject constructor(
     fun loadProfile() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            
+
+            val myUid = sessionRepository.getCurrentUser()?.uid
+            val isMe = userId == myUid
+
             val userResult = useCase.getUser(userId)
             val travelsResult = useCase.getTravels(userId)
-            val followResult = isFollowingUseCase(userId)
+            val followResult = if (isMe) Result.success(false) else followUseCases.isFollowing(userId)
 
             _uiState.update { it.copy(
                 user = userResult.getOrNull(),
                 travels = travelsResult.getOrDefault(emptyList()),
                 isFollowing = followResult.getOrDefault(false),
+                isMe = isMe,
                 isLoading = false,
                 error = userResult.exceptionOrNull()?.message
             ) }
@@ -53,10 +55,9 @@ class PublicProfileViewModel @Inject constructor(
     fun toggleFollow() {
         viewModelScope.launch {
             val currentIsFollowing = uiState.value.isFollowing
-            val result = if (currentIsFollowing) unfollowUseCase(userId) else followUseCase(userId)
+            val result = followUseCases.toggleFollow(userId, currentIsFollowing)
 
             if (result.isSuccess) {
-                // Actualizamos el estado local para que el contador cambie al instante
                 val currentUser = uiState.value.user
                 if (currentUser != null) {
                     val newFollowersCount = if (currentIsFollowing) {
@@ -64,11 +65,13 @@ class PublicProfileViewModel @Inject constructor(
                     } else {
                         currentUser.followersCount + 1
                     }
-                    
+
                     _uiState.update { it.copy(
                         isFollowing = !currentIsFollowing,
                         user = currentUser.copy(followersCount = newFollowersCount)
                     ) }
+
+                    loadProfile()
                 }
             }
         }

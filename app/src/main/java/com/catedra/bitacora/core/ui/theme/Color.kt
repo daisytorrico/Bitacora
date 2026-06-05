@@ -25,6 +25,9 @@ val GrisPildora = Color(0xFFE0E0E0).copy(alpha = 0.3f)
 val RojoPin = Color(0xFFE53935)
 val GrisBorde = Color(0xFFEEEEEE)
 val GrisSeparador = Color(0xFFE0E0E0)
-
 val NegroAzulado = Color(0xFF01031C)
 val GrisOscuroAzulado = Color(0xFF0F0F26)
+
+// fechas/actualizaciones
+val AzulSutil = AzulOscuro.copy(alpha = 0.6f)
+val AzulSutilDark = AzulClaro.copy(alpha = 0.6f)

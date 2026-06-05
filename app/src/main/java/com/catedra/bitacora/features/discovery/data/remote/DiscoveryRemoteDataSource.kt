@@ -29,47 +29,56 @@ class DiscoveryRemoteDataSource @Inject constructor(
         excludeOwnerIds: List<String> = emptyList()
     ): TravelPageRemote {
         val currentUserId = auth.currentUser?.uid ?: ""
-        val allExcluded = excludeOwnerIds + currentUserId
+        val followingIds = getFollowingIds()
         
-        val fetchLimit = limit + 20
+        // Lista negra: Mis viajes + los que ya sigo
+        val blackList = (excludeOwnerIds + currentUserId + followingIds).toSet()
         
-        var query = firestore.collection("trips")
-            .whereEqualTo("visibility", TravelVisibility.PUBLIC.name.lowercase())
-            .orderBy("updatedAt", Query.Direction.DESCENDING)
-            .limit(fetchLimit)
+        val resultTravels = mutableListOf<Travel>()
+        var lastDoc = lastDocument
         
-        if (lastDocument != null) {
-            query = query.startAfter(lastDocument)
-        }
+        var attempts = 0
+        while (resultTravels.size < limit && attempts < 3) {
+            var query = firestore.collection("trips")
+                .whereEqualTo("visibility", TravelVisibility.PUBLIC.name.lowercase())
+                .orderBy("updatedAt", Query.Direction.DESCENDING)
+                .limit(limit * 2) 
 
-        val snapshot = query.get().await()
-        val travels = mutableListOf<Travel>()
-        var lastProcessedDoc: DocumentSnapshot? = null
-
-        for (doc in snapshot.documents) {
-            val travel = doc.toTravel()
-            // Quitamos el filtro de travel.ownerId !in allExcluded para que el usuario 
-            // pueda ver sus propios viajes públicos en la pestaña de exploración.
-            if (travel != null) {
-                travels.add(travel)
-                lastProcessedDoc = doc
-                if (travels.size >= limit) break
+            if (lastDoc != null) {
+                query = query.startAfter(lastDoc)
             }
-            lastProcessedDoc = doc
+
+            val snapshot = query.get().await()
+            if (snapshot.isEmpty) break
+
+            for (doc in snapshot.documents) {
+                val travel = doc.toTravel()
+                lastDoc = doc
+                
+                if (travel != null && travel.ownerId !in blackList) {
+                    resultTravels.add(travel)
+                    if (resultTravels.size >= limit) break
+                }
+            }
+            attempts++
         }
         
-        return TravelPageRemote(travels, lastProcessedDoc)
+        return TravelPageRemote(resultTravels, lastDoc)
     }
 
     suspend fun getFollowingTravels(
         limit: Long,
         lastDocument: DocumentSnapshot? = null
     ): TravelPageRemote {
-        val followingIds = getFollowingIds()
+        val currentUserId = auth.currentUser?.uid ?: ""
+        val followingIds = getFollowingIds().filter { it != currentUserId }
+        
         if (followingIds.isEmpty()) return TravelPageRemote(emptyList(), null)
 
+        val queryIds = followingIds.take(30)
+
         var query = firestore.collection("trips")
-            .whereIn("ownerId", followingIds)
+            .whereIn("ownerId", queryIds)
             .whereIn("visibility", listOf("public", "followers"))
             .orderBy("updatedAt", Query.Direction.DESCENDING)
             .limit(limit)

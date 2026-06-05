@@ -88,9 +88,6 @@ fun NavGraphBuilder.discoveryGraph(navController: NavController) {
                 onProfileClick = { userId ->
                     navController.navigate(DiscoveryDestinations.publicProfile(userId))
                 },
-                onEditClick = { travelId, pointId ->
-                    navController.navigate("travel_details/$travelId/points/$pointId/edit")
-                },
                 navController = navController
             )
         }

@@ -16,21 +16,27 @@ class TravelRemoteDataSource @Inject constructor(
     suspend fun getTravels(userId: String): List<DocumentSnapshot> {
         val results = mutableListOf<DocumentSnapshot>()
         
+        // Consulta 1: Viajes donde soy dueño
         try {
             val ownedQuery = db.collection("trips")
                 .whereEqualTo("ownerId", userId)
                 .get()
                 .await()
             results.addAll(ownedQuery.documents)
-        } catch (e: Exception) {}
+        } catch (e: Exception) {
+            // Error silencioso en producción, el repositorio ya maneja el Result
+        }
 
+        // Consulta 2: Viajes donde soy colaborador
         try {
             val sharedQuery = db.collection("trips")
                 .whereArrayContains("privileges", userId)
                 .get()
                 .await()
             results.addAll(sharedQuery.documents)
-        } catch (e: Exception) {}
+        } catch (e: Exception) {
+            // Error silencioso en producción
+        }
 
         return results.distinctBy { it.id }
     }
@@ -38,6 +44,7 @@ class TravelRemoteDataSource @Inject constructor(
     suspend fun saveTravel(travelData: Map<String, Any?>): String {
         val dataWithTimestamp = travelData.toMutableMap().apply {
             put("updatedAt", FieldValue.serverTimestamp())
+            // Aseguramos que privileges sea una lista si no viene
             if (!containsKey("privileges")) put("privileges", emptyList<String>())
         }
         
@@ -102,18 +109,17 @@ class TravelRemoteDataSource @Inject constructor(
     }
 
     suspend fun updatePoint(travelId: String, pointId: String, pointData: Map<String, Any?>) {
+        val batch = db.batch()
+        
         val pointRef = db.collection("trips")
             .document(travelId)
             .collection("pointsOfInterest")
             .document(pointId)
+        batch.update(pointRef, pointData)
         
-        pointRef.update(pointData).await()
+        val tripRef = db.collection("trips").document(travelId)
+        batch.update(tripRef, "updatedAt", FieldValue.serverTimestamp())
         
-        try {
-            val tripRef = db.collection("trips").document(travelId)
-            tripRef.update("updatedAt", FieldValue.serverTimestamp()).await()
-        } catch (e: Exception) {
-            // Ignore if user has no permission to update the trip document
-        }
+        batch.commit().await()
     }
 }
