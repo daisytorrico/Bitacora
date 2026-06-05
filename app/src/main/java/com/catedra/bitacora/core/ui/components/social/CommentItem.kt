@@ -78,22 +78,20 @@ fun CommentItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // @username en negrita
                 Text(
-                    text = buildAnnotatedString {
-                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("@$username")
-                        }
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = "@$username",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.ExtraBold
+                    ),
                     modifier = Modifier.clickable { onProfileClick(userId) }
                 )
                 // Fecha relativa
                 Text(
-                    text = relativeTime(timestamp),
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 10.sp
+                    text = relativeTime(timestamp).uppercase(),
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        fontSize = 9.sp,
+                        letterSpacing = 0.5.sp
                     )
                 )
             }
@@ -102,7 +100,10 @@ fun CommentItem(
                 text = buildAnnotatedString {
                     content.split(" ").forEachIndexed { index, word ->
                         if (word.startsWith("@") && word.length > 1) {
-                            withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)) {
+                            withStyle(SpanStyle(
+                                color = MaterialTheme.colorScheme.primary, 
+                                fontWeight = FontWeight.ExtraBold
+                            )) {
                                 append(word)
                             }
                         } else {
