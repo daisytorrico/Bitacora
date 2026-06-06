@@ -9,10 +9,11 @@ import androidx.lifecycle.viewModelScope
 import com.catedra.bitacora.features.travel.domain.model.PointOfInterest
 import com.catedra.bitacora.features.travel.domain.repository.TravelsRepository
 import com.catedra.bitacora.core.domain.useCase.CompressImageUseCase
-import com.catedra.bitacora.core.ui.util.PhotoPickerHelper
+import com.catedra.bitacora.core.helpers.PhotoPickerHelper
 import com.catedra.bitacora.core.domain.useCase.UploadImageUseCase
 import com.catedra.bitacora.features.travel.domain.useCase.GetCurrentLocationUseCase
 import com.catedra.bitacora.features.travel.domain.useCase.SavePointUseCase
+import com.catedra.bitacora.core.domain.useCase.SchedulePointVisitNotificationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,7 +32,8 @@ class CreatePointViewModel @Inject constructor(
     private val compressImageUseCase: CompressImageUseCase,
     private val uploadImageUseCase: UploadImageUseCase,
     private val savePointUseCase: SavePointUseCase,
-    private val getCurrentLocationUseCase: GetCurrentLocationUseCase
+    private val getCurrentLocationUseCase: GetCurrentLocationUseCase,
+    private val schedulePointVisitNotificationUseCase: SchedulePointVisitNotificationUseCase
 ) : ViewModel() {
 
     private val travelId: String = checkNotNull(savedStateHandle["travelId"])
@@ -146,6 +148,11 @@ class CreatePointViewModel @Inject constructor(
 
                 if (result.isSuccess) {
                     val id = result.getOrNull()
+                    
+                    // Notificacion si tiene fecha
+                    val savedPoint = point.copy(id = id ?: "")
+                    schedulePointVisitNotificationUseCase(travelId, savedPoint, id ?: "")
+
                     _uiState.update { it.copy(isLoading = false, isSuccess = true, pointId = id) }
                 } else {
                     _uiState.update { it.copy(isLoading = false, error = result.exceptionOrNull()?.message ?: "Error al guardar") }

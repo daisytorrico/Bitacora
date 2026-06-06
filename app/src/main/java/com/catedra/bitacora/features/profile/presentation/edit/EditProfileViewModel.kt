@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.catedra.bitacora.core.domain.repository.SessionRepository
 import com.catedra.bitacora.features.profile.domain.useCase.UpdateProfileUseCase
 import com.catedra.bitacora.core.domain.useCase.CompressImageUseCase
-import com.catedra.bitacora.core.ui.util.PhotoPickerHelper
+import com.catedra.bitacora.core.helpers.PhotoPickerHelper
 import com.catedra.bitacora.core.domain.useCase.UploadImageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

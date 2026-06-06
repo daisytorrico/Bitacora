@@ -6,11 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.catedra.bitacora.core.domain.useCase.CompressImageUseCase
 import com.catedra.bitacora.core.domain.useCase.UploadImageUseCase
-import com.catedra.bitacora.core.ui.util.PhotoPickerHelper
+import com.catedra.bitacora.core.helpers.PhotoPickerHelper
 import com.catedra.bitacora.features.travel.domain.model.Travel
 import com.catedra.bitacora.features.travel.domain.model.TravelVisibility
 import com.catedra.bitacora.features.travel.domain.repository.TravelsRepository
 import com.catedra.bitacora.features.travel.domain.useCase.UpdateTravelUseCase
+import com.catedra.bitacora.core.domain.useCase.ScheduleTripStartNotificationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +29,8 @@ class EditTravelViewModel @Inject constructor(
     private val updateTravelUseCase: UpdateTravelUseCase,
     private val compressImageUseCase: CompressImageUseCase,
     private val uploadImageUseCase: UploadImageUseCase,
-    private val photoPickerHelper: PhotoPickerHelper
+    private val photoPickerHelper: PhotoPickerHelper,
+    private val scheduleTripStartNotificationUseCase: ScheduleTripStartNotificationUseCase
 ) : ViewModel() {
 
     private val travelId: String = checkNotNull(savedStateHandle["travelId"])
@@ -106,6 +108,8 @@ class EditTravelViewModel @Inject constructor(
                 ) ?: return@launch
 
                 updateTravelUseCase(updatedTravel).onSuccess {
+                    // Actualiza notificacion
+                    scheduleTripStartNotificationUseCase(updatedTravel)
                     _uiState.update { it.copy(isLoading = false, success = true) }
                 }.onFailure { e ->
                     _uiState.update { it.copy(isLoading = false, error = e.message) }

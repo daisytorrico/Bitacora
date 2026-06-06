@@ -6,10 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.catedra.bitacora.core.domain.useCase.CompressImageUseCase
 import com.catedra.bitacora.core.domain.useCase.UploadImageUseCase
-import com.catedra.bitacora.core.ui.util.PhotoPickerHelper
+import com.catedra.bitacora.core.helpers.PhotoPickerHelper
 import com.catedra.bitacora.features.travel.domain.model.PointOfInterest
 import com.catedra.bitacora.features.travel.domain.repository.TravelsRepository
 import com.catedra.bitacora.features.travel.domain.useCase.UpdatePointUseCase
+import com.catedra.bitacora.core.domain.useCase.SchedulePointVisitNotificationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,7 +30,8 @@ class EditPointViewModel @Inject constructor(
     private val updatePointUseCase: UpdatePointUseCase,
     private val compressImageUseCase: CompressImageUseCase,
     private val uploadImageUseCase: UploadImageUseCase,
-    private val photoPickerHelper: PhotoPickerHelper
+    private val photoPickerHelper: PhotoPickerHelper,
+    private val schedulePointVisitNotificationUseCase: SchedulePointVisitNotificationUseCase
 ) : ViewModel() {
 
     private val travelId: String = checkNotNull(savedStateHandle["travelId"])
@@ -127,6 +129,8 @@ class EditPointViewModel @Inject constructor(
                 )
 
                 updatePointUseCase(travelId, updatedPoint).onSuccess {
+                    // Actualiza notificacion
+                    schedulePointVisitNotificationUseCase(travelId, updatedPoint, pointId)
                     _uiState.update { it.copy(isLoading = false, isSuccess = true) }
                 }.onFailure { e ->
                     _uiState.update { it.copy(isLoading = false, error = e.message) }

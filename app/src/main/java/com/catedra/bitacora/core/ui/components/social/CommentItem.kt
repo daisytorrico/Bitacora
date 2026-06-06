@@ -20,22 +20,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.catedra.bitacora.core.ui.components.profile.ProfileImage
+import com.catedra.bitacora.core.ui.util.toRelativeTime
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-
-// Timestamp a texto
-private fun relativeTime(timestamp: LocalDateTime): String {
-    val now = LocalDateTime.now()
-    val minutes = ChronoUnit.MINUTES.between(timestamp, now)
-    val hours = ChronoUnit.HOURS.between(timestamp, now)
-    val days = ChronoUnit.DAYS.between(timestamp, now)
-    return when {
-        minutes < 1 -> "ahora"
-        minutes < 60 -> "hace $minutes min"
-        hours < 24 -> "hace $hours h"
-        else -> "hace $days d"
-    }
-}
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
@@ -87,7 +74,7 @@ fun CommentItem(
                 )
                 // Fecha relativa
                 Text(
-                    text = relativeTime(timestamp).uppercase(),
+                    text = timestamp.toRelativeTime(includePrefix = true).uppercase(),
                     style = MaterialTheme.typography.labelSmall.copy(
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                         fontSize = 9.sp,

@@ -3,6 +3,7 @@ package com.catedra.bitacora.features.discovery.presentation.publicPointDetail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.catedra.bitacora.features.auth.domain.repository.AuthRepository
 import com.catedra.bitacora.features.discovery.domain.useCase.GetPublicPointDetailUseCase
 import com.catedra.bitacora.features.discovery.domain.useCase.GetPublicProfileUseCase
 import com.catedra.bitacora.features.social.domain.useCase.*
@@ -18,13 +19,16 @@ class PublicPointDetailViewModel @Inject constructor(
     private val useCase: GetPublicPointDetailUseCase,
     private val profileUseCase: GetPublicProfileUseCase,
     private val likeUseCases: LikeUseCases,
-    private val commentUseCases: CommentUseCases
+    private val commentUseCases: CommentUseCases,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
     private val travelId: String = checkNotNull(savedStateHandle["travelId"])
     private val pointId: String = checkNotNull(savedStateHandle["pointId"])
     private val ownerId: String = checkNotNull(savedStateHandle["ownerId"])
 
-    private val _uiState = MutableStateFlow(PointDetailUiState())
+    private val _uiState = MutableStateFlow(
+        PointDetailUiState(currentUserId = authRepository.getCurrentUser()?.uid)
+    )
     val uiState: StateFlow<PointDetailUiState> = _uiState.asStateFlow()
 
     init {
@@ -35,7 +39,7 @@ class PublicPointDetailViewModel @Inject constructor(
     private fun loadDetail() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            
+
             val pointResult = useCase(travelId, pointId)
             val userResult = profileUseCase.getUser(ownerId)
 
