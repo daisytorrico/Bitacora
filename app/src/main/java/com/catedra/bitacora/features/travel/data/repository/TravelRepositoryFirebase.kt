@@ -76,6 +76,7 @@ class TravelRepositoryFirebase @Inject constructor(
             Result.failure(e)
         }
     }
+
     override suspend fun savePoint(
         travelId: String,
         point: PointOfInterest,
@@ -86,7 +87,6 @@ class TravelRepositoryFirebase @Inject constructor(
             val pointData = point.toData().toMutableMap()
             if (geohash != null) pointData["geohash"] = geohash
             if (authorizedUsers.isNotEmpty()) pointData["authorizedUsers"] = authorizedUsers
-
             val pointId = remoteDataSource.savePoint(travelId, pointData)
             Result.success(pointId)
         } catch (e: Exception) {
@@ -113,9 +113,28 @@ class TravelRepositoryFirebase @Inject constructor(
             val data = point.toData().toMutableMap()
             if (geohash != null) data["geohash"] = geohash
             if (authorizedUsers.isNotEmpty()) data["authorizedUsers"] = authorizedUsers
-            
             remoteDataSource.updatePoint(travelId, point.id, data)
             Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun syncTripAccess(travelId: String, newPrivileges: List<String>, removed: List<String>): Result<Unit> {
+        return try {
+            remoteDataSource.syncTripAccess(travelId, newPrivileges, removed)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    override suspend fun getSharedTravels(userId: String): Result<List<Travel>> {
+        return try {
+            val tripIds = remoteDataSource.getSharedTripIds(userId)
+            val travels = tripIds.mapNotNull { tripId ->
+                remoteDataSource.getTravelById(tripId).toTravel()
+            }.sortedByDescending { it.updatedAt }
+            Result.success(travels)
         } catch (e: Exception) {
             Result.failure(e)
         }

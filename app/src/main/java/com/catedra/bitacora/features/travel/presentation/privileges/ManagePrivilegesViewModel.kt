@@ -25,6 +25,7 @@ class ManagePrivilegesViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val travelId: String = checkNotNull(savedStateHandle["travelId"])
+    private var ownerUid: String? = null
 
     private val _uiState = MutableStateFlow(ManagePrivilegesUiState())
     val uiState: StateFlow<ManagePrivilegesUiState> = _uiState.asStateFlow()
@@ -40,6 +41,7 @@ class ManagePrivilegesViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             travelsRepository.getTravelById(travelId).onSuccess { travel ->
+                ownerUid = travel.ownerId
                 val privileges = travel.privileges ?: emptyList()
                 getUsersByIdsUseCase(privileges).onSuccess { users ->
                     _uiState.update { it.copy(collaborators = users, isLoading = false) }
@@ -64,7 +66,9 @@ class ManagePrivilegesViewModel @Inject constructor(
                 _uiState.update { it.copy(isSearching = true) }
                 searchUserUseCase(query).onSuccess { results ->
                     val currentCollaboratorsIds = _uiState.value.collaborators.map { it.uid }
-                    val filteredResults = results.filter { it.uid !in currentCollaboratorsIds }
+                    val filteredResults = results.filter {
+                        it.uid !in currentCollaboratorsIds && it.uid != ownerUid
+                    }
                     _uiState.update { it.copy(searchResults = filteredResults, isSearching = false) }
                 }.onFailure {
                     _uiState.update { it.copy(isSearching = false) }

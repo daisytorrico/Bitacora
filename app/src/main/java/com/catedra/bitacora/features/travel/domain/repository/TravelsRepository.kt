@@ -15,18 +15,16 @@ interface TravelsRepository {
         geohash: String? = null,
         authorizedUsers: List<String> = emptyList()
     ): Result<String>
-
-
-    // Guardar el viaje y retornar su ID
     suspend fun saveTravel(travel: Travel): Result<String>
-
     suspend fun updateTravel(travel: Travel): Result<Unit>
+    suspend fun getSharedTravels(userId: String): Result<List<Travel>>
     suspend fun updatePoint(
         travelId: String,
         point: PointOfInterest,
         geohash: String? = null,
         authorizedUsers: List<String> = emptyList()
     ): Result<Unit>
+    suspend fun syncTripAccess(travelId: String, newPrivileges: List<String>, removed: List<String>): Result<Unit>
 
     companion object {
         const val DEFAULT_PAGE_SIZE = 10
