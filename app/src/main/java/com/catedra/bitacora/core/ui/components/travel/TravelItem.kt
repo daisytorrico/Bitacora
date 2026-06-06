@@ -26,15 +26,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.catedra.bitacora.features.travel.domain.model.Travel
 import com.catedra.bitacora.features.travel.domain.model.TravelStatus
 import com.catedra.bitacora.features.travel.domain.model.TravelVisibility
 import com.catedra.bitacora.core.ui.theme.GrisMedio
-import java.time.LocalDateTime
+import com.catedra.bitacora.core.ui.util.toRelativeTime
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 @Composable
@@ -45,7 +43,9 @@ fun TravelItem(
     modifier: Modifier = Modifier
 ) {
     val dateRange = remember(travel) { getDateRange(travel) }
-    val updateText = remember(travel.updatedAt) { getRelativeUpdateText(travel.updatedAt) }
+    val updateText = remember(travel.updatedAt) { 
+        travel.updatedAt?.toRelativeTime(shortUnits = true)?.uppercase() 
+    }
     val isDark = !MaterialTheme.colorScheme.surface.isLight()
     
     val primary = MaterialTheme.colorScheme.primary
@@ -227,18 +227,6 @@ private fun StatusCleanBadge(status: TravelStatus) {
                 color = color
             )
         )
-    }
-}
-
-private fun getRelativeUpdateText(dateTime: LocalDateTime?): String? {
-    if (dateTime == null) return null
-    val now = LocalDateTime.now()
-    val minutes = ChronoUnit.MINUTES.between(dateTime, now)
-    return when {
-        minutes < 1 -> "AHORA"
-        minutes < 60 -> "${minutes}MIN"
-        minutes < 1440 -> "${minutes / 60}H"
-        else -> "${minutes / 1440}D"
     }
 }
 

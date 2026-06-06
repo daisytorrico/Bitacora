@@ -2,11 +2,14 @@ package com.catedra.bitacora.features.travel.presentation.travelList
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.catedra.bitacora.features.auth.domain.repository.AuthRepository
 import com.catedra.bitacora.features.auth.domain.useCase.GetFullUserDataUseCase
+import com.catedra.bitacora.features.travel.domain.model.TravelStatus
+import com.catedra.bitacora.features.travel.domain.model.TravelVisibility
+import com.catedra.bitacora.features.travel.domain.useCase.GetSharedTravelsUseCase
 import com.catedra.bitacora.features.travel.domain.useCase.GetTravelsListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,8 +19,8 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class TravelListViewModel @Inject constructor(
     private val getTravelsList: GetTravelsListUseCase,
-    private val getFullUserDataUseCase: GetFullUserDataUseCase,
-    private val authRepository: AuthRepository
+    private val getSharedTravels: GetSharedTravelsUseCase,
+    private val getFullUserDataUseCase: GetFullUserDataUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TravelListUiState())
     val uiState: StateFlow<TravelListUiState> = _uiState.asStateFlow()
@@ -32,21 +35,25 @@ class TravelListViewModel @Inject constructor(
 
     fun loadTravels() {
         viewModelScope.launch {
-            val currentUserId = authRepository.getCurrentUser()?.uid
-            getTravelsList(
-                page = uiState.value.page
-            ).onSuccess { data ->
-                val myTravels = data.filter { it.ownerId == currentUserId }
-                val sharedTravels = data.filter { it.ownerId != currentUserId }
-                
-                _uiState.update { it.copy(
-                    myTravels = myTravels,
-                    sharedTravels = sharedTravels,
-                    loading = false
-                ) }
-            }.onFailure {
-                _uiState.update { it.copy(loading = false) }
-            }
+            val myTravelsJob = async { getTravelsList(page = uiState.value.page) }
+            val sharedTravelsJob = async { getSharedTravels() }
+
+            val myResult = myTravelsJob.await()
+            val sharedResult = sharedTravelsJob.await()
+
+            _uiState.update { it.copy(
+                myTravels = myResult.getOrDefault(emptyList()),
+                sharedTravels = sharedResult.getOrDefault(emptyList()),
+                loading = false
+            )}
         }
+    }
+
+    fun onStatusFilterChange(status: TravelStatus?) {
+        _uiState.update { it.copy(selectedStatus = status) }
+    }
+
+    fun onVisibilityFilterChange(visibility: TravelVisibility?) {
+        _uiState.update { it.copy(selectedVisibility = visibility) }
     }
 }
