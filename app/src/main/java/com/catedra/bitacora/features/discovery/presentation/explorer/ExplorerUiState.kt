@@ -9,5 +9,9 @@ data class ExplorerUiState(
     val isFollowingLastPage: Boolean = false,
     val isLoadingMoreFollowing: Boolean = false,
     val error: String? = null,
-    val lastFollowingDoc: Any? = null
+    val lastFollowingDoc: Any? = null,
+    val searchQuery: String = "",
+    val searchResults: List<Travel> = emptyList(),
+    val isSearching: Boolean = false,
+    val isSearchModeActive: Boolean = false
 )

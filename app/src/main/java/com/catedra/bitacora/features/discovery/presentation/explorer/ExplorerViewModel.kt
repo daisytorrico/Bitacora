@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.catedra.bitacora.features.discovery.domain.useCase.GetFollowingIdsUseCase
 import com.catedra.bitacora.features.discovery.domain.useCase.GetFollowingTravelsUseCase
 import com.catedra.bitacora.features.discovery.domain.useCase.GetPublicTravelsUseCase
+import com.catedra.bitacora.features.discovery.domain.useCase.SearchTravelsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -19,7 +20,9 @@ import javax.inject.Inject
 class ExplorerViewModel @Inject constructor(
     private val getPublicTravelsUseCase: GetPublicTravelsUseCase,
     private val getFollowingTravelsUseCase: GetFollowingTravelsUseCase,
-    private val getFollowingIdsUseCase: GetFollowingIdsUseCase
+    private val getFollowingIdsUseCase: GetFollowingIdsUseCase,
+    private val searchTravelsUseCase: SearchTravelsUseCase
+
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ExplorerUiState())
     val uiState: StateFlow<ExplorerUiState> = _uiState.asStateFlow()
@@ -84,5 +87,40 @@ class ExplorerViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoadingMoreFollowing = false) }
             }
         }
+    }
+    fun onSearchQueryChange(query: String) {
+        _uiState.update { it.copy(searchQuery = query) }
+        if (query.isBlank()) clearSearch()
+    }
+
+    fun performSearch() {
+        val query = uiState.value.searchQuery.trim()
+        if (query.isBlank()) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSearching = true, isSearchModeActive = true) }
+            searchTravelsUseCase(query)
+                .onSuccess { results ->
+                    _uiState.update { it.copy(
+                        searchResults = results,
+                        isSearching = false
+                    )}
+                }
+                .onFailure {
+                    _uiState.update { it.copy(
+                        isSearching = false,
+                        error = "Error al buscar"
+                    )}
+                }
+        }
+    }
+
+    fun clearSearch() {
+        _uiState.update { it.copy(
+            searchQuery = "",
+            searchResults = emptyList(),
+            isSearchModeActive = false,
+            isSearching = false
+        )}
     }
 }

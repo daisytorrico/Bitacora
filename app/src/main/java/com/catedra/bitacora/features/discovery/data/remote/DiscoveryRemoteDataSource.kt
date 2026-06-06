@@ -1,5 +1,6 @@
 package com.catedra.bitacora.features.discovery.data.remote
 
+import android.util.Log
 import com.catedra.bitacora.features.auth.data.mapper.toUser
 import com.catedra.bitacora.core.domain.model.User
 import com.catedra.bitacora.features.discovery.data.remote.model.TravelPageRemote
@@ -111,19 +112,22 @@ class DiscoveryRemoteDataSource @Inject constructor(
     suspend fun getPublicUserTravels(userId: String): List<Travel> {
         val currentUserId = auth.currentUser?.uid
         val isMe = currentUserId == userId
-        
+
         val baseQuery = firestore.collection("trips").whereEqualTo("ownerId", userId)
-        
+
         val snapshot = if (isMe) {
             baseQuery.get().await()
         } else {
             try {
-                baseQuery.whereIn("visibility", listOf("public", "followers")).get().await()
+                baseQuery
+                    .whereIn("visibility", listOf("public", "followers"))
+                    .orderBy("updatedAt", Query.Direction.DESCENDING)
+                    .get().await()
             } catch (e: Exception) {
                 baseQuery.whereEqualTo("visibility", "public").get().await()
             }
         }
-        
+
         return snapshot.documents.mapNotNull { it.toTravel() }
     }
 
@@ -190,5 +194,33 @@ class DiscoveryRemoteDataSource @Inject constructor(
         val snapshot = firestore.collection("followers").document(userId)
             .collection("following").get().await()
         return snapshot.documents.map { it.id }
+    }
+    suspend fun searchTravels(query: String): List<Travel> {
+        val currentUserId = auth.currentUser?.uid ?: ""
+        val followingIds = getFollowingIds()
+        val end = query + '\uf8ff'
+
+        val publicDeferred = firestore.collection("trips")
+            .whereEqualTo("visibility", TravelVisibility.PUBLIC.name.lowercase())
+            .whereGreaterThanOrEqualTo("name", query)
+            .whereLessThanOrEqualTo("name", end)
+            .limit(20)
+            .get().await()
+
+        val publicTravels = publicDeferred.documents
+            .mapNotNull { it.toTravel() }
+            .filter { it.ownerId != currentUserId }
+
+        val followingTravels = if (followingIds.isNotEmpty()) {
+            firestore.collection("trips")
+                .whereIn("ownerId", followingIds.take(30))
+                .whereIn("visibility", listOf("public", "followers"))
+                .limit(50)
+                .get().await()
+                .documents.mapNotNull { it.toTravel() }
+                .filter { it.name.startsWith(query, ignoreCase = true) }
+        } else emptyList()
+
+        return (publicTravels + followingTravels).distinctBy { it.id }
     }
 }

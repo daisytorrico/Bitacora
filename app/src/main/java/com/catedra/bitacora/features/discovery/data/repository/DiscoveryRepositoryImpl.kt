@@ -111,4 +111,15 @@ class DiscoveryRepositoryImpl @Inject constructor(
     override suspend fun isFollowing(userId: String): Result<Boolean> = runCatching {
         remoteDataSource.isFollowing(userId)
     }
+    override suspend fun searchTravels(query: String): Result<List<Travel>> = runCatching {
+        val travels = remoteDataSource.searchTravels(query)
+        coroutineScope {
+            travels.map { travel ->
+                async {
+                    val count = try { remoteDataSource.getPointsCount(travel.id) } catch (e: Exception) { 0L }
+                    travel.copy(pointsCount = count.toInt())
+                }
+            }.awaitAll()
+        }
+    }
 }

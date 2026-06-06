@@ -29,4 +29,5 @@ interface DiscoveryRepository {
     suspend fun followUser(userId: String): Result<Unit>
     suspend fun unfollowUser(userId: String): Result<Unit>
     suspend fun isFollowing(userId: String): Result<Boolean>
+    suspend fun searchTravels(query: String): Result<List<Travel>>
 }
