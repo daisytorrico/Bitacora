@@ -1,23 +1,38 @@
 package com.catedra.bitacora.features.travel.presentation.travelList
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.People
+import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.catedra.bitacora.core.ui.components.common.AppTopBar
 import com.catedra.bitacora.core.ui.components.travel.TravelListContent
+import com.catedra.bitacora.features.travel.domain.model.TravelStatus
+import com.catedra.bitacora.features.travel.domain.model.TravelVisibility
 import androidx.navigation.NavController
+import com.catedra.bitacora.core.ui.theme.GrisMedio
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,6 +46,7 @@ fun TravelListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
+    var filterPanelVisible by remember { mutableStateOf(false) }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -50,6 +66,16 @@ fun TravelListScreen(
             AppTopBar(
                 titulo = "Tu perfil",
                 actions = {
+                    IconButton(onClick = { filterPanelVisible = !filterPanelVisible }) {
+                        Icon(
+                            imageVector = Icons.Default.FilterList,
+                            contentDescription = "Filtros",
+                            tint = if (uiState.isFilterActive)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                     IconButton(onClick = onCerrarSesion) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Logout,
@@ -80,11 +106,139 @@ fun TravelListScreen(
                 CircularProgressIndicator()
             }
         } else {
+            var selectedTab by remember { mutableIntStateOf(0) }
+
+            val filteredUiState = remember(uiState, selectedTab) {
+                if (selectedTab == 0) {
+                    uiState.copy(sharedTravels = emptyList())
+                } else {
+                    uiState.copy(myTravels = emptyList())
+                }
+            }
+
             TravelListContent(
-                uiState = uiState,
+                uiState = filteredUiState,
                 onTravelClick = onTravelClick,
                 onEditarPerfilClick = onEditarPerfilClick,
-                paddingValues = paddingValues
+                paddingValues = paddingValues,
+                middleContent = {
+                    AnimatedVisibility(
+                        visible = filterPanelVisible,
+                        enter = expandVertically(),
+                        exit = shrinkVertically()
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 4.dp),
+                            verticalArrangement = Arrangement.spacedBy((-8).dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.horizontalScroll(rememberScrollState()),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                listOf(
+                                    TravelStatus.ONGOING to "En curso",
+                                    TravelStatus.PLANNED to "Planificando",
+                                    TravelStatus.COMPLETED to "Completado"
+                                ).forEach { (status, label) ->
+                                    val color = when (status) {
+                                        TravelStatus.ONGOING -> Color(0xFF2E7D32)
+                                        TravelStatus.PLANNED -> MaterialTheme.colorScheme.primary
+                                        TravelStatus.COMPLETED -> GrisMedio
+                                    }
+                                    val selected = uiState.selectedStatus == status
+
+                                    FilterChip(
+                                        selected = selected,
+                                        onClick = {
+                                            viewModel.onStatusFilterChange(if (selected) null else status)
+                                        },
+                                        label = {
+                                            Text(
+                                                text = label,
+                                                style = MaterialTheme.typography.labelSmall,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        },
+                                        shape = RoundedCornerShape(20.dp),
+                                        colors = FilterChipDefaults.filterChipColors(
+                                            selectedContainerColor = color.copy(alpha = 0.15f),
+                                            selectedLabelColor = color,
+                                            selectedLeadingIconColor = color
+                                        ),
+                                        border = FilterChipDefaults.filterChipBorder(
+                                            enabled = true,
+                                            selected = selected,
+                                            borderColor = color.copy(alpha = 0.3f),
+                                            selectedBorderColor = color.copy(alpha = 0.5f)
+                                        ),
+                                        leadingIcon = if (selected) {
+                                            { Box(Modifier.size(6.dp).background(color, CircleShape)) }
+                                        } else null
+                                    )
+                                }
+                            }
+
+                            Row(
+                                modifier = Modifier.horizontalScroll(rememberScrollState()),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                listOf(
+                                    TravelVisibility.PUBLIC to Icons.Outlined.Public,
+                                    TravelVisibility.PRIVATE to Icons.Outlined.Lock,
+                                    TravelVisibility.FOLLOWERS to Icons.Outlined.People
+                                ).forEach { (visibility, icon) ->
+                                    val selected = uiState.selectedVisibility == visibility
+
+                                    FilterChip(
+                                        selected = selected,
+                                        onClick = {
+                                            viewModel.onVisibilityFilterChange(if (selected) null else visibility)
+                                        },
+                                        label = {
+                                            Icon(
+                                                imageVector = icon,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(16.dp),
+                                                tint = if (selected)
+                                                    MaterialTheme.colorScheme.primary
+                                                else
+                                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                                            )
+                                        },
+                                        shape = RoundedCornerShape(20.dp),
+                                        colors = FilterChipDefaults.filterChipColors(
+                                            selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                            selectedLabelColor = MaterialTheme.colorScheme.primary,
+                                        ),
+                                        border = FilterChipDefaults.filterChipBorder(
+                                            enabled = true,
+                                            selected = selected,
+                                            borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                                            selectedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    TabRow(selectedTabIndex = selectedTab) {
+                        Tab(
+                            selected = selectedTab == 0,
+                            onClick = { selectedTab = 0 },
+                            text = { Text("Mis viajes") }
+                        )
+                        Tab(
+                            selected = selectedTab == 1,
+                            onClick = { selectedTab = 1 },
+                            text = { Text("Compartidos") }
+                        )
+                    }
+                }
             )
         }
     }

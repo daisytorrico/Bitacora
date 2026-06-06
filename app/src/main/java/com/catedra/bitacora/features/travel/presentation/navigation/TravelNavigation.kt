@@ -11,6 +11,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.navDeepLink
 import com.catedra.bitacora.features.profile.presentation.navigation.ProfileDestinations
 import com.catedra.bitacora.features.travel.presentation.pointCreate.CreatePointScreen
 import com.catedra.bitacora.features.travel.presentation.pointDetail.PointDetailScreen
@@ -57,7 +58,12 @@ fun NavGraphBuilder.travelGraph(
         )
     }
 
-    composable(TravelDestinations.TRAVEL_DETAIL) {
+    composable(
+        route = TravelDestinations.TRAVEL_DETAIL,
+        deepLinks = listOf(
+            navDeepLink { uriPattern = "bitacora://travel_detail/{travelId}" }
+        )
+    ) {
         TravelDetailScreen(
             onBack = { navController.popBackStack() },
             onAddPointClick = { travelId ->
@@ -89,7 +95,12 @@ fun NavGraphBuilder.travelGraph(
         )
     }
 
-    composable(TravelDestinations.POINT_DETAIL) { backStackEntry ->
+    composable(
+        route = TravelDestinations.POINT_DETAIL,
+        deepLinks = listOf(
+            navDeepLink { uriPattern = "bitacora://travel_details/{travelId}/points/{pointId}" }
+        )
+    ) { backStackEntry ->
         val travelId = backStackEntry.arguments?.getString("travelId") ?: return@composable
         PointDetailScreen(
             onBack = { navController.popBackStack() },
@@ -112,7 +123,6 @@ fun NavGraphBuilder.travelGraph(
             onBack = { navController.popBackStack() },
             onTravelCreated = { travelId ->
                 navController.navigate("travel_detail/$travelId") {
-                    // Eliminar la pantalla de creación del backstack para que al volver atrás no regrese al formulario
                     popUpTo(TravelDestinations.TRAVEL_CREATE) { inclusive = true }
                 }
             }

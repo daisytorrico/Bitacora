@@ -18,7 +18,8 @@ fun TravelListContent(
     modifier: Modifier = Modifier,
     onEditarPerfilClick: (() -> Unit)? = null,
     paddingValues: PaddingValues = PaddingValues(0.dp),
-    headerActions: @Composable (RowScope.() -> Unit)? = null
+    headerActions: @Composable (RowScope.() -> Unit)? = null,
+    middleContent: (@Composable () -> Unit)? = null
 ) {
     LazyColumn(
         modifier = modifier
@@ -34,6 +35,10 @@ fun TravelListContent(
                 onEditClick = onEditarPerfilClick,
                 actions = headerActions
             )
+        }
+
+        middleContent?.let {
+            item { it() }
         }
 
         if (uiState.filteredMyTravels.isNotEmpty()) {
@@ -58,7 +63,6 @@ fun TravelListContent(
                     color = MaterialTheme.colorScheme.primary
                 )
             }
-            
             items(
                 items = uiState.filteredSharedTravels,
                 key = { "shared_${it.id}" }
