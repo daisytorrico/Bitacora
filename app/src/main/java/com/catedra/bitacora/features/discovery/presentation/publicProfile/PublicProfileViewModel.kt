@@ -68,12 +68,17 @@ class PublicProfileViewModel @Inject constructor(
 
                     _uiState.update { it.copy(
                         isFollowing = !currentIsFollowing,
-                        user = currentUser.copy(followersCount = newFollowersCount)
+                        user = currentUser.copy(followersCount = newFollowersCount),
+                        followMessage = if (currentIsFollowing) "Dejaste de seguir a @${currentUser.username}" else "Ahora sigues a @${currentUser.username}"
                     ) }
 
                     loadProfile()
                 }
             }
         }
+    }
+
+    fun resetFollowMessage() {
+        _uiState.update { it.copy(followMessage = null) }
     }
 }
