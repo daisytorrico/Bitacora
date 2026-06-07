@@ -118,6 +118,7 @@ fun TravelListScreen(
 
             TravelListContent(
                 uiState = filteredUiState,
+                travelCount = uiState.myTravels.size,
                 onTravelClick = onTravelClick,
                 onEditarPerfilClick = onEditarPerfilClick,
                 paddingValues = paddingValues,

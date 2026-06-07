@@ -16,6 +16,7 @@ fun TravelListContent(
     uiState: TravelListUiState,
     onTravelClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    travelCount: Int? = null,
     onEditarPerfilClick: (() -> Unit)? = null,
     paddingValues: PaddingValues = PaddingValues(0.dp),
     headerActions: @Composable (RowScope.() -> Unit)? = null,
@@ -31,7 +32,7 @@ fun TravelListContent(
         item {
             ProfileHeader(
                 user = uiState.user,
-                travelCount = uiState.myTravels.size,
+                travelCount = travelCount ?: uiState.myTravels.size,
                 onEditClick = onEditarPerfilClick,
                 actions = headerActions
             )
