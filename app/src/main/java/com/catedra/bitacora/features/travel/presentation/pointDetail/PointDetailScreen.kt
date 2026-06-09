@@ -50,8 +50,7 @@ fun PointDetailScreen(
             AppTopBar(
                 titulo = uiState.point?.name ?: "Detalle del Punto",
                 onBack = onBack,
-                actions = {
-                    if (uiState.canEdit) {
+                actions = {                    if (uiState.canEdit) {
                         IconButton(onClick = { uiState.point?.id?.let { onEdit(it) } }) {
                             Icon(Icons.Default.Edit, contentDescription = "Editar")
                         }
@@ -143,8 +142,7 @@ fun PointDetailScreen(
                             navController.navigate("public_profile/$userId")
                         }
                     }
-                )
-            }
+                )            }
         }
 
         if (uiState.showMap && uiState.point != null) {

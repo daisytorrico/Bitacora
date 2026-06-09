@@ -2,6 +2,7 @@ package com.catedra.bitacora.features.travel.presentation.pointDetail
 
 import com.catedra.bitacora.core.domain.model.User
 import com.catedra.bitacora.features.travel.domain.model.PointOfInterest
+import com.catedra.bitacora.features.travel.domain.model.Travel
 
 data class PointDetailUiState(
     val travelId: String = "",
@@ -18,5 +19,8 @@ data class PointDetailUiState(
     val error: String? = null,
     val showMap: Boolean = false,
     val showDeleteDialog: Boolean = false,
-    val isDeleted: Boolean = false
+    val isDeleted: Boolean = false,
+    val myTravels: List<Travel> = emptyList(),
+    val showTripSelector: Boolean = false,
+    val isLoadingTrips: Boolean = false
 )

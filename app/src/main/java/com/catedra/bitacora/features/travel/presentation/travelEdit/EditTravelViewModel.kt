@@ -12,6 +12,7 @@ import com.catedra.bitacora.features.travel.domain.model.TravelVisibility
 import com.catedra.bitacora.features.travel.domain.repository.TravelsRepository
 import com.catedra.bitacora.features.travel.domain.useCase.UpdateTravelUseCase
 import com.catedra.bitacora.core.domain.useCase.ScheduleTripStartNotificationUseCase
+import com.catedra.bitacora.core.domain.useCase.ScheduleTravelPreparationNotificationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +31,8 @@ class EditTravelViewModel @Inject constructor(
     private val compressImageUseCase: CompressImageUseCase,
     private val uploadImageUseCase: UploadImageUseCase,
     private val photoPickerHelper: PhotoPickerHelper,
-    private val scheduleTripStartNotificationUseCase: ScheduleTripStartNotificationUseCase
+    private val scheduleTripStartNotificationUseCase: ScheduleTripStartNotificationUseCase,
+    private val scheduleTravelPreparationNotificationUseCase: ScheduleTravelPreparationNotificationUseCase
 ) : ViewModel() {
 
     private val travelId: String = checkNotNull(savedStateHandle["travelId"])
@@ -108,8 +110,9 @@ class EditTravelViewModel @Inject constructor(
                 ) ?: return@launch
 
                 updateTravelUseCase(updatedTravel).onSuccess {
-                    // Actualiza notificacion
+                    // Actualiza notificaciones
                     scheduleTripStartNotificationUseCase(updatedTravel)
+                    scheduleTravelPreparationNotificationUseCase(updatedTravel)
                     _uiState.update { it.copy(isLoading = false, success = true) }
                 }.onFailure { e ->
                     _uiState.update { it.copy(isLoading = false, error = e.message) }

@@ -9,6 +9,7 @@ import com.catedra.bitacora.features.social.domain.useCase.*
 import com.catedra.bitacora.features.travel.domain.repository.TravelsRepository
 import com.catedra.bitacora.features.travel.domain.useCase.GetPointOfInterestUseCase
 import com.catedra.bitacora.features.travel.domain.useCase.DeletePointUseCase
+import com.catedra.bitacora.features.travel.domain.useCase.GetTravelsListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -22,6 +23,7 @@ class PointDetailViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val likeUseCases: LikeUseCases,
     private val commentUseCases: CommentUseCases,
+    private val getTravelsListUseCase: GetTravelsListUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 

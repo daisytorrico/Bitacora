@@ -22,6 +22,7 @@ import coil.compose.AsyncImage
 import com.catedra.bitacora.R
 import com.catedra.bitacora.features.travel.domain.model.Travel
 import com.catedra.bitacora.features.travel.presentation.travelDetail.TravelDetailUiState
+import com.catedra.bitacora.features.travel.domain.model.TravelVisibility
 import com.catedra.bitacora.core.ui.theme.Blanco
 import com.catedra.bitacora.core.ui.theme.Negro
 import com.catedra.bitacora.core.ui.theme.VerdeMentaFondo
@@ -148,8 +149,14 @@ private fun CreatorAndStatsSection(
             onClick = onProfileClick,
             badges = {
                 Badge(containerColor = MaterialTheme.colorScheme.surface) {
+                    val visibilityText = when (travel?.visibility) {
+                        TravelVisibility.PUBLIC -> stringResource(R.string.public_travel)
+                        TravelVisibility.FOLLOWERS -> stringResource(R.string.followers_travel)
+                        TravelVisibility.PRIVATE -> stringResource(R.string.private_travel)
+                        null -> "..."
+                    }
                     Text(
-                        text = travel?.visibility?.name ?: "PRIVATE",
+                        text = visibilityText,
                         fontSize = 10.sp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
