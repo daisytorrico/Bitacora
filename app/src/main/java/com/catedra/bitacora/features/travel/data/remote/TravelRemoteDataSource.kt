@@ -144,27 +144,53 @@ class TravelRemoteDataSource @Inject constructor(
             .collection("pointsOfInterest").document(pointId)
 
         coroutineScope {
-            //Traer likes y comments en paralelo
+            // Traer likes del punto y comentarios en paralelo
             val likesDeferred = async { pointRef.collection("likes").get().await() }
             val commentsDeferred = async { pointRef.collection("comments").get().await() }
+            
             val likes = likesDeferred.await()
             val comments = commentsDeferred.await()
 
-            //Traer todas las replies en paralelo
-            val repliesByComment = comments.documents.map { comment ->
-                async { comment.reference.collection("replies").get().await() }
-            }.map { it.await() }
+            // Para cada comentario, traer sus likes y sus replies en paralelo
+            val commentDataDeferred = comments.documents.map { comment ->
+                async {
+                    val cLikes = comment.reference.collection("likes").get().await()
+                    val cReplies = comment.reference.collection("replies").get().await()
+                    Triple(comment, cLikes, cReplies)
+                }
+            }
+            val commentData = commentDataDeferred.map { it.await() }
 
-            //Armar la lista de todas las referencias a borrar
+            // Para cada reply, traer sus likes en paralelo
+            val replyLikesDeferred = commentData.flatMap { triple ->
+                triple.third.documents.map { reply ->
+                    async { reply.reference.collection("likes").get().await() to reply.reference }
+                }
+            }
+            val replyLikes = replyLikesDeferred.map { it.await() }
+
+            // Armar la lista de todas las referencias a borrar
             val toDelete = mutableListOf<com.google.firebase.firestore.DocumentReference>()
+            
+            // 1. Likes del punto
             likes.documents.forEach { toDelete.add(it.reference) }
-            comments.documents.forEachIndexed { index, comment ->
-                repliesByComment[index].documents.forEach { toDelete.add(it.reference) }
+            
+            // 2. Comentarios, sus likes y sus replies
+            commentData.forEach { (comment, cLikes, cReplies) ->
+                cLikes.documents.forEach { toDelete.add(it.reference) }
                 toDelete.add(comment.reference)
             }
+
+            // 3. Replies y sus likes
+            replyLikes.forEach { (rLikes, replyRef) ->
+                rLikes.documents.forEach { toDelete.add(it.reference) }
+                toDelete.add(replyRef)
+            }
+
+            // 4. El punto mismo
             toDelete.add(pointRef)
 
-            //Borrar en batches de 498 para dejar lugar al decremento y updatedAt
+            // Borrar en batches de 498 para dejar lugar al decremento y updatedAt
             val tripRef = db.collection("trips").document(travelId)
             toDelete.chunked(498).forEachIndexed { index, chunk ->
                 val batch = db.batch()

@@ -15,13 +15,15 @@ class SchedulePointVisitNotificationUseCase @Inject constructor(
             .toInstant()
             .toEpochMilli()
 
-        notificationHelper.scheduleNotification(
-            id = pointId.hashCode(),
-            triggerAtMillis = triggerMillis,
-            title = "Recordatorio de visita",
-            message = "Es hora de tu parada en ${point.name}",
-            travelId = travelId,
-            pointId = pointId
-        )
+        if (triggerMillis > System.currentTimeMillis()) {
+            notificationHelper.scheduleNotification(
+                id = pointId.hashCode(),
+                triggerAtMillis = triggerMillis,
+                title = "Recordatorio de visita",
+                message = "Es hora de tu parada en ${point.name}",
+                travelId = travelId,
+                pointId = pointId
+            )
+        }
     }
 }

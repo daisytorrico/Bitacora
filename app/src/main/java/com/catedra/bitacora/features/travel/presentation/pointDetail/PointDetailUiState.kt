@@ -16,5 +16,7 @@ data class PointDetailUiState(
     val isLiked: Boolean = false,
     val commentsCount: Int = 0,
     val error: String? = null,
-    val showMap: Boolean = false
+    val showMap: Boolean = false,
+    val showDeleteDialog: Boolean = false,
+    val isDeleted: Boolean = false
 )

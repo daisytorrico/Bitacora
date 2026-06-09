@@ -8,6 +8,7 @@ import com.catedra.bitacora.features.auth.domain.repository.AuthRepository
 import com.catedra.bitacora.features.social.domain.useCase.*
 import com.catedra.bitacora.features.travel.domain.repository.TravelsRepository
 import com.catedra.bitacora.features.travel.domain.useCase.GetPointOfInterestUseCase
+import com.catedra.bitacora.features.travel.domain.useCase.DeletePointUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -16,6 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PointDetailViewModel @Inject constructor(
     private val getPointOfInterestUseCase: GetPointOfInterestUseCase,
+    private val deletePointUseCase: DeletePointUseCase,
     private val travelsRepository: TravelsRepository,
     private val authRepository: AuthRepository,
     private val likeUseCases: LikeUseCases,
@@ -116,5 +118,24 @@ class PointDetailViewModel @Inject constructor(
 
     fun onToggleMap(show: Boolean) {
         _uiState.update { it.copy(showMap = show) }
+    }
+
+    fun setShowDeleteDialog(show: Boolean) {
+        _uiState.update { it.copy(showDeleteDialog = show) }
+    }
+
+    fun deletePoint() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, showDeleteDialog = false) }
+            val result = deletePointUseCase(travelId, pointId)
+            if (result.isSuccess) {
+                _uiState.update { it.copy(isLoading = false, isDeleted = true) }
+            } else {
+                _uiState.update { it.copy(
+                    isLoading = false, 
+                    error = result.exceptionOrNull()?.message ?: "Error al eliminar el punto"
+                ) }
+            }
+        }
     }
 }

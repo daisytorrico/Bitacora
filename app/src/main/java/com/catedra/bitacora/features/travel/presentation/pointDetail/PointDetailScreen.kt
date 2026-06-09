@@ -4,10 +4,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import android.widget.Toast
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -30,8 +34,16 @@ fun PointDetailScreen(
     viewModel: PointDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showComments by remember { mutableStateOf(false) }
+
+    LaunchedEffect(uiState.isDeleted) {
+        if (uiState.isDeleted) {
+            Toast.makeText(context, "Punto eliminado", Toast.LENGTH_SHORT).show()
+            onBack()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -42,6 +54,27 @@ fun PointDetailScreen(
                     if (uiState.canEdit) {
                         IconButton(onClick = { uiState.point?.id?.let { onEdit(it) } }) {
                             Icon(Icons.Default.Edit, contentDescription = "Editar")
+                        }
+                        
+                        var showMenu by remember { mutableStateOf(false) }
+                        Box {
+                            IconButton(onClick = { showMenu = !showMenu }) {
+                                Icon(Icons.Default.MoreVert, contentDescription = "Más opciones")
+                            }
+                            DropdownMenu(
+                                expanded = showMenu,
+                                onDismissRequest = { showMenu = false },
+                                modifier = Modifier.width(180.dp),
+                                containerColor = MaterialTheme.colorScheme.surface
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("Borrar", modifier = Modifier.fillMaxWidth()) },
+                                    onClick = {
+                                        showMenu = false
+                                        viewModel.setShowDeleteDialog(true)
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -126,6 +159,27 @@ fun PointDetailScreen(
                     onDismiss = { viewModel.onToggleMap(false) }
                 )
             }
+        }
+
+        if (uiState.showDeleteDialog) {
+            AlertDialog(
+                onDismissRequest = { viewModel.setShowDeleteDialog(false) },
+                title = { Text("¿Borrar punto?") },
+                text = { Text("Esta acción borrará el punto de interés, sus comentarios y likes de forma permanente.") },
+                confirmButton = {
+                    TextButton(
+                        onClick = { viewModel.deletePoint() },
+                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Text("Borrar")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { viewModel.setShowDeleteDialog(false) }) {
+                        Text("Cancelar")
+                    }
+                }
+            )
         }
     }
 }

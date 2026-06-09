@@ -24,6 +24,7 @@ interface TravelsRepository {
         geohash: String? = null,
         authorizedUsers: List<String> = emptyList()
     ): Result<Unit>
+    suspend fun deletePoint(travelId: String, pointId: String): Result<Unit>
     suspend fun syncTripAccess(travelId: String, newPrivileges: List<String>, removed: List<String>): Result<Unit>
 
     companion object {
