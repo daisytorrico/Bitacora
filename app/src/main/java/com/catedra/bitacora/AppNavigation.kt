@@ -19,7 +19,7 @@ import com.catedra.bitacora.core.domain.model.AuthState
 import com.catedra.bitacora.features.auth.presentation.AuthViewModel
 import com.catedra.bitacora.features.auth.presentation.navigation.AuthDestinations
 import com.catedra.bitacora.features.auth.presentation.navigation.authGraph
-import com.catedra.bitacora.features.auth.presentation.util.crearGoogleSignInHandler
+import com.catedra.bitacora.features.auth.presentation.util.createGoogleSignInHandler
 import com.catedra.bitacora.features.profile.presentation.navigation.ProfileDestinations
 import com.catedra.bitacora.features.profile.presentation.navigation.profileGraph
 import com.catedra.bitacora.features.discovery.presentation.navigation.discoveryGraph
@@ -39,6 +39,7 @@ object Rutas {
 
 @Composable
 fun AppNavigation(viewModel: AuthViewModel) {
+    // Declaramos todo al principio para evitar advertencias de "código inalcanzable"
     val navController = rememberNavController()
     val authState by viewModel.authState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -47,6 +48,20 @@ fun AppNavigation(viewModel: AuthViewModel) {
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+
+    // Si está cargando, mostramos el spinner y salimos. 
+    // Al estar declarado showLogOut arriba, ya no habrá advertencias.
+    if (authState is AuthState.Cargando) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        }
+        return
+    }
 
     val showBottomBar = currentDestination?.hierarchy?.any { 
         it.route in listOf(
@@ -80,23 +95,17 @@ fun AppNavigation(viewModel: AuthViewModel) {
         }
     }
 
-    if (authState is AuthState.Cargando) {
-        Box(modifier = Modifier.fillMaxSize())
-        return
-    }
-
     Box(modifier = Modifier.fillMaxSize()) {
         NavHost(
             navController = navController,
-            startDestination = when {
-                authState is AuthState.Autenticado -> Rutas.HOME
-                authState is AuthState.NecesitaPerfil || authState is AuthState.EsperandoUsername -> Rutas.USERNAME
-                viewModel.estaLogueado() -> Rutas.USERNAME
+            startDestination = when (authState) {
+                is AuthState.Autenticado -> Rutas.HOME
+                is AuthState.NecesitaPerfil, is AuthState.EsperandoUsername -> Rutas.USERNAME
                 else -> Rutas.LOGIN
             },
             modifier = Modifier.padding(bottom = animatedBottomPadding)
         ) {
-            authGraph(navController, viewModel, crearGoogleSignInHandler(context, coroutineScope, viewModel))
+            authGraph(navController, viewModel, createGoogleSignInHandler(context, coroutineScope, viewModel))
             travelGraph(navController) { showLogOut = true }
             discoveryGraph(navController)
             profileGraph(navController)
@@ -151,7 +160,7 @@ fun AppNavigation(viewModel: AuthViewModel) {
             title = { Text("Cerrar Sesión") },
             text = { Text("¿Seguro que desea cerrar sesión?") },
             confirmButton = {
-                TextButton(onClick = { showLogOut = false; viewModel.cerrarSesion() }) {
+                TextButton(onClick = { showLogOut = false; viewModel.logout() }) {
                     Text("Cerrar sesión")
                 }
             },

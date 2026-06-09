@@ -16,10 +16,6 @@ object AuthDestinations {
     const val USERNAME = "username"
 }
 
-/**
- * Extensión de NavGraphBuilder para encapsular las pantallas de Auth.
- * AppNavigation solo llama a esta función.
- */
 fun NavGraphBuilder.authGraph(
     navController: NavController,
     viewModel: AuthViewModel,
@@ -27,31 +23,64 @@ fun NavGraphBuilder.authGraph(
 ) {
     composable(AuthDestinations.LOGIN) {
         val authState by viewModel.authState.collectAsStateWithLifecycle()
+        val email by viewModel.loginEmail.collectAsStateWithLifecycle()
+        val password by viewModel.loginPassword.collectAsStateWithLifecycle()
+
         LoginScreen(
             authState = authState,
-            onLoginClick = { email, pass -> viewModel.iniciarSesion(email, pass) },
+            email = email,
+            onEmailChange = viewModel::onLoginEmailChange,
+            password = password,
+            onPasswordChange = viewModel::onLoginPasswordChange,
+            onLoginClick = viewModel::login,
             onGoogleSignInClick = onGoogleSignInClick,
-            onNavigateToRegister = { navController.navigate(AuthDestinations.REGISTRO) }
+            onNavigateToRegister = { 
+                viewModel.clearError()
+                navController.navigate(AuthDestinations.REGISTRO) 
+            },
+            onResetError = viewModel::clearError
         )
     }
 
     composable(AuthDestinations.REGISTRO) {
         val authState by viewModel.authState.collectAsStateWithLifecycle()
+        val name by viewModel.registerName.collectAsStateWithLifecycle()
+        val email by viewModel.registerEmail.collectAsStateWithLifecycle()
+        val password by viewModel.registerPassword.collectAsStateWithLifecycle()
+        val confirmPassword by viewModel.registerConfirmPassword.collectAsStateWithLifecycle()
+
         RegisterScreen(
             authState = authState,
-            onRegisterClick = { nombre, email, pass -> viewModel.registrar(nombre, email, pass) },
-            onNavigateToLogin = { navController.popBackStack() }
+            name = name,
+            onNameChange = viewModel::onRegisterNameChange,
+            email = email,
+            onEmailChange = viewModel::onRegisterEmailChange,
+            password = password,
+            onPasswordChange = viewModel::onRegisterPasswordChange,
+            confirmPassword = confirmPassword,
+            onConfirmPasswordChange = viewModel::onRegisterConfirmPasswordChange,
+            onRegisterClick = viewModel::register,
+            onNavigateToLogin = { 
+                viewModel.clearError()
+                navController.popBackStack() 
+            },
+            onResetError = viewModel::clearError
         )
     }
 
     composable(AuthDestinations.USERNAME) {
         val authState by viewModel.authState.collectAsStateWithLifecycle()
+        val username by viewModel.username.collectAsStateWithLifecycle()
         val usernameError by viewModel.usernameError.collectAsStateWithLifecycle()
+
         UsernameScreen(
             authState = authState,
+            username = username,
+            onUsernameChange = viewModel::onUsernameChange,
             usernameError = usernameError,
-            onConfirmarClick = { username -> viewModel.guardarUsername(username) },
-            onResetError = { viewModel.limpiarUsernameError() }
+            onConfirmClick = viewModel::saveUsername,
+            onResetError = viewModel::clearUsernameError,
+            onLogout = viewModel::logout
         )
     }
 }

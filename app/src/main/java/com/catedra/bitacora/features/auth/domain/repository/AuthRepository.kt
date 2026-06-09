@@ -13,6 +13,7 @@ interface AuthRepository : SessionRepository {
     suspend fun signInWithGoogle(idToken: String): Result<Unit>
     suspend fun logout()
     suspend fun saveUsername(username: String): Result<Unit>
+    fun resetError()
     override suspend fun getFullUserData(): Result<User>
     suspend fun updateProfile(name: String, bio: String, photoUrl: String?): Result<Unit>
     suspend fun searchUsers(query: String): Result<List<User>>

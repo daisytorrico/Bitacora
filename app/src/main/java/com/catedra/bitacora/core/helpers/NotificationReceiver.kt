@@ -5,7 +5,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.core.app.NotificationCompat
 import com.catedra.bitacora.MainActivity
 import com.catedra.bitacora.R
@@ -24,7 +24,7 @@ class NotificationReceiver : BroadcastReceiver() {
         }
 
         val deepLinkIntent = Intent(context, MainActivity::class.java).apply {
-            data = Uri.parse(uri)
+            data = uri.toUri()
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
 

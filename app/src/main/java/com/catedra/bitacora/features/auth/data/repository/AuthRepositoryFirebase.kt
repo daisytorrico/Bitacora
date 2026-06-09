@@ -1,6 +1,7 @@
 package com.catedra.bitacora.features.auth.data.repository
 
 import android.util.Log
+import androidx.core.net.toUri
 import com.catedra.bitacora.features.auth.data.mapper.toDomain
 import com.catedra.bitacora.features.auth.data.remote.AuthRemoteDataSource
 import com.catedra.bitacora.core.domain.model.AuthState
@@ -66,15 +67,19 @@ class AuthRepositoryFirebase @Inject constructor(
     }
 
     override suspend fun loginWithEmail(email: String, pass: String): Result<Unit> {
+        _authState.value = AuthState.Cargando
         return try {
             remoteDataSource.signInWithEmail(email, pass)
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e("AuthRepository", "Error login: ${e.message}")
+            _authState.value = AuthState.Error("Email o contraseña incorrectos")
             Result.failure(e)
         }
     }
 
     override suspend fun registerWithEmail(nombre: String, email: String, pass: String): Result<Unit> {
+        _authState.value = AuthState.Cargando
         return try {
             remoteDataSource.createUserWithEmail(email, pass)
             
@@ -90,6 +95,13 @@ class AuthRepositoryFirebase @Inject constructor(
             }
             Result.success(Unit)
         } catch (e: Exception) {
+            Log.e("AuthRepository", "Error registro: ${e.message}")
+            val msg = when {
+                e.message?.contains("already in use") == true -> "El email ya está registrado"
+                e.message?.contains("weak-password") == true -> "La contraseña es muy débil"
+                else -> "Error al crear la cuenta. Intentá de nuevo."
+            }
+            _authState.value = AuthState.Error(msg)
             Result.failure(e)
         }
     }
@@ -134,6 +146,12 @@ class AuthRepositoryFirebase @Inject constructor(
         }
     }
 
+    override fun resetError() {
+        if (_authState.value is AuthState.Error) {
+            _authState.value = AuthState.NoAutenticado
+        }
+    }
+
     override suspend fun getFullUserData(): Result<User> {
         val firebaseUser = remoteDataSource.currentUser ?: return Result.failure(Exception("No user logged in"))
         return try {
@@ -153,7 +171,7 @@ class AuthRepositoryFirebase @Inject constructor(
         return try {
             val profileUpdates = userProfileChangeRequest {
                 displayName = name
-                photoUrl?.let { this.photoUri = android.net.Uri.parse(it) }
+                photoUrl?.let { this.photoUri = it.toUri() }
             }
             remoteDataSource.updateProfile(profileUpdates)
             remoteDataSource.reloadUser()

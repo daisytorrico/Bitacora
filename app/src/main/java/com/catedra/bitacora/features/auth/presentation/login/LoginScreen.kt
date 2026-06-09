@@ -1,6 +1,7 @@
 package com.catedra.bitacora.features.auth.presentation.login
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -14,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.semantics
@@ -29,26 +31,41 @@ import com.catedra.bitacora.core.domain.model.AuthState
 @Composable
 fun LoginScreen(
     authState: AuthState,
-    onLoginClick: (String, String) -> Unit,
+    email: String,
+    onEmailChange: (String) -> Unit,
+    password: String,
+    onPasswordChange: (String) -> Unit,
+    onLoginClick: () -> Unit,
     onGoogleSignInClick: () -> Unit,
-    onNavigateToRegister: () -> Unit
+    onNavigateToRegister: () -> Unit,
+    onResetError: () -> Unit
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    
+    val emailValido = remember(email) { 
+        android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() 
+    }
+    val habilitado = emailValido && password.isNotEmpty() && authState !is AuthState.Cargando
+    
     val cargando = authState is AuthState.Cargando
+    val isDark = isSystemInDarkTheme()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
     ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
         Image(
             painter = painterResource(id = R.drawable.screen),
             contentDescription = "Logo Travesía",
-            modifier = Modifier.size(120.dp)
+            modifier = Modifier.size(120.dp),
+            colorFilter = if (isDark) ColorFilter.tint(MaterialTheme.colorScheme.primary) else null
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -72,7 +89,7 @@ fun LoginScreen(
 
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = onEmailChange,
             label = { Text("Email") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -83,17 +100,14 @@ fun LoginScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
             enabled = !cargando,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black,
-            )
+            isError = email.isNotEmpty() && !emailValido || authState is AuthState.Error
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = onPasswordChange,
             label = { Text("Contraseña") },
             modifier = Modifier.fillMaxWidth(),
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
@@ -107,18 +121,23 @@ fun LoginScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
             enabled = !cargando,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black,
-            )
+            isError = authState is AuthState.Error,
+            supportingText = {
+                if (authState is AuthState.Error) {
+                    Text(
+                        text = authState.mensaje,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = { onLoginClick(email, password) },
+            onClick = onLoginClick,
             modifier = Modifier.fillMaxWidth(),
-            enabled = !cargando,
+            enabled = habilitado,
             shape = MaterialTheme.shapes.medium
         ) {
             if (cargando) {
@@ -159,14 +178,6 @@ fun LoginScreen(
             Spacer(modifier = Modifier.width(8.dp))
             Text("Continuar con Google")
         }
-
-        if (authState is AuthState.Error) {
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = authState.mensaje,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
     }
+}
 }

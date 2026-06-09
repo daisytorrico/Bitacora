@@ -11,7 +11,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-fun crearGoogleSignInHandler(
+fun createGoogleSignInHandler(
     context: Context,
     coroutineScope: CoroutineScope,
     viewModel: AuthViewModel
@@ -40,7 +40,7 @@ fun crearGoogleSignInHandler(
                 
                 if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                     val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-                    viewModel.iniciarSesionConGoogle(googleIdTokenCredential.idToken)
+                    viewModel.loginWithGoogle(googleIdTokenCredential.idToken)
                 } else {
                     Log.w("Auth", "Tipo de credencial no esperado: ${credential.type}")
                 }
