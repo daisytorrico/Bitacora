@@ -23,12 +23,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.catedra.bitacora.R
 import com.catedra.bitacora.core.ui.components.common.AppTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,6 +41,7 @@ fun EditProfileScreen(
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
+    val chooserTitle = stringResource(R.string.choice_photo)
 
     val selectorLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -53,13 +56,14 @@ fun EditProfileScreen(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            viewModel.buildSystemChooserIntent().let { selectorLauncher.launch(it) }
+            viewModel.buildSystemChooserIntent(chooserTitle).let { selectorLauncher.launch(it) }
         }
     }
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
-            Toast.makeText(context, "Perfil actualizado con éxito", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context,
+                context.getString(R.string.succefull_profile_update), Toast.LENGTH_SHORT).show()
             onBack()
         }
     }
@@ -73,7 +77,7 @@ fun EditProfileScreen(
     Scaffold(
         topBar = {
             AppTopBar(
-                titulo = "Editar Perfil",
+                titulo = stringResource(R.string.edit_profile),
                 onBack = onBack
             )
         }
@@ -94,10 +98,11 @@ fun EditProfileScreen(
                     .size(120.dp)
                     .clip(CircleShape)
                     .background(Color.LightGray)
-                    .clickable { 
-                        val permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                    .clickable {
+                        val permissionCheck =
+                            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
                         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                            viewModel.buildSystemChooserIntent().let { selectorLauncher.launch(it) }
+                            viewModel.buildSystemChooserIntent(chooserTitle).let { selectorLauncher.launch(it) }
                         } else {
                             permissionLauncher.launch(Manifest.permission.CAMERA)
                         }
@@ -106,7 +111,7 @@ fun EditProfileScreen(
             ) {
                 AsyncImage(
                     model = uiState.selectedImageUri ?: uiState.photoUrl ?: "https://via.placeholder.com/150",
-                    contentDescription = "Foto de perfil",
+                    contentDescription = stringResource(R.string.profile_photo_pic),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
@@ -118,7 +123,7 @@ fun EditProfileScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.CameraAlt,
-                        contentDescription = "Cambiar foto",
+                        contentDescription = stringResource(R.string.change_photo),
                         tint = Color.White,
                         modifier = Modifier.size(32.dp)
                     )
@@ -130,7 +135,7 @@ fun EditProfileScreen(
                 OutlinedTextField(
                     value = uiState.name,
                     onValueChange = { viewModel.onNameChange(it) },
-                    label = { Text("Nombre Completo") },
+                    label = { Text(stringResource(R.string.full_name)) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     singleLine = true,
@@ -140,7 +145,7 @@ fun EditProfileScreen(
                 OutlinedTextField(
                     value = uiState.bio,
                     onValueChange = { viewModel.onBioChange(it) },
-                    label = { Text("Biografía") },
+                    label = { Text(stringResource(R.string.biography)) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     minLines = 3,
@@ -168,7 +173,7 @@ fun EditProfileScreen(
                     )
                 } else {
                     Text(
-                        text = "Guardar Cambios",
+                        text = stringResource(R.string.save_changes),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )

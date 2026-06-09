@@ -12,9 +12,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.catedra.bitacora.R
 import com.catedra.bitacora.core.ui.components.common.AppTopBar
 import com.catedra.bitacora.core.ui.components.travel.TravelItem
 
@@ -45,7 +47,7 @@ fun AllPublicTravelsScreen(
     Scaffold(
         topBar = {
             AppTopBar(
-                titulo = "Todos los Viajes",
+                titulo = stringResource(R.string.all_the_travels),
                 onBack = { navController.popBackStack() }
             )
         }
@@ -69,7 +71,9 @@ fun AllPublicTravelsScreen(
             if (uiState.isLoading) {
                 item {
                     Box(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(modifier = Modifier.size(32.dp))

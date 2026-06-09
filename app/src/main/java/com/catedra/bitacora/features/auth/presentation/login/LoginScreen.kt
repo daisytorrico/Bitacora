@@ -17,6 +17,7 @@ import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -71,7 +72,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Bitácora",
+            text = stringResource(R.string.app_name),
             style = MaterialTheme.typography.headlineLarge.copy(
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 2.sp
@@ -80,7 +81,7 @@ fun LoginScreen(
         )
 
         Text(
-            text = "Tu bitácora de viaje inteligente",
+            text = stringResource(R.string.app_description),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.secondary
         )
@@ -108,7 +109,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = password,
             onValueChange = onPasswordChange,
-            label = { Text("Contraseña") },
+            label = { Text(stringResource(R.string.password)) },
             modifier = Modifier.fillMaxWidth(),
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
             trailingIcon = {
@@ -147,7 +148,7 @@ fun LoginScreen(
                     color = MaterialTheme.colorScheme.onPrimary
                 )
             } else {
-                Text("Iniciar Sesión")
+                Text(stringResource(R.string.log_in))
             }
         }
 
@@ -157,7 +158,7 @@ fun LoginScreen(
             onClick = onNavigateToRegister,
             enabled = !cargando
         ) {
-            Text("¿No tienes cuenta? Regístrate aquí")
+            Text(stringResource(R.string.no_account_register))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -176,7 +177,7 @@ fun LoginScreen(
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Continuar con Google")
+            Text(stringResource(R.string.continue_with_google))
         }
     }
 }

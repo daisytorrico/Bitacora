@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -71,7 +72,7 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Bitácora",
+                text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 2.sp
@@ -80,7 +81,7 @@ fun RegisterScreen(
             )
 
             Text(
-                text = "Crea tu cuenta y empieza la aventura",
+                text = stringResource(R.string.app_slogan),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.secondary
             )
@@ -93,7 +94,7 @@ fun RegisterScreen(
                     onNameChange(it)
                     onResetError()
                 },
-                label = { Text("Nombre Completo") },
+                label = { Text(stringResource(R.string.full_name)) },
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                 singleLine = true
@@ -113,7 +114,7 @@ fun RegisterScreen(
                 isError = (email.isNotEmpty() && !emailValid) || (authState is AuthState.Error && authState.mensaje.contains("email", ignoreCase = true)),
                 supportingText = { 
                     when {
-                        email.isNotEmpty() && !emailValid -> Text("Email no válido")
+                        email.isNotEmpty() && !emailValid -> Text(stringResource(R.string.invalid_email))
                         authState is AuthState.Error && authState.mensaje.contains("email", ignoreCase = true) -> 
                             Text(authState.mensaje, color = MaterialTheme.colorScheme.error)
                     }
@@ -130,7 +131,7 @@ fun RegisterScreen(
                     onPasswordChange(it)
                     onResetError()
                 },
-                label = { Text("Contraseña") },
+                label = { Text(stringResource(R.string.password)) },
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                 trailingIcon = {
@@ -142,7 +143,7 @@ fun RegisterScreen(
                 isError = (password.isNotEmpty() && !passwordValid) || (authState is AuthState.Error && authState.mensaje.contains("contraseña", ignoreCase = true)),
                 supportingText = { 
                     when {
-                        password.isNotEmpty() && !passwordValid -> Text("Mínimo 6 caracteres")
+                        password.isNotEmpty() && !passwordValid -> Text(stringResource(R.string.password_min))
                         authState is AuthState.Error && authState.mensaje.contains("contraseña", ignoreCase = true) -> 
                             Text(authState.mensaje, color = MaterialTheme.colorScheme.error)
                     }
@@ -160,7 +161,7 @@ fun RegisterScreen(
                     onConfirmPasswordChange(it)
                     onResetError()
                 },
-                label = { Text("Confirmar Contraseña") },
+                label = { Text(stringResource(R.string.confirm_password)) },
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -169,7 +170,7 @@ fun RegisterScreen(
                 isError = confirmPassword.isNotEmpty() && password != confirmPassword,
                 supportingText = {
                     if (confirmPassword.isNotEmpty() && password != confirmPassword) {
-                        Text("Las contraseñas no coinciden", color = MaterialTheme.colorScheme.error)
+                        Text(stringResource(R.string.unmatching_password), color = MaterialTheme.colorScheme.error)
                     }
                 }
             )
@@ -189,14 +190,14 @@ fun RegisterScreen(
                         strokeWidth = 2.dp
                     )
                 } else {
-                    Text("Crear Cuenta")
+                    Text(stringResource(R.string.sign_in))
                 }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
             TextButton(onClick = onNavigateToLogin) {
-                Text("¿Ya tienes cuenta? Inicia sesión")
+                Text(stringResource(R.string.already_account_log_in))
             }
         }
     }

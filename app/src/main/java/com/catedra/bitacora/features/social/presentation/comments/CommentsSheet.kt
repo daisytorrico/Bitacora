@@ -17,9 +17,11 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.catedra.bitacora.R
 import com.catedra.bitacora.core.ui.components.social.CommentItem
 import com.catedra.bitacora.features.social.domain.model.Comment
 
@@ -37,8 +39,8 @@ fun CommentsSheetContent(
     if (commentToDelete != null) {
         AlertDialog(
             onDismissRequest = { commentToDelete = null },
-            title = { Text("¿Borrar comentario?") },
-            text = { Text("Se borrarán también todas sus respuestas.") },
+            title = { Text(stringResource(R.string.delete_comment_question)) },
+            text = { Text(stringResource(R.string.delete_comment_warning)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -46,10 +48,10 @@ fun CommentsSheetContent(
                         commentToDelete = null
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.primary)
-                ) { Text("Borrar") }
+                ) { Text(stringResource(R.string.delete)) }
             },
             dismissButton = {
-                TextButton(onClick = { commentToDelete = null }) { Text("Cancelar") }
+                TextButton(onClick = { commentToDelete = null }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -57,7 +59,7 @@ fun CommentsSheetContent(
     if (replyToDelete != null) {
         AlertDialog(
             onDismissRequest = { replyToDelete = null },
-            title = { Text("¿Borrar respuesta?") },
+            title = { Text(stringResource(R.string.delete_response_question)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -65,10 +67,10 @@ fun CommentsSheetContent(
                         viewModel.deleteReply(parentId, reply.id)
                         replyToDelete = null
                     }
-                ) { Text("Borrar") }
+                ) { Text(stringResource(R.string.delete)) }
             },
             dismissButton = {
-                TextButton(onClick = { replyToDelete = null }) { Text("Cancelar") }
+                TextButton(onClick = { replyToDelete = null }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -85,7 +87,7 @@ fun CommentsSheetContent(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Comentarios",
+                text = stringResource(R.string.comments),
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
         }
@@ -97,7 +99,7 @@ fun CommentsSheetContent(
         ) {
             if (!uiState.isLoading && uiState.comments.isEmpty()) {
                 Text(
-                    text = "No hay comentarios aún.\n¡Sé el primero!",
+                    text = stringResource(R.string.no_comments_yet),
                     modifier = Modifier
                         .align(Alignment.Center)
                         .padding(horizontal = 32.dp),
@@ -215,7 +217,7 @@ fun CommentInput(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Respondiendo a @$replyingToName",
+                        text = stringResource(R.string.responding_to, replyingToName),
                         style = MaterialTheme.typography.bodySmall.copy(
                             color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.SemiBold
@@ -224,7 +226,7 @@ fun CommentInput(
                     IconButton(onClick = onCancelReply, modifier = Modifier.size(18.dp)) {
                         Icon(
                             Icons.Default.Close,
-                            contentDescription = "Cancelar",
+                            contentDescription = stringResource(R.string.cancel),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
@@ -240,7 +242,9 @@ fun CommentInput(
                 OutlinedTextField(
                     value = text,
                     onValueChange = onTextChange,
-                    placeholder = { Text(if (replyingToName == null) "Escribe un comentario..." else "Escribe una respuesta...") },
+                    placeholder = { Text(if (replyingToName == null) stringResource(R.string.write_a_comment) else stringResource(
+                        R.string.write_a_response
+                    )) },
                     modifier = Modifier
                         .weight(1f)
                         .focusRequester(focusRequester),
@@ -260,7 +264,7 @@ fun CommentInput(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Send,
-                            contentDescription = "Enviar",
+                            contentDescription = stringResource(R.string.send),
                             tint = if (text.isNotBlank()) MaterialTheme.colorScheme.primary else Color.Gray
                         )
                     }

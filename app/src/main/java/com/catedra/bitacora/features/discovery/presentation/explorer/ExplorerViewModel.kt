@@ -2,6 +2,8 @@ package com.catedra.bitacora.features.discovery.presentation.explorer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.catedra.bitacora.R
+import com.catedra.bitacora.core.ui.util.UiText
 import com.catedra.bitacora.features.discovery.domain.useCase.GetFilteredTravelsUseCase
 import com.catedra.bitacora.features.discovery.domain.useCase.GetFollowingIdsUseCase
 import com.catedra.bitacora.features.discovery.domain.useCase.GetFollowingTravelsUseCase
@@ -63,7 +65,7 @@ class ExplorerViewModel @Inject constructor(
                     ) }
                 }
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, error = "Error al cargar feed") }
+                _uiState.update { it.copy(isLoading = false, error = UiText.StringResource(R.string.loading_feed_err)) }
             }
         }
     }
@@ -160,7 +162,7 @@ class ExplorerViewModel @Inject constructor(
                     isSearching = false
                 )}
             }.onFailure {
-                _uiState.update { it.copy(isSearching = false, error = "Error al filtrar") }
+                _uiState.update { it.copy(isSearching = false, error = UiText.StringResource(R.string.filter_err)) }
             }
         }
     }

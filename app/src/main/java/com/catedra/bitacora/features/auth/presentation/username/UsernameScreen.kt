@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,7 +46,7 @@ fun UsernameScreen(
             ) {
                 Icon(
                     Icons.AutoMirrored.Filled.Logout,
-                    contentDescription = "Cerrar sesión",
+                    contentDescription = stringResource(R.string.log_out),
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             }
@@ -67,7 +68,7 @@ fun UsernameScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Tu @usuario",
+                    text = stringResource(R.string.your_user),
                     style = MaterialTheme.typography.headlineLarge.copy(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp
@@ -76,7 +77,7 @@ fun UsernameScreen(
                 )
 
                 Text(
-                    text = "Elige un nombre de usuario para tu perfil",
+                    text = stringResource(R.string.choice_an_username),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.secondary
                 )
@@ -86,8 +87,8 @@ fun UsernameScreen(
                 OutlinedTextField(
                     value = username,
                     onValueChange = onUsernameChange,
-                    label = { Text("Nombre de usuario") },
-                    placeholder = { Text("ej: viajero_24") },
+                    label = { Text(stringResource(R.string.username)) },
+                    placeholder = { Text(stringResource(R.string.username_ph)) },
                     modifier = Modifier.fillMaxWidth(),
                     leadingIcon = { Icon(Icons.Default.AlternateEmail, contentDescription = null) },
                     singleLine = true,
@@ -99,7 +100,7 @@ fun UsernameScreen(
                                 color = MaterialTheme.colorScheme.error
                             )
                             !isValid && username.isNotEmpty() -> Text(
-                                "Mínimo 3 caracteres (letras, números o _)"
+                                stringResource(R.string.password_rules)
                             )
                         }
                     }
@@ -120,7 +121,7 @@ fun UsernameScreen(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("Empezar mi aventura")
+                        Text(stringResource(R.string.start_my_adventure))
                     }
                 }
 
@@ -139,19 +140,19 @@ fun UsernameScreen(
     if (showLogoutDialog) {
         AlertDialog(
             onDismissRequest = { showLogoutDialog = false },
-            title = { Text("Cerrar Sesión") },
-            text = { Text("¿Seguro que desea cerrar sesión?") },
+            title = { Text(stringResource(R.string.log_out)) },
+            text = { Text(stringResource(R.string.close_session_confirm)) },
             confirmButton = {
                 TextButton(onClick = {
                     showLogoutDialog = false
                     onLogout()
                 }) {
-                    Text("Cerrar sesión")
+                    Text(stringResource(R.string.log_out))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showLogoutDialog = false }) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

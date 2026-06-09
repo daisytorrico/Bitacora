@@ -160,11 +160,11 @@ fun AppNavigation(viewModel: AuthViewModel) {
     if (showLogOut) {
         AlertDialog(
             onDismissRequest = { showLogOut = false },
-            title = { Text(stringResource(R.string.close_session)) },
+            title = { Text(stringResource(R.string.log_out)) },
             text = { Text(stringResource(R.string.close_session_confirm)) },
             confirmButton = {
                 TextButton(onClick = { showLogOut = false; viewModel.logout() }) {
-                    Text(stringResource(R.string.close_session))
+                    Text(stringResource(R.string.log_out))
                 }
             },
             dismissButton = {

@@ -13,12 +13,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.catedra.bitacora.R
 import com.catedra.bitacora.core.ui.components.common.AppTopBar
 import com.catedra.bitacora.core.ui.components.common.BitacoraChip
 import com.catedra.bitacora.core.ui.components.travel.TravelItem
@@ -77,7 +79,7 @@ fun ExplorerScreen(
     Scaffold(
         topBar = {
             AppTopBar(
-                titulo = "Explorar",
+                titulo = stringResource(R.string.explore),
                 actions = {
                     IconButton(onClick = {
                         isSearchVisible = !isSearchVisible
@@ -115,7 +117,7 @@ fun ExplorerScreen(
                                 onSearch = { viewModel.performSearch() },
                                 expanded = false,
                                 onExpandedChange = { },
-                                placeholder = { Text("Buscar viajes...") },
+                                placeholder = { Text(stringResource(R.string.search_travels)) },
                                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                                 trailingIcon = {
                                     if (uiState.searchQuery.isNotBlank()) {
@@ -142,9 +144,9 @@ fun ExplorerScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         listOf(
-                            DurationFilter.SHORT to "1-3 días",
-                            DurationFilter.MEDIUM to "4-7 días",
-                            DurationFilter.LONG to "+7 días"
+                            DurationFilter.SHORT to stringResource(R.string.short_duration_filter),
+                            DurationFilter.MEDIUM to stringResource(R.string.medium_duration_filter),
+                            DurationFilter.LONG to stringResource(R.string.long_duration_filter)
                         ).forEach { (filter, label) ->
                             val selected = uiState.selectedDuration == filter
                             BitacoraChip(
@@ -168,7 +170,7 @@ fun ExplorerScreen(
                             onClick = { viewModel.onDetailedFilterChange() },
                             label = {
                                 Text(
-                                    text = "📍 +5 puntos",
+                                    text = stringResource(R.string.plus_five_points),
                                     style = MaterialTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -189,7 +191,7 @@ fun ExplorerScreen(
                                             .getDisplayName(TextStyle.FULL, Locale("es"))
                                             .replaceFirstChar { it.uppercase() }
                                         "$mName ${uiState.selectedYear ?: ""}"
-                                    } else "📅 Mes"
+                                    } else stringResource(R.string.month)
                                     Text(
                                         text = text,
                                         style = MaterialTheme.typography.labelSmall,
@@ -228,7 +230,9 @@ fun ExplorerScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     IconButton(onClick = { menuYear-- }) {
-                                        Icon(Icons.Default.KeyboardArrowLeft, contentDescription = "Año anterior")
+                                        Icon(Icons.Default.KeyboardArrowLeft, contentDescription = stringResource(
+                                            R.string.previous_year
+                                        ))
                                     }
                                     Text(
                                         text = menuYear.toString(),
@@ -236,7 +240,9 @@ fun ExplorerScreen(
                                         fontWeight = FontWeight.Bold
                                     )
                                     IconButton(onClick = { menuYear++ }) {
-                                        Icon(Icons.Default.KeyboardArrowRight, contentDescription = "Año siguiente")
+                                        Icon(Icons.Default.KeyboardArrowRight, contentDescription = stringResource(
+                                            R.string.next_year
+                                        ))
                                     }
                                 }
                                 HorizontalDivider(thickness = 0.5.dp)
@@ -282,7 +288,9 @@ fun ExplorerScreen(
                         if (uiState.isSearching) {
                             item {
                                 Box(
-                                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(32.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     CircularProgressIndicator(modifier = Modifier.size(32.dp))
@@ -291,10 +299,12 @@ fun ExplorerScreen(
                         } else if (uiState.filterResults.isEmpty()) {
                             item {
                                 Box(
-                                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(32.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text("Sin resultados para este filtro")
+                                    Text(stringResource(R.string.no_results_on_filter))
                                 }
                             }
                         } else {
@@ -320,7 +330,9 @@ fun ExplorerScreen(
                         if (uiState.isSearching) {
                             item {
                                 Box(
-                                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(32.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     CircularProgressIndicator(modifier = Modifier.size(32.dp))
@@ -329,10 +341,16 @@ fun ExplorerScreen(
                         } else if (uiState.searchResults.isEmpty()) {
                             item {
                                 Box(
-                                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(32.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text("Sin resultados para \"${uiState.searchQuery}\"")
+                                    Text(
+                                        stringResource(
+                                            R.string.no_results_for_query,
+                                            uiState.searchQuery
+                                        ))
                                 }
                             }
                         } else {
@@ -348,7 +366,9 @@ fun ExplorerScreen(
                         item {
                             BotonDescubrirViajes(
                                 onClick = onSeeAllClick,
-                                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
                             )
                         }
 
@@ -363,7 +383,9 @@ fun ExplorerScreen(
                         item {
                             BotonAventuraSeguidos(
                                 onClick = { },
-                                modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 12.dp)
                             )
                         }
 

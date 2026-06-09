@@ -1,6 +1,7 @@
 package com.catedra.bitacora.features.discovery.presentation.publicProfile
 
 import com.catedra.bitacora.core.domain.model.User
+import com.catedra.bitacora.core.ui.util.UiText
 import com.catedra.bitacora.features.travel.domain.model.Travel
 import com.catedra.bitacora.features.travel.presentation.travelList.TravelListUiState
 
@@ -10,8 +11,8 @@ data class PublicProfileUiState(
     val travels: List<Travel> = emptyList(),
     val isFollowing: Boolean = false,
     val isMe: Boolean = false,
-    val error: String? = null,
-    val followMessage: String? = null
+    val error: UiText? = null,
+    val followMessage: UiText? = null
 ) {
     fun toTravelListUiState() = TravelListUiState(
         user = user,

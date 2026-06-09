@@ -4,6 +4,7 @@ import android.net.Uri
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.catedra.bitacora.R
 import com.catedra.bitacora.core.domain.repository.SessionRepository
 import com.catedra.bitacora.features.profile.domain.useCase.UpdateProfileUseCase
 import com.catedra.bitacora.core.domain.useCase.CompressImageUseCase
@@ -57,8 +58,8 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
-    fun buildSystemChooserIntent(): Intent {
-        val (intent, tempUri) = photoPickerHelper("Seleccionar Foto")
+    fun buildSystemChooserIntent(title: String): Intent {
+        val (intent, tempUri) = photoPickerHelper(title)
         currentTempCameraUri = tempUri
         return intent
     }

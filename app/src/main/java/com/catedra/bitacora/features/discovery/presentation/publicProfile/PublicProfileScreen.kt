@@ -29,7 +29,7 @@ fun PublicProfileScreen(
 
     LaunchedEffect(uiState.followMessage) {
         uiState.followMessage?.let {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, it.asString(context), Toast.LENGTH_SHORT).show()
             viewModel.resetFollowMessage()
         }
     }

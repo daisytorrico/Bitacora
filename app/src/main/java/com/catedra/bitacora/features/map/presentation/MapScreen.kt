@@ -8,8 +8,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.catedra.bitacora.R
 import com.catedra.bitacora.core.ui.components.map.MapComponent
 import com.catedra.bitacora.core.domain.model.ExternalPoi
 import com.catedra.bitacora.core.ui.components.common.AppTopBar
@@ -24,12 +26,12 @@ fun MapScreen(
     Scaffold(
         topBar = {
             AppTopBar(
-                titulo = "Mapa cerca de tí",
+                titulo = stringResource(R.string.map_close_you),
                 actions = {
                     IconButton(onClick = onLogout) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Logout,
-                            contentDescription = "Cerrar Sesión"
+                            contentDescription = stringResource(R.string.log_out)
                         )
                     }
                 }
@@ -44,7 +46,7 @@ fun MapScreen(
                     onNavigateToPoi(point.travelId, point.id)
                 }
             },
-            externalPoiButtonText = "Detalles",
+            externalPoiButtonText = stringResource(R.string.details),
             onCameraMoved = viewModel::onCameraMoved
         )
     }

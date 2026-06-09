@@ -1,5 +1,6 @@
 package com.catedra.bitacora.features.discovery.presentation.explorer
 
+import com.catedra.bitacora.core.ui.util.UiText
 import com.catedra.bitacora.features.travel.domain.model.Travel
 
 data class ExplorerUiState(
@@ -8,7 +9,7 @@ data class ExplorerUiState(
     val followingTravels: List<Travel> = emptyList(),
     val isFollowingLastPage: Boolean = false,
     val isLoadingMoreFollowing: Boolean = false,
-    val error: String? = null,
+    val error: UiText? = null,
     val lastFollowingDoc: Any? = null,
     val searchQuery: String = "",
     val searchResults: List<Travel> = emptyList(),

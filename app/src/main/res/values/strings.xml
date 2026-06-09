@@ -7,7 +7,7 @@
     <string name="go_back">Volver</string>
 
     <!--  Sesión  -->
-    <string name="close_session">Cerrar Sesión</string>
+    <string name="log_out">Cerrar Sesión</string>
     <string name="close_session_confirm">¿Seguro que desea cerrar sesión?</string>
 
     <!--  Navegación  -->
@@ -84,4 +84,63 @@
     <string name="your_travel_starts_today">¡Hoy empieza tu viaje!</string>
     <string name="named_your_adventure_starts">Tu aventura \'%1$s\' arranca hoy. ¡Buen viaje!</string>
     <string name="selected_point">Punto seleccionado</string>
+    <string name="ssssss">fsddfe</string>
+    <string name="your_user">Tu @usuario</string>
+    <string name="choice_an_username">Elige un nombre de usuario para tu perfil</string>
+    <string name="username">Nombre de usuario</string>
+    <string name="username_ph">ej: viajero_24</string>
+    <string name="password_rules">Mínimo 3 caracteres (letras, números o _)</string>
+    <string name="start_my_adventure">Empezar mi aventura</string>
+    <string name="app_description">Tu bitácora de viaje inteligente</string>
+    <string name="password">Contraseña</string>
+    <string name="log_in">Iniciar Sesión</string>
+    <string name="no_account_register">¿No tienes cuenta? Regístrate aquí</string>
+    <string name="continue_with_google">Continuar con Google</string>
+    <string name="app_slogan">Crea tu cuenta y empieza la aventura</string>
+    <string name="full_name">Nombre Completo</string>
+    <string name="invalid_email">Email no válido</string>
+    <string name="password_min">Mínimo 6 caracteres</string>
+    <string name="confirm_password">Confirmar Contraseña</string>
+    <string name="unmatching_password">Las contraseñas no coinciden</string>
+    <string name="sign_in">Crear Cuenta</string>
+    <string name="already_account_log_in">¿Ya tienes cuenta? Inicia sesión</string>
+    <string name="search_travels">Buscar viajes...</string>
+    <string name="short_duration_filter">1-3 días</string>
+    <string name="medium_duration_filter">4-7 días</string>
+    <string name="long_duration_filter">+7 días</string>
+    <string name="plus_five_points">📍 +5 puntos</string>
+    <string name="month">📅 Mes</string>
+    <string name="previous_year">Año anterior</string>
+    <string name="next_year">Año siguiente</string>
+    <string name="no_results_on_filter">Sin resultados para este filtro</string>
+    <string name="no_results_for_query">Sin resultados para \"%1$s\"</string>
+    <string name="discover_travels">DESCUBRIR VIAJES</string>
+    <string name="followed_travels">VIAJES SEGUIDOS</string>
+    <string name="all_the_travels">Todos los Viajes</string>
+    <string name="loading_feed_err">Error al cargar feed</string>
+    <string name="filter_err">Error al filtrar</string>
+    <string name="you_unfollowed">Dejaste de seguir a @%1$s</string>
+    <string name="now_you_follow">Ahora sigues a @%1$s</string>
+    <string name="map_close_you">Mapa cerca de tí</string>
+    <string name="details">Detalles</string>
+    <string name="choice_photo">Seleccionar Foto</string>
+    <string name="biography">Biografía</string>
+    <string name="save_changes">Guardar Cambios</string>
+    <string name="succefull_profile_update">Perfil actualizado con éxito</string>
+    <string name="profile_photo_pic">Foto de perfil</string>
+    <string name="change_photo">Cambiar foto</string>
+    <string name="delete_response_question">¿Borrar respuesta?</string>
+    <string name="delete">Borrar</string>
+    <string name="delete_comment_question">¿Borrar comentario?</string>
+    <string name="delete_comment_warning">Se borrarán también todas sus respuestas.</string>
+    <string name="no_comments_yet">No hay comentarios aún.\n¡Sé el primero!</string>
+    <string name="responding_to">Respondiendo a @%1$s</string>
+    <string name="write_a_comment">Escribe un comentario...</string>
+    <string name="write_a_response">Escribe una respuesta...</string>
+    <string name="send">Enviar</string>
+    <string name="confirm_changes">Confirmar cambios</string>
+    <string name="confirm_poi_changes">¿Estás seguro de que deseas guardar los cambios en este punto de interés?</string>
+    <string name="updated_point">Punto actualizado</string>
+    <string name="denied_cammera">Permiso de cámara denegado</string>
+    <string name="edit_point">Editar Punto</string>
 </resources>

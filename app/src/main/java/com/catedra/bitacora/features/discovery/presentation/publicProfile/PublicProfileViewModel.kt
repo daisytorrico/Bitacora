@@ -3,7 +3,9 @@ package com.catedra.bitacora.features.discovery.presentation.publicProfile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.catedra.bitacora.R
 import com.catedra.bitacora.core.domain.repository.SessionRepository
+import com.catedra.bitacora.core.ui.util.UiText
 import com.catedra.bitacora.features.discovery.domain.useCase.GetPublicProfileUseCase
 import com.catedra.bitacora.features.social.domain.useCase.FollowUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -47,7 +49,7 @@ class PublicProfileViewModel @Inject constructor(
                 isFollowing = followResult.getOrDefault(false),
                 isMe = isMe,
                 isLoading = false,
-                error = userResult.exceptionOrNull()?.message
+                error = userResult.exceptionOrNull()?.message?.let { UiText.DynamicString(it) }
             ) }
         }
     }
@@ -69,7 +71,10 @@ class PublicProfileViewModel @Inject constructor(
                     _uiState.update { it.copy(
                         isFollowing = !currentIsFollowing,
                         user = currentUser.copy(followersCount = newFollowersCount),
-                        followMessage = if (currentIsFollowing) "Dejaste de seguir a @${currentUser.username}" else "Ahora sigues a @${currentUser.username}"
+                        followMessage = if (currentIsFollowing) UiText.StringResource(
+                            R.string.you_unfollowed,
+                            currentUser.username ?: ""
+                        ) else UiText.StringResource(R.string.now_you_follow, currentUser.username ?: "")
                     ) }
 
                     loadProfile()

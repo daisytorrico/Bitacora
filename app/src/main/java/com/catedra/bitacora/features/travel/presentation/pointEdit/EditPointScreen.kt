@@ -18,11 +18,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.catedra.bitacora.R
 import com.catedra.bitacora.core.domain.model.Coordinates
 import com.catedra.bitacora.core.domain.model.PointOnMap
 import com.catedra.bitacora.core.ui.components.common.AppTopBar
@@ -41,7 +43,7 @@ fun EditPointScreen(
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
-            Toast.makeText(context, "Punto actualizado", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.updated_point), Toast.LENGTH_SHORT).show()
             onPointUpdated()
         }
     }
@@ -78,21 +80,21 @@ fun EditPointScreen(
         if (granted) {
             photoLauncher.launch(viewModel.buildPhotoPickerIntent())
         } else {
-            Toast.makeText(context, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.denied_cammera), Toast.LENGTH_SHORT).show()
         }
     }
 
     Scaffold(
         topBar = {
             AppTopBar(
-                titulo = "Editar Punto",
+                titulo = stringResource(R.string.edit_point),
                 onBack = onBack,
                 actions = {
                     IconButton(
                         onClick = { if (uiState.canSave) viewModel.setShowConfirmDialog(true) },
                         enabled = uiState.canSave && !uiState.isLoading
                     ) {
-                        Icon(Icons.Default.Check, contentDescription = "Guardar")
+                        Icon(Icons.Default.Check, contentDescription = stringResource(R.string.save))
                     }
                 }
             )
@@ -104,7 +106,9 @@ fun EditPointScreen(
             }
         } else {
             Box(modifier = Modifier.fillMaxSize()) {
-                Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)) {
                     PointFormContent(
                         name = uiState.name,
                         onNameChange = { viewModel.onNameChange(it) },
@@ -144,16 +148,16 @@ fun EditPointScreen(
                 if (uiState.showConfirmDialog) {
                     AlertDialog(
                         onDismissRequest = { viewModel.setShowConfirmDialog(false) },
-                        title = { Text("Confirmar cambios") },
-                        text = { Text("¿Estás seguro de que deseas guardar los cambios en este punto de interés?") },
+                        title = { Text(stringResource(R.string.confirm_changes)) },
+                        text = { Text(stringResource(R.string.confirm_poi_changes)) },
                         confirmButton = {
                             TextButton(onClick = { viewModel.updatePoint() }) {
-                                Text("Guardar")
+                                Text(stringResource(R.string.save))
                             }
                         },
                         dismissButton = {
                             TextButton(onClick = { viewModel.setShowConfirmDialog(false) }) {
-                                Text("Cancelar")
+                                Text(stringResource(R.string.cancel))
                             }
                         }
                     )
