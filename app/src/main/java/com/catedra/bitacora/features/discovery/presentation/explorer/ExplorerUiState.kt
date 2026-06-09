@@ -13,5 +13,21 @@ data class ExplorerUiState(
     val searchQuery: String = "",
     val searchResults: List<Travel> = emptyList(),
     val isSearching: Boolean = false,
-    val isSearchModeActive: Boolean = false
+    val isSearchModeActive: Boolean = false,
+    val selectedDuration: DurationFilter? = null,
+    val isDetailedOnly: Boolean = false,
+    val selectedMonth: Int? = null,
+    val selectedYear: Int? = null,
+    val filterResults: List<Travel> = emptyList(),
+    val isFilterModeActive: Boolean = false,
+    val filterLastDocument: Any? = null,
+    val isFilterLastPage: Boolean = false,
+    val isLoadingMoreFiltered: Boolean = false
 )
+
+enum class DurationFilter {
+    SHORT,
+    MEDIUM,
+    LONG
+}
+fun ExplorerUiState.hasActiveFilter() = selectedDuration != null || isDetailedOnly || selectedMonth != null

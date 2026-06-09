@@ -56,7 +56,7 @@ fun AllPublicTravelsScreen(
                 .fillMaxSize()
                 .padding(paddingValues),
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(5.dp)
         ) {
             itemsIndexed(uiState.travels) { index, travel ->
                 TravelItem(
@@ -76,7 +76,7 @@ fun AllPublicTravelsScreen(
                     }
                 }
             }
-            
+
             if (uiState.error != null && uiState.travels.isEmpty()) {
                 item {
                     Box(

@@ -22,7 +22,7 @@ val Typography = Typography(
         lineHeight = 40.sp,
         letterSpacing = 0.sp
     ),
-    
+
     // Titulos de secciones y barras de navegacion
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,

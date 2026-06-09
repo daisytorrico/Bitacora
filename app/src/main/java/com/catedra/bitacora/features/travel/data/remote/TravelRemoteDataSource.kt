@@ -8,6 +8,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import javax.inject.Inject
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
 
 class TravelRemoteDataSource @Inject constructor(
@@ -81,6 +83,7 @@ class TravelRemoteDataSource @Inject constructor(
             .document()
         batch.set(pointRef, pointData)
         val tripRef = db.collection("trips").document(travelId)
+        batch.update(tripRef, "pointsCount", FieldValue.increment(1))
         batch.update(tripRef, "updatedAt", FieldValue.serverTimestamp())
         batch.commit().await()
         return pointRef.id
@@ -135,4 +138,44 @@ class TravelRemoteDataSource @Inject constructor(
             .await()
         return snapshot.documents.map { it.id }
     }
+
+    suspend fun deletePoint(travelId: String, pointId: String) {
+        val pointRef = db.collection("trips").document(travelId)
+            .collection("pointsOfInterest").document(pointId)
+
+        coroutineScope {
+            //Traer likes y comments en paralelo
+            val likesDeferred = async { pointRef.collection("likes").get().await() }
+            val commentsDeferred = async { pointRef.collection("comments").get().await() }
+            val likes = likesDeferred.await()
+            val comments = commentsDeferred.await()
+
+            //Traer todas las replies en paralelo
+            val repliesByComment = comments.documents.map { comment ->
+                async { comment.reference.collection("replies").get().await() }
+            }.map { it.await() }
+
+            //Armar la lista de todas las referencias a borrar
+            val toDelete = mutableListOf<com.google.firebase.firestore.DocumentReference>()
+            likes.documents.forEach { toDelete.add(it.reference) }
+            comments.documents.forEachIndexed { index, comment ->
+                repliesByComment[index].documents.forEach { toDelete.add(it.reference) }
+                toDelete.add(comment.reference)
+            }
+            toDelete.add(pointRef)
+
+            //Borrar en batches de 498 para dejar lugar al decremento y updatedAt
+            val tripRef = db.collection("trips").document(travelId)
+            toDelete.chunked(498).forEachIndexed { index, chunk ->
+                val batch = db.batch()
+                chunk.forEach { batch.delete(it) }
+                if (index == toDelete.chunked(498).lastIndex) {
+                    batch.update(tripRef, "pointsCount", FieldValue.increment(-1))
+                    batch.update(tripRef, "updatedAt", FieldValue.serverTimestamp())
+                }
+                batch.commit().await()
+            }
+        }
+    }
+
 }

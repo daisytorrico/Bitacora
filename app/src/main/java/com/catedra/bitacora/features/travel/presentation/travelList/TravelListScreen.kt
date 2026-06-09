@@ -28,6 +28,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.catedra.bitacora.core.ui.components.common.AppTopBar
+import com.catedra.bitacora.core.ui.components.common.BitacoraChip
 import com.catedra.bitacora.core.ui.components.travel.TravelListContent
 import com.catedra.bitacora.features.travel.domain.model.TravelStatus
 import com.catedra.bitacora.features.travel.domain.model.TravelVisibility
@@ -151,7 +152,7 @@ fun TravelListScreen(
                                     }
                                     val selected = uiState.selectedStatus == status
 
-                                    FilterChip(
+                                    BitacoraChip(
                                         selected = selected,
                                         onClick = {
                                             viewModel.onStatusFilterChange(if (selected) null else status)
@@ -163,18 +164,11 @@ fun TravelListScreen(
                                                 fontWeight = FontWeight.Bold
                                             )
                                         },
-                                        shape = RoundedCornerShape(20.dp),
-                                        colors = FilterChipDefaults.filterChipColors(
-                                            selectedContainerColor = color.copy(alpha = 0.15f),
-                                            selectedLabelColor = color,
-                                            selectedLeadingIconColor = color
-                                        ),
-                                        border = FilterChipDefaults.filterChipBorder(
-                                            enabled = true,
-                                            selected = selected,
-                                            borderColor = color.copy(alpha = 0.3f),
-                                            selectedBorderColor = color.copy(alpha = 0.5f)
-                                        ),
+                                        activeColor = color,
+                                        unselectedBorderColor = color.copy(alpha = 0.5f),
+                                        selectedContainerAlpha = 0.15f,
+                                        selectedBorderAlpha = 0.5f,
+                                        selectedBorderWidth = 1.dp,
                                         leadingIcon = if (selected) {
                                             { Box(Modifier.size(6.dp).background(color, CircleShape)) }
                                         } else null
@@ -194,7 +188,7 @@ fun TravelListScreen(
                                 ).forEach { (visibility, icon) ->
                                     val selected = uiState.selectedVisibility == visibility
 
-                                    FilterChip(
+                                    BitacoraChip(
                                         selected = selected,
                                         onClick = {
                                             viewModel.onVisibilityFilterChange(if (selected) null else visibility)
@@ -210,17 +204,9 @@ fun TravelListScreen(
                                                     MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                                             )
                                         },
-                                        shape = RoundedCornerShape(20.dp),
-                                        colors = FilterChipDefaults.filterChipColors(
-                                            selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                                            selectedLabelColor = MaterialTheme.colorScheme.primary,
-                                        ),
-                                        border = FilterChipDefaults.filterChipBorder(
-                                            enabled = true,
-                                            selected = selected,
-                                            borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                                            selectedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                                        )
+                                        selectedContainerAlpha = 0.1f,
+                                        selectedBorderAlpha = 0.5f,
+                                        selectedBorderWidth = 1.dp
                                     )
                                 }
                             }

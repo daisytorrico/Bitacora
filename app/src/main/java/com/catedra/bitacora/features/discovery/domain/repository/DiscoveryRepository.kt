@@ -3,6 +3,7 @@ package com.catedra.bitacora.features.discovery.domain.repository
 import com.catedra.bitacora.core.domain.model.User
 import com.catedra.bitacora.features.travel.domain.model.PointOfInterest
 import com.catedra.bitacora.features.discovery.domain.model.TravelPage
+import com.catedra.bitacora.features.discovery.presentation.explorer.DurationFilter
 import com.catedra.bitacora.features.travel.domain.model.Travel
 
 interface DiscoveryRepository {
@@ -16,7 +17,15 @@ interface DiscoveryRepository {
         limit: Long = 10,
         lastDocument: Any? = null
     ): Result<TravelPage>
-    
+    suspend fun getFilteredTravels(
+        limit: Long = 10,
+        lastDocument: Any? = null,
+        searchQuery: String? = null,
+        durationFilter: DurationFilter? = null,
+        isDetailedOnly: Boolean = false,
+        selectedMonth: Int? = null,
+        selectedYear: Int? = null
+    ): Result<TravelPage>
     suspend fun getFollowingIds(): Result<List<String>>
     
     suspend fun getPointsCount(travelId: String): Result<Int>

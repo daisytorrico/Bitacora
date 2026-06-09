@@ -27,7 +27,7 @@ fun TravelListContent(
             .fillMaxSize()
             .padding(paddingValues),
         contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         item {
             ProfileHeader(

@@ -7,6 +7,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import java.util.Date
 
 fun QuerySnapshot.toDomain(): List<Travel> {
@@ -37,6 +38,7 @@ fun DocumentSnapshot.toTravel(): Travel? {
             startDate = firestoreStartDate,
             endDate = firestoreEndDate,
             pointsCount = getLong("pointsCount")?.toInt() ?: 0,
+            durationDays = getLong("durationDays")?.toInt() ?: 0,
             visibility = getString("visibility")?.uppercase()?.let { TravelVisibility.valueOf(it) } ?: TravelVisibility.PRIVATE,
             privileges = get("privileges") as? List<String>,
             updatedAt = updatedAt
@@ -59,7 +61,11 @@ fun Travel.toData(): Map<String, Any?> {
             Timestamp(Date.from(it.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant()))
         },
         "visibility" to visibility.name.lowercase(),
-        "privileges" to (privileges ?: emptyList<String>())
+        "privileges" to (privileges ?: emptyList<String>()),
+        "pointsCount" to pointsCount,
+        "durationDays" to if (startDate != null && endDate != null) {
+            ChronoUnit.DAYS.between(startDate, endDate).toInt() + 1
+        } else 0
     ).filterValues { it != null }
 }
 

@@ -1,29 +1,30 @@
 package com.catedra.bitacora.features.discovery.presentation.explorer
 
+import androidx.compose.animation.*
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.catedra.bitacora.core.ui.components.common.AppTopBar
+import com.catedra.bitacora.core.ui.components.common.BitacoraChip
 import com.catedra.bitacora.core.ui.components.travel.TravelItem
+import java.time.Month
+import java.time.format.TextStyle
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,7 +36,16 @@ fun ExplorerScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    var isSearchVisible by remember { mutableStateOf(false) }
+    var showMonthDropdown by remember { mutableStateOf(false) }
+    var menuYear by remember { mutableIntStateOf(java.time.LocalDate.now().year) }
+
+    LaunchedEffect(showMonthDropdown) {
+        if (showMonthDropdown) {
+            menuYear = uiState.selectedYear ?: java.time.LocalDate.now().year
+        }
+    }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -56,40 +66,207 @@ fun ExplorerScreen(
     }
 
     LaunchedEffect(shouldLoadMore) {
-        if (shouldLoadMore && !uiState.isSearchModeActive) {
-            viewModel.loadMoreFollowing()
+        if (shouldLoadMore) {
+            when {
+                uiState.isFilterModeActive -> viewModel.loadMoreFiltered()
+                !uiState.isSearchModeActive -> viewModel.loadMoreFollowing()
+            }
         }
     }
 
     Scaffold(
-        topBar = { AppTopBar(titulo = "Explorar") }
+        topBar = {
+            AppTopBar(
+                titulo = "Explorar",
+                actions = {
+                    IconButton(onClick = {
+                        isSearchVisible = !isSearchVisible
+                        if (!isSearchVisible) viewModel.clearAll()
+                    }) {
+                        Icon(
+                            imageVector = if (isSearchVisible) Icons.Default.Close else Icons.Default.Tune,
+                            contentDescription = "Filtros y Búsqueda",
+                            tint = if (uiState.isFilterModeActive || uiState.searchQuery.isNotBlank()) 
+                                MaterialTheme.colorScheme.primary 
+                            else 
+                                MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            )
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Buscador siempre visible
-            OutlinedTextField(
-                value = uiState.searchQuery,
-                onValueChange = { viewModel.onSearchQueryChange(it) },
-                placeholder = { Text("Buscar viajes...") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                singleLine = true,
-                trailingIcon = {
-                    if (uiState.searchQuery.isNotBlank()) {
-                        IconButton(onClick = { viewModel.clearSearch() }) {
-                            Icon(Icons.Default.Close, contentDescription = "Limpiar")
+            AnimatedVisibility(
+                visible = isSearchVisible,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                Column {
+                    SearchBar(
+                        inputField = {
+                            SearchBarDefaults.InputField(
+                                query = uiState.searchQuery,
+                                onQueryChange = { viewModel.onSearchQueryChange(it) },
+                                onSearch = { viewModel.performSearch() },
+                                expanded = false,
+                                onExpandedChange = { },
+                                placeholder = { Text("Buscar viajes...") },
+                                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                                trailingIcon = {
+                                    if (uiState.searchQuery.isNotBlank()) {
+                                        IconButton(onClick = { viewModel.clearSearch() }) {
+                                            Icon(Icons.Default.Close, contentDescription = "Limpiar")
+                                        }
+                                    }
+                                }
+                            )
+                        },
+                        expanded = false,
+                        onExpandedChange = { },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        windowInsets = WindowInsets(0, 0, 0, 0)
+                    ) { }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        listOf(
+                            DurationFilter.SHORT to "1-3 días",
+                            DurationFilter.MEDIUM to "4-7 días",
+                            DurationFilter.LONG to "+7 días"
+                        ).forEach { (filter, label) ->
+                            val selected = uiState.selectedDuration == filter
+                            BitacoraChip(
+                                selected = selected,
+                                onClick = { viewModel.onDurationFilterChange(filter) },
+                                label = {
+                                    Text(
+                                        text = label,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                },
+                                selectedContainerAlpha = 0.2f,
+                                selectedBorderAlpha = 0.7f,
+                                selectedBorderWidth = 1.5.dp
+                            )
+                        }
+
+                        BitacoraChip(
+                            selected = uiState.isDetailedOnly,
+                            onClick = { viewModel.onDetailedFilterChange() },
+                            label = {
+                                Text(
+                                    text = "📍 +5 puntos",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            selectedContainerAlpha = 0.2f,
+                            selectedBorderAlpha = 0.7f,
+                            selectedBorderWidth = 1.5.dp
+                        )
+
+                        Box {
+                            val monthSelected = uiState.selectedMonth != null
+                            BitacoraChip(
+                                selected = monthSelected,
+                                onClick = { showMonthDropdown = true },
+                                label = {
+                                    val text = if (uiState.selectedMonth != null) {
+                                        val mName = Month.of(uiState.selectedMonth!!)
+                                            .getDisplayName(TextStyle.FULL, Locale("es"))
+                                            .replaceFirstChar { it.uppercase() }
+                                        "$mName ${uiState.selectedYear ?: ""}"
+                                    } else "📅 Mes"
+                                    Text(
+                                        text = text,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                },
+                                selectedContainerAlpha = 0.2f,
+                                selectedBorderAlpha = 0.7f,
+                                selectedBorderWidth = 1.5.dp,
+                                trailingIcon = {
+                                    if (uiState.selectedMonth != null) {
+                                        IconButton(
+                                            onClick = { viewModel.onMonthFilterChange(null, null) },
+                                            modifier = Modifier.size(18.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Close,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(14.dp),
+                                                tint = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
+                                    }
+                                }
+                            )
+                            DropdownMenu(
+                                expanded = showMonthDropdown,
+                                onDismissRequest = { showMonthDropdown = false },
+                                modifier = Modifier.width(200.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp),
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    IconButton(onClick = { menuYear-- }) {
+                                        Icon(Icons.Default.KeyboardArrowLeft, contentDescription = "Año anterior")
+                                    }
+                                    Text(
+                                        text = menuYear.toString(),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    IconButton(onClick = { menuYear++ }) {
+                                        Icon(Icons.Default.KeyboardArrowRight, contentDescription = "Año siguiente")
+                                    }
+                                }
+                                HorizontalDivider(thickness = 0.5.dp)
+                                
+                                Box(modifier = Modifier.heightIn(max = 300.dp)) {
+                                    Column {
+                                        (1..12).forEach { month ->
+                                            DropdownMenuItem(
+                                                text = {
+                                                    val mName = Month.of(month).getDisplayName(TextStyle.FULL, Locale("es"))
+                                                        .replaceFirstChar { it.uppercase() }
+                                                    Text(mName)
+                                                },
+                                                onClick = {
+                                                    viewModel.onMonthFilterChange(month, menuYear)
+                                                    showMonthDropdown = false
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
-                },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(onSearch = { viewModel.performSearch() })
-            )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
 
-            // Contenido
+            HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+
             if (uiState.isLoading && uiState.publicTravels.isEmpty() && uiState.followingTravels.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
@@ -99,10 +276,47 @@ fun ExplorerScreen(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                    verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
-                    if (uiState.isSearchModeActive) {
-                        // Modo búsqueda
+                    if (uiState.isFilterModeActive) {
+                        if (uiState.isSearching) {
+                            item {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                                }
+                            }
+                        } else if (uiState.filterResults.isEmpty()) {
+                            item {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth().padding(32.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text("Sin resultados para este filtro")
+                                }
+                            }
+                        } else {
+                            items(uiState.filterResults) { travel ->
+                                TravelItem(
+                                    travel = travel,
+                                    pointsCount = travel.pointsCount,
+                                    onClick = { onTravelClick(travel.id) }
+                                )
+                            }
+                            if (uiState.isLoadingMoreFiltered) {
+                                item {
+                                    Box(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                                    }
+                                }
+                            }
+                        }
+                    } else if (uiState.isSearchModeActive) {
                         if (uiState.isSearching) {
                             item {
                                 Box(
@@ -131,23 +345,11 @@ fun ExplorerScreen(
                             }
                         }
                     } else {
-                        // Modo feed normal
                         item {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Descubrir Viajes",
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                TextButton(onClick = onSeeAllClick) {
-                                    Text("Ver todos")
-                                }
-                            }
+                            BotonDescubrirViajes(
+                                onClick = onSeeAllClick,
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                            )
                         }
 
                         items(uiState.publicTravels) { travel ->
@@ -159,21 +361,10 @@ fun ExplorerScreen(
                         }
 
                         item {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Default.Group,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "Actividad de Seguidos",
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
+                            BotonAventuraSeguidos(
+                                onClick = { },
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)
+                            )
                         }
 
                         items(uiState.followingTravels) { travel ->

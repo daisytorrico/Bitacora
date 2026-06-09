@@ -55,6 +55,7 @@ class AllPublicTravelsViewModel @Inject constructor(
             }
         }
     }
+
 }
 
 data class AllPublicTravelsUiState(
@@ -62,5 +63,9 @@ data class AllPublicTravelsUiState(
     val travels: List<Travel> = emptyList(),
     val isLastPage: Boolean = false,
     val error: String? = null,
-    val lastDocument: Any? = null
+    val lastDocument: Any? = null,
+    val searchQuery: String = "",
+    val searchResults: List<Travel> = emptyList(),
+    val isSearching: Boolean = false,
+    val isSearchModeActive: Boolean = false
 )

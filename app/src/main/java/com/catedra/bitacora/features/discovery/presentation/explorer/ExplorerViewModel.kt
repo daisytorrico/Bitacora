@@ -2,6 +2,7 @@ package com.catedra.bitacora.features.discovery.presentation.explorer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.catedra.bitacora.features.discovery.domain.useCase.GetFilteredTravelsUseCase
 import com.catedra.bitacora.features.discovery.domain.useCase.GetFollowingIdsUseCase
 import com.catedra.bitacora.features.discovery.domain.useCase.GetFollowingTravelsUseCase
 import com.catedra.bitacora.features.discovery.domain.useCase.GetPublicTravelsUseCase
@@ -21,7 +22,7 @@ class ExplorerViewModel @Inject constructor(
     private val getPublicTravelsUseCase: GetPublicTravelsUseCase,
     private val getFollowingTravelsUseCase: GetFollowingTravelsUseCase,
     private val getFollowingIdsUseCase: GetFollowingIdsUseCase,
-    private val searchTravelsUseCase: SearchTravelsUseCase
+    private val getFilteredTravelsUseCase: GetFilteredTravelsUseCase
 
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ExplorerUiState())
@@ -90,29 +91,120 @@ class ExplorerViewModel @Inject constructor(
     }
     fun onSearchQueryChange(query: String) {
         _uiState.update { it.copy(searchQuery = query) }
-        if (query.isBlank()) clearSearch()
+        if (query.isBlank() && !uiState.value.hasActiveFilter()) {
+            clearAll()
+        }
     }
 
     fun performSearch() {
-        val query = uiState.value.searchQuery.trim()
-        if (query.isBlank()) return
+        if (uiState.value.searchQuery.isBlank()) return
+        applySearchAndFilters()
+    }
+
+    fun onDurationFilterChange(filter: DurationFilter?) {
+        val newFilter = if (uiState.value.selectedDuration == filter) null else filter
+        _uiState.update { it.copy(
+            selectedDuration = newFilter,
+            isDetailedOnly = false,
+            selectedMonth = null
+        )}
+        applySearchAndFilters()
+    }
+
+    fun onDetailedFilterChange() {
+        _uiState.update { it.copy(
+            isDetailedOnly = !uiState.value.isDetailedOnly,
+            selectedDuration = null,
+            selectedMonth = null
+        )}
+        applySearchAndFilters()
+    }
+
+    fun onMonthFilterChange(month: Int?, year: Int?) {
+        _uiState.update { it.copy(
+            selectedMonth = month,
+            selectedYear = year,
+            selectedDuration = null,
+            isDetailedOnly = false
+        )}
+        applySearchAndFilters()
+    }
+
+    private fun applySearchAndFilters() {
+        val state = uiState.value
+        val hasText = state.searchQuery.isNotBlank()
+        val hasFilter = state.hasActiveFilter()
+
+        if (!hasText && !hasFilter) {
+            clearAll()
+            return
+        }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isSearching = true, isSearchModeActive = true) }
-            searchTravelsUseCase(query)
-                .onSuccess { results ->
-                    _uiState.update { it.copy(
-                        searchResults = results,
-                        isSearching = false
-                    )}
-                }
-                .onFailure {
-                    _uiState.update { it.copy(
-                        isSearching = false,
-                        error = "Error al buscar"
-                    )}
-                }
+            _uiState.update { it.copy(
+                filterResults = emptyList(),
+                isSearching = true,
+                isFilterModeActive = true
+            )}
+            getFilteredTravelsUseCase(
+                searchQuery = if (hasText) state.searchQuery.trim() else null,
+                durationFilter = state.selectedDuration,
+                isDetailedOnly = state.isDetailedOnly,
+                selectedMonth = state.selectedMonth,
+                selectedYear = state.selectedYear
+            ).onSuccess { results ->
+                _uiState.update { it.copy(
+                    filterResults = results.travels,
+                    filterLastDocument = results.lastDocument,
+                    isFilterLastPage = results.travels.size < 10,
+                    isSearching = false
+                )}
+            }.onFailure {
+                _uiState.update { it.copy(isSearching = false, error = "Error al filtrar") }
+            }
         }
+    }
+
+    fun loadMoreFiltered() {
+        val state = uiState.value
+        if (state.isLoadingMoreFiltered || state.isFilterLastPage) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoadingMoreFiltered = true) }
+            getFilteredTravelsUseCase(
+                lastDocument = state.filterLastDocument,
+                searchQuery = if (state.searchQuery.isNotBlank()) state.searchQuery.trim() else null,
+                durationFilter = state.selectedDuration,
+                isDetailedOnly = state.isDetailedOnly,
+                selectedMonth = state.selectedMonth,
+                selectedYear = state.selectedYear
+            ).onSuccess { page ->
+                _uiState.update { it.copy(
+                    filterResults = (it.filterResults + page.travels).distinctBy { t -> t.id },
+                    filterLastDocument = page.lastDocument,
+                    isFilterLastPage = page.travels.size < 10,
+                    isLoadingMoreFiltered = false
+                )}
+            }.onFailure {
+                _uiState.update { it.copy(isLoadingMoreFiltered = false) }
+            }
+        }
+    }
+    fun clearAll() {
+        _uiState.update { it.copy(
+            searchQuery = "",
+            searchResults = emptyList(),
+            filterResults = emptyList(),
+            isSearchModeActive = false,
+            isFilterModeActive = false,
+            isSearching = false,
+            selectedDuration = null,
+            isDetailedOnly = false,
+            selectedMonth = null,
+            selectedYear = null,
+            filterLastDocument = null,
+            isFilterLastPage = false
+        )}
     }
 
     fun clearSearch() {
@@ -122,5 +214,10 @@ class ExplorerViewModel @Inject constructor(
             isSearchModeActive = false,
             isSearching = false
         )}
+        if (!uiState.value.hasActiveFilter()) {
+            _uiState.update { it.copy(isFilterModeActive = false) }
+        } else {
+            applySearchAndFilters()
+        }
     }
 }

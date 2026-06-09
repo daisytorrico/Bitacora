@@ -4,6 +4,7 @@ import android.util.Log
 import com.catedra.bitacora.features.auth.data.mapper.toUser
 import com.catedra.bitacora.core.domain.model.User
 import com.catedra.bitacora.features.discovery.data.remote.model.TravelPageRemote
+import com.catedra.bitacora.features.discovery.presentation.explorer.DurationFilter
 import com.catedra.bitacora.features.travel.data.mapper.toPointOfInterest
 import com.catedra.bitacora.features.travel.data.mapper.toPointsDomain
 import com.catedra.bitacora.features.travel.data.mapper.toTravel
@@ -16,6 +17,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
+import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -51,10 +53,11 @@ class DiscoveryRemoteDataSource @Inject constructor(
 
             val snapshot = query.get().await()
             if (snapshot.isEmpty) break
-
+            
+            lastDoc = snapshot.documents.lastOrNull()
+            
             for (doc in snapshot.documents) {
                 val travel = doc.toTravel()
-                lastDoc = doc
                 
                 if (travel != null && travel.ownerId !in blackList) {
                     resultTravels.add(travel)
@@ -95,50 +98,40 @@ class DiscoveryRemoteDataSource @Inject constructor(
     }
 
     suspend fun getPointsCount(travelId: String): Long {
-        return firestore.collection("trips")
-            .document(travelId)
-            .collection("pointsOfInterest")
-            .count()
-            .get(com.google.firebase.firestore.AggregateSource.SERVER)
+        return firestore.collection("trips").document(travelId)
+            .get()
             .await()
-            .count
+            .getLong("pointsCount") ?: 0
     }
 
     suspend fun getPublicProfile(userId: String): User {
-        val doc = firestore.collection("users").document(userId).get().await()
-        return doc.toUser()
+        return firestore.collection("users").document(userId)
+            .get()
+            .await()
+            .toUser() ?: throw Exception("Usuario no encontrado")
     }
 
     suspend fun getPublicUserTravels(userId: String): List<Travel> {
-        val currentUserId = auth.currentUser?.uid
-        val isMe = currentUserId == userId
-
-        val baseQuery = firestore.collection("trips").whereEqualTo("ownerId", userId)
-
-        val snapshot = if (isMe) {
-            baseQuery.get().await()
-        } else {
-            try {
-                baseQuery
-                    .whereIn("visibility", listOf("public", "followers"))
-                    .orderBy("updatedAt", Query.Direction.DESCENDING)
-                    .get().await()
-            } catch (e: Exception) {
-                baseQuery.whereEqualTo("visibility", "public").get().await()
-            }
-        }
-
-        return snapshot.documents.mapNotNull { it.toTravel() }
+        return firestore.collection("trips")
+            .whereEqualTo("ownerId", userId)
+            .whereEqualTo("visibility", TravelVisibility.PUBLIC.name.lowercase())
+            .orderBy("updatedAt", Query.Direction.DESCENDING)
+            .get()
+            .await()
+            .documents.mapNotNull { it.toTravel() }
     }
 
     suspend fun getPublicTravelDetail(travelId: String): Travel {
-        val doc = firestore.collection("trips").document(travelId).get().await()
-        return doc.toTravel() ?: throw Exception("Viaje no encontrado")
+        return firestore.collection("trips").document(travelId)
+            .get()
+            .await()
+            .toTravel() ?: throw Exception("Viaje no encontrado")
     }
 
     suspend fun getPublicPointsOfInterest(travelId: String): List<PointOfInterest> {
         return firestore.collection("trips").document(travelId)
             .collection("pointsOfInterest")
+            .orderBy("visitDate", Query.Direction.ASCENDING)
             .get()
             .await()
             .toPointsDomain()
@@ -222,5 +215,80 @@ class DiscoveryRemoteDataSource @Inject constructor(
         } else emptyList()
 
         return (publicTravels + followingTravels).distinctBy { it.id }
+    }
+
+    suspend fun getFilteredTravels(
+        limit: Long,
+        lastDocument: DocumentSnapshot? = null,
+        searchQuery: String? = null,
+        durationFilter: DurationFilter? = null,
+        isDetailedOnly: Boolean = false,
+        selectedMonth: Int? = null,
+        selectedYear: Int? = null
+    ): TravelPageRemote {
+        val currentUserId = auth.currentUser?.uid ?: ""
+        val blackList = setOf(currentUserId)
+
+        var query = firestore.collection("trips")
+            .whereEqualTo("visibility", TravelVisibility.PUBLIC.name.lowercase())
+
+        // 1. Filtro de búsqueda (siempre se puede combinar)
+        if (!searchQuery.isNullOrBlank()) {
+            val end = searchQuery + '\uf8ff'
+            query = query
+                .whereGreaterThanOrEqualTo("name", searchQuery)
+                .whereLessThanOrEqualTo("name", end)
+        }
+
+        // 2. Aplicamos el resto de los filtros de forma exclusiva (Chips)
+        query = when {
+            durationFilter == DurationFilter.SHORT -> query
+                .whereGreaterThanOrEqualTo("durationDays", 1)
+                .whereLessThanOrEqualTo("durationDays", 3)
+                .orderBy("durationDays", Query.Direction.ASCENDING)
+
+            durationFilter == DurationFilter.MEDIUM -> query
+                .whereGreaterThanOrEqualTo("durationDays", 4)
+                .whereLessThanOrEqualTo("durationDays", 7)
+                .orderBy("durationDays", Query.Direction.ASCENDING)
+
+            durationFilter == DurationFilter.LONG -> query
+                .whereGreaterThan("durationDays", 7)
+                .orderBy("durationDays", Query.Direction.ASCENDING)
+
+            isDetailedOnly -> query
+                .whereGreaterThanOrEqualTo("pointsCount", 5)
+                .orderBy("pointsCount", Query.Direction.DESCENDING)
+
+            selectedMonth != null -> {
+                val year = selectedYear ?: java.time.LocalDate.now().year
+                val firstDay = java.time.LocalDate.of(year, selectedMonth, 1)
+                val lastDay = firstDay.withDayOfMonth(firstDay.lengthOfMonth())
+                val start = com.google.firebase.Timestamp(Date.from(firstDay.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()))
+                val end = com.google.firebase.Timestamp(Date.from(lastDay.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()))
+
+                query.whereGreaterThanOrEqualTo("startDate", start)
+                    .whereLessThanOrEqualTo("startDate", end)
+                    .orderBy("updatedAt", Query.Direction.DESCENDING)
+            }
+
+            // Si hay búsqueda pero no chip, ordenamos por nombre para que el rango funcione
+            !searchQuery.isNullOrBlank() -> query.orderBy("name")
+
+            else -> query.orderBy("updatedAt", Query.Direction.DESCENDING)
+        }
+
+        query = query.limit(limit)
+
+        if (lastDocument != null) {
+            query = query.startAfter(lastDocument)
+        }
+
+        val snapshot = query.get().await()
+        val travels = snapshot.documents
+            .mapNotNull { it.toTravel() }
+            .filter { it.ownerId !in blackList }
+
+        return TravelPageRemote(travels, snapshot.documents.lastOrNull())
     }
 }

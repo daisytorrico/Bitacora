@@ -4,6 +4,7 @@ import com.catedra.bitacora.core.domain.model.User
 import com.catedra.bitacora.features.discovery.data.remote.DiscoveryRemoteDataSource
 import com.catedra.bitacora.features.discovery.domain.model.TravelPage
 import com.catedra.bitacora.features.discovery.domain.repository.DiscoveryRepository
+import com.catedra.bitacora.features.discovery.presentation.explorer.DurationFilter
 import com.catedra.bitacora.features.travel.domain.model.PointOfInterest
 import com.catedra.bitacora.features.travel.domain.model.Travel
 import com.google.firebase.firestore.DocumentSnapshot
@@ -27,17 +28,8 @@ class DiscoveryRepositoryImpl @Inject constructor(
         
         val result = remoteDataSource.getPublicTravels(limit, startAfter, excludeOwnerIds)
         
-        val travelsWithCount = coroutineScope {
-            result.travels.map { travel ->
-                async {
-                    val count = try { remoteDataSource.getPointsCount(travel.id) } catch(e: Exception) { 0L }
-                    travel.copy(pointsCount = count.toInt())
-                }
-            }.awaitAll()
-        }
-        
         TravelPage(
-            travels = travelsWithCount,
+            travels = result.travels,
             lastDocument = result.lastDocument
         )
     }
@@ -49,17 +41,8 @@ class DiscoveryRepositoryImpl @Inject constructor(
         val startAfter = lastDocument as? DocumentSnapshot
         val result = remoteDataSource.getFollowingTravels(limit, startAfter)
 
-        val travelsWithCount = coroutineScope {
-            result.travels.map { travel ->
-                async {
-                    val count = try { remoteDataSource.getPointsCount(travel.id) } catch(e: Exception) { 0L }
-                    travel.copy(pointsCount = count.toInt())
-                }
-            }.awaitAll()
-        }
-
         TravelPage(
-            travels = travelsWithCount,
+            travels = result.travels,
             lastDocument = result.lastDocument
         )
     }
@@ -77,15 +60,7 @@ class DiscoveryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getPublicUserTravels(userId: String): Result<List<Travel>> = runCatching {
-        val travels = remoteDataSource.getPublicUserTravels(userId)
-        coroutineScope {
-            travels.map { travel ->
-                async {
-                    val count = try { remoteDataSource.getPointsCount(travel.id) } catch(e: Exception) { 0L }
-                    travel.copy(pointsCount = count.toInt())
-                }
-            }.awaitAll()
-        }
+        remoteDataSource.getPublicUserTravels(userId)
     }
 
     override suspend fun getPublicTravelDetail(travelId: String): Result<Travel> = runCatching {
@@ -112,14 +87,27 @@ class DiscoveryRepositoryImpl @Inject constructor(
         remoteDataSource.isFollowing(userId)
     }
     override suspend fun searchTravels(query: String): Result<List<Travel>> = runCatching {
-        val travels = remoteDataSource.searchTravels(query)
-        coroutineScope {
-            travels.map { travel ->
-                async {
-                    val count = try { remoteDataSource.getPointsCount(travel.id) } catch (e: Exception) { 0L }
-                    travel.copy(pointsCount = count.toInt())
-                }
-            }.awaitAll()
-        }
+        remoteDataSource.searchTravels(query)
+    }
+    override suspend fun getFilteredTravels(
+        limit: Long,
+        lastDocument: Any?,
+        searchQuery: String?,
+        durationFilter: DurationFilter?,
+        isDetailedOnly: Boolean,
+        selectedMonth: Int?,
+        selectedYear: Int?
+    ): Result<TravelPage> = runCatching {
+        val startAfter = lastDocument as? DocumentSnapshot
+        val result = remoteDataSource.getFilteredTravels(
+            limit = limit,
+            lastDocument = startAfter,
+            searchQuery = searchQuery,
+            durationFilter = durationFilter,
+            isDetailedOnly = isDetailedOnly,
+            selectedMonth = selectedMonth,
+            selectedYear = selectedYear
+        )
+        TravelPage(travels = result.travels, lastDocument = result.lastDocument)
     }
 }

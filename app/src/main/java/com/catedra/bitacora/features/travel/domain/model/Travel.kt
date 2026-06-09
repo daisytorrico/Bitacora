@@ -12,6 +12,7 @@ data class Travel(
     val startDate: LocalDate? = null,
     val endDate: LocalDate? = null,
     val pointsCount: Int = 0,
+    val durationDays: Int = 0,
     val visibility: TravelVisibility = TravelVisibility.PRIVATE,
     val privileges: List<String>? = null,
     val updatedAt: LocalDateTime? = null
