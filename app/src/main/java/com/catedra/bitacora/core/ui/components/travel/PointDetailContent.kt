@@ -18,7 +18,11 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,6 +53,18 @@ fun PointDetailContent(
 ) {
     val point = uiState.point ?: return
 
+    var showStoriesDialog by remember { mutableStateOf(false) }
+    var selectedImageIndex by remember { mutableIntStateOf(0) }
+
+    if (showStoriesDialog && point.imageUrls.isNotEmpty()) {
+        PointStoriesDialog(
+            imageUrls = point.imageUrls,
+            title = point.name,
+            initialIndex = selectedImageIndex,
+            onDismiss = { showStoriesDialog = false }
+        )
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -64,13 +80,17 @@ fun PointDetailContent(
                     .background(GrisSeparador),
                 contentPadding = PaddingValues(horizontal = 0.dp)
             ) {
-                items(point.imageUrls) { url ->
+                items(point.imageUrls.indices.toList()) { index ->
                     AsyncImage(
-                        model = url,
+                        model = point.imageUrls[index],
                         contentDescription = null,
                         modifier = Modifier
                             .fillParentMaxWidth()
-                            .height(240.dp),
+                            .height(240.dp)
+                            .clickable {
+                                selectedImageIndex = index
+                                showStoriesDialog = true
+                            },
                         contentScale = ContentScale.Crop
                     )
                 }
@@ -208,7 +228,7 @@ fun PointDetailContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
