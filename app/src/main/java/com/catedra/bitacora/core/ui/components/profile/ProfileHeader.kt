@@ -11,10 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.catedra.bitacora.R
 import com.catedra.bitacora.core.domain.model.User
 import com.catedra.bitacora.core.ui.theme.GrisMedio
 
@@ -38,14 +40,14 @@ fun ProfileHeader(
             
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = user?.displayName ?: "Cargando...",
+                    text = user?.displayName ?: stringResource(R.string.loading),
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
                     )
                 )
                 Text(
-                    text = "@${user?.username ?: "usuario"}",
+                    text = "@${user?.username ?: stringResource(R.string.user)}",
                     style = MaterialTheme.typography.bodyMedium.copy(color = GrisMedio)
                 )
                 if (!user?.bio.isNullOrBlank()) {
@@ -63,7 +65,7 @@ fun ProfileHeader(
                 IconButton(onClick = onEditClick) {
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "Editar Perfil",
+                        contentDescription = stringResource(R.string.edit_profile),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -79,9 +81,13 @@ fun ProfileHeader(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            CounterItem(Icons.Default.TravelExplore, travelCount, "Viajes")
-            CounterItem(Icons.Default.People, user?.followersCount ?: 0, "Seguidores")
-            CounterItem(Icons.Default.PersonAdd, user?.followingCount ?: 0, "Seguidos")
+            CounterItem(Icons.Default.TravelExplore, travelCount, stringResource(R.string.travels))
+            CounterItem(Icons.Default.People, user?.followersCount ?: 0,
+                stringResource(R.string.followers)
+            )
+            CounterItem(Icons.Default.PersonAdd, user?.followingCount ?: 0,
+                stringResource(R.string.followed)
+            )
         }
     }
 }

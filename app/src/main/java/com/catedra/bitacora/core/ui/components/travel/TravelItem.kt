@@ -43,9 +43,7 @@ fun TravelItem(
     modifier: Modifier = Modifier
 ) {
     val dateRange = remember(travel) { getDateRange(travel) }
-    val updateText = remember(travel.updatedAt) { 
-        travel.updatedAt?.toRelativeTime(shortUnits = true)?.uppercase() 
-    }
+    val updateText = travel.updatedAt?.toRelativeTime(shortUnits = true)?.asString()?.uppercase()
     val isDark = !MaterialTheme.colorScheme.surface.isLight()
     
     val primary = MaterialTheme.colorScheme.primary

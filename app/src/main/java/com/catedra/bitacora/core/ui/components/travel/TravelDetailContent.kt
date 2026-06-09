@@ -14,10 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.catedra.bitacora.R
 import com.catedra.bitacora.features.travel.domain.model.Travel
 import com.catedra.bitacora.features.travel.presentation.travelDetail.TravelDetailUiState
 import com.catedra.bitacora.core.ui.theme.Blanco
@@ -57,7 +59,7 @@ fun TravelDetailContent(
 
         item {
             Text(
-                text = "Puntos de interés",
+                text = stringResource(R.string.points_of_interests),
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 22.sp
@@ -117,7 +119,7 @@ private fun BannerSection(travel: Travel) {
                 val formatter = DateTimeFormatter.ofPattern("dd MMM")
                 val dateText = if (travel.startDate != null && travel.endDate != null) {
                     "${travel.startDate.format(formatter)} - ${travel.endDate.format(formatter)}"
-                } else "Sin fechas"
+                } else stringResource(R.string.no_date)
                 Text(text = dateText, color = Blanco, fontSize = 14.sp)
             }
             Text(
@@ -153,7 +155,7 @@ private fun CreatorAndStatsSection(
                     )
                 }
                 Badge(containerColor = MaterialTheme.colorScheme.secondaryContainer) {
-                    Text(travel?.status?.label ?: "Cargando", fontSize = 10.sp)
+                    Text(travel?.status?.label ?: stringResource(R.string.loading), fontSize = 10.sp)
                 }
             }
         )
@@ -162,7 +164,7 @@ private fun CreatorAndStatsSection(
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             SuggestionChip(
                 onClick = { },
-                label = { Text("${uiState.pointsOfInterest.size} Puntos") },
+                label = { Text(stringResource(R.string.n_points, uiState.pointsOfInterest.size)) },
                 colors = SuggestionChipDefaults.suggestionChipColors(
                     containerColor = VerdeMentaFondo,
                     labelColor = VerdeMentaTexto

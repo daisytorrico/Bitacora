@@ -9,7 +9,9 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.catedra.bitacora.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,10 +64,10 @@ fun AppTimePickerField(
                     TextButton(onClick = {
                         onTimeSelected(timePickerState.hour, timePickerState.minute)
                         showTimePicker = false
-                    }) { Text("Aceptar") }
+                    }) { Text(stringResource(R.string.accept)) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showTimePicker = false }) { Text("Cancelar") }
+                    TextButton(onClick = { showTimePicker = false }) { Text(stringResource(R.string.cancel)) }
                 },
                 text = { TimePicker(state = timePickerState) }
             )

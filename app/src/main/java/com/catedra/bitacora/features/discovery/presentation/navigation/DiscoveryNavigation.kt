@@ -19,7 +19,7 @@ import com.catedra.bitacora.features.discovery.presentation.publicTravelDetail.P
 fun NavGraphBuilder.discoveryGraph(navController: NavController) {
     navigation(
         startDestination = DiscoveryDestinations.EXPLORER,
-        route = "discovery_graph"
+        route = DiscoveryDestinations.DISCOVERY_GRAPH
     ) {
         composable(DiscoveryDestinations.EXPLORER) {
             val viewModel: ExplorerViewModel = hiltViewModel()

@@ -9,7 +9,9 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.catedra.bitacora.R
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -63,10 +65,10 @@ fun AppDatePickerField(
                     TextButton(onClick = {
                         onDateSelected(datePickerState.selectedDateMillis)
                         showDatePicker = false
-                    }) { Text("Aceptar") }
+                    }) { Text(stringResource(R.string.accept)) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDatePicker = false }) { Text("Cancelar") }
+                    TextButton(onClick = { showDatePicker = false }) { Text(stringResource(R.string.cancel)) }
                 }
             ) {
                 DatePicker(state = datePickerState)

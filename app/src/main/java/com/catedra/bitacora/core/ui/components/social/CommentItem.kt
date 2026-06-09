@@ -13,12 +13,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.catedra.bitacora.R
 import com.catedra.bitacora.core.ui.components.profile.ProfileImage
 import com.catedra.bitacora.core.ui.util.toRelativeTime
 import java.time.LocalDateTime
@@ -74,7 +76,7 @@ fun CommentItem(
                 )
                 // Fecha relativa
                 Text(
-                    text = timestamp.toRelativeTime(includePrefix = true).uppercase(),
+                    text = timestamp.toRelativeTime(includePrefix = true).asString().uppercase(),
                     style = MaterialTheme.typography.labelSmall.copy(
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                         fontSize = 9.sp,
@@ -135,7 +137,7 @@ fun CommentItem(
                 ) {
                     Icon(
                         imageVector = Icons.Default.ChatBubbleOutline,
-                        contentDescription = "Responder",
+                        contentDescription = stringResource(R.string.respond),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(16.dp)
                     )

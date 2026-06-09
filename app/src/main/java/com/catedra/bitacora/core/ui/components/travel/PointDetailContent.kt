@@ -28,10 +28,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.catedra.bitacora.R
 import com.catedra.bitacora.core.ui.components.map.MapComponent
 import com.catedra.bitacora.core.ui.components.profile.UserHeader
 import com.catedra.bitacora.core.domain.model.Coordinates
@@ -146,7 +148,7 @@ fun PointDetailContent(
                 Text(
                     text = point.visitDate?.format(
                         DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
-                    ) ?: "Sin fecha",
+                    ) ?: stringResource(R.string.no_date),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                 )
             }
@@ -177,7 +179,7 @@ fun PointDetailContent(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Ubicación",
+                text = stringResource(R.string.location),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
             )
@@ -224,7 +226,7 @@ fun PointDetailContent(
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.outlinedButtonColors(containerColor = Blanco)
                 ) {
-                    Text("Ver en grande", fontSize = 12.sp)
+                    Text(stringResource(R.string.see_in_map), fontSize = 12.sp)
                 }
             }
 
@@ -242,7 +244,7 @@ fun PointDetailContent(
                     ) {
                         Icon(
                             imageVector = if (uiState.isLiked) Icons.Filled.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = "Me gusta",
+                            contentDescription = stringResource(R.string.like),
                             modifier = Modifier.size(24.dp),
                             tint = if (uiState.isLiked) Color.Red else GrisMedio
                         )
@@ -261,7 +263,7 @@ fun PointDetailContent(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Comment,
-                            contentDescription = "Comentarios",
+                            contentDescription = stringResource(R.string.comments),
                             modifier = Modifier.size(24.dp),
                             tint = GrisMedio
                         )
@@ -278,7 +280,7 @@ fun PointDetailContent(
                 IconButton(onClick = { /* Sin lógica por ahora */ }) {
                     Icon(
                         imageVector = Icons.Default.BookmarkBorder,
-                        contentDescription = "Guardar",
+                        contentDescription = stringResource(R.string.save),
                         modifier = Modifier.size(26.dp),
                         tint = GrisMedio
                     )
@@ -288,7 +290,7 @@ fun PointDetailContent(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Notas del Diario",
+                text = stringResource(R.string.notebook_notes),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
             )
@@ -300,7 +302,7 @@ fun PointDetailContent(
                 border = androidx.compose.foundation.BorderStroke(1.dp, GrisBorde)
             ) {
                 Text(
-                    text = point.notes.ifEmpty { "No hay notas para este punto." },
+                    text = point.notes.ifEmpty { stringResource(R.string.no_notes_yet) },
                     modifier = Modifier.padding(16.dp),
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onSurface

@@ -44,11 +44,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.catedra.bitacora.R
 import com.catedra.bitacora.core.domain.model.Coordinates
 import com.catedra.bitacora.core.domain.model.PointOnMap
 import kotlin.math.abs
@@ -214,7 +216,7 @@ fun MapContent(
                         CircularProgressIndicator()
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Preparando mapa...",
+                            text = stringResource(R.string.preparing_map),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onBackground
                         )
@@ -239,7 +241,7 @@ fun MapContent(
                             onSearch = { searchActive = false },
                             expanded = searchActive,
                             onExpandedChange = { searchActive = it },
-                            placeholder = { Text("Buscar lugar...") },
+                            placeholder = { Text(stringResource(R.string.search_place)) },
                             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                             trailingIcon = {
                                 if (uiState.searchQuery.isNotEmpty()) {
@@ -318,7 +320,7 @@ fun MapContent(
                     containerColor = MaterialTheme.colorScheme.surface,
                     contentColor = MaterialTheme.colorScheme.primary
                 ) {
-                    Icon(Icons.Default.MyLocation, contentDescription = "Centrar en mi ubicación")
+                    Icon(Icons.Default.MyLocation, contentDescription = stringResource(R.string.center_in_my_ubication))
                 }
             }
 
@@ -328,10 +330,10 @@ fun MapContent(
                         .padding(16.dp)
                         .align(Alignment.BottomCenter), action = {
                         TextButton(onClick = onClearSelection) {
-                            Text("OK")
+                            Text(stringResource(R.string.ok))
                         }
                     }) {
-                    Text(error)
+                    Text(error.toString())
                 }
             }
         }
@@ -365,7 +367,7 @@ fun PointDetailCard(
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End
             ) {
-                TextButton(onClick = onCancel) { Text("Cancelar") }
+                TextButton(onClick = onCancel) { Text(stringResource(R.string.cancel)) }
                 if (buttonText != null) {
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(onClick = onConfirm) { Text(buttonText) }

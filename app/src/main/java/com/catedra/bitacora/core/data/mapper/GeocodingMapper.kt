@@ -1,13 +1,11 @@
 package com.catedra.bitacora.core.data.mapper
 
 import android.location.Address
+import com.catedra.bitacora.R
 import com.catedra.bitacora.core.domain.model.Coordinates
 import com.catedra.bitacora.core.domain.model.PointOnMap
+import com.catedra.bitacora.core.ui.util.UiText
 
-/**
- * Convierte una lista de direcciones en el mejor punto posible para el mapa.
- * Prioriza nombres de lugares (POIs) sobre direcciones numéricas.
- */
 fun List<Address>.toBestDomain(coordinates: Coordinates): PointOnMap? {
     if (isEmpty()) return null
 
@@ -25,10 +23,22 @@ fun List<Address>.toBestDomain(coordinates: Coordinates): PointOnMap? {
 fun Address.toDomain(coordinates: Coordinates): PointOnMap {
     val isPOI = featureName != null && featureName != thoroughfare && !featureName.isPurelyNumeric()
     
+    var nameUiText: UiText? = null
     val name = if (isPOI) {
         featureName!!
     } else {
-        buildStreetAddress() ?: getAddressLine(0) ?: "Punto seleccionado"
+        val street = buildStreetAddress()
+        if (street != null) {
+            street
+        } else {
+            val line = getAddressLine(0)
+            if (line != null) {
+                line
+            } else {
+                nameUiText = UiText.StringResource(R.string.selected_point)
+                ""
+            }
+        }
     }
 
     val address = if (isPOI) {
@@ -40,7 +50,8 @@ fun Address.toDomain(coordinates: Coordinates): PointOnMap {
     return PointOnMap(
         name = name,
         address = address,
-        coordinates = coordinates
+        coordinates = coordinates,
+        nameUiText = nameUiText,
     )
 }
 

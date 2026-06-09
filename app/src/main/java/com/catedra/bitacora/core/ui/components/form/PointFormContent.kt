@@ -16,9 +16,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.catedra.bitacora.R
 import com.catedra.bitacora.features.travel.domain.model.Travel
 import com.catedra.bitacora.features.travel.presentation.pointCreate.AddPhotoButton
 import com.catedra.bitacora.features.travel.presentation.pointCreate.PhotoItem
@@ -58,8 +60,8 @@ fun PointFormContent(
         OutlinedTextField(
             value = name,
             onValueChange = onNameChange,
-            label = { Text("Nombre del lugar") },
-            placeholder = { Text("Ej. Fontana di Trevi") },
+            label = { Text(stringResource(R.string.point_name_label)) },
+            placeholder = { Text(stringResource(R.string.point_name_ph)) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             enabled = !isLoading
@@ -69,8 +71,8 @@ fun PointFormContent(
             OutlinedTextField(
                 value = address,
                 onValueChange = onAddressChange,
-                label = { Text("Dirección") },
-                placeholder = { Text("Calle o coordenadas") },
+                label = { Text(stringResource(R.string.point_direccion_label)) },
+                placeholder = { Text(stringResource(R.string.point_direction_ph)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 trailingIcon = {
@@ -91,7 +93,7 @@ fun PointFormContent(
                 ) {
                     Icon(Icons.Default.MyLocation, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Mi ubicación", fontSize = 12.sp)
+                    Text(stringResource(R.string.my_ubication), fontSize = 12.sp)
                 }
 
                 OutlinedButton(
@@ -102,7 +104,7 @@ fun PointFormContent(
                 ) {
                     Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Ver en mapa", fontSize = 12.sp)
+                    Text(stringResource(R.string.see_in_map), fontSize = 12.sp)
                 }
             }
         }
@@ -110,17 +112,21 @@ fun PointFormContent(
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             val formatter = remember { java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy") }
             val rangeText = if (travel?.startDate != null && travel.endDate != null) {
-                "Rango del viaje: ${travel.startDate.format(formatter)} al ${travel.endDate.format(formatter)}"
+                stringResource(
+                    R.string.travel_range,
+                    travel.startDate.format(formatter),
+                    travel.endDate.format(formatter)
+                )
             } else ""
 
             AppDatePickerField(
-                label = "Fecha de visita",
+                label = stringResource(R.string.point_date_label),
                 selectedDateMillis = visitDateMillis,
                 onDateSelected = onDateSelected,
                 modifier = Modifier.fillMaxWidth()
             )
             AppTimePickerField(
-                label = "Hora de visita",
+                label = stringResource(R.string.point_time_label),
                 selectedHour = visitHour,
                 selectedMinute = visitMinute,
                 onTimeSelected = onTimeSelected,
@@ -129,7 +135,7 @@ fun PointFormContent(
 
             if (isDateOutOfRange) {
                 Text(
-                    text = "Fuera de rango. $rangeText",
+                    text = stringResource(R.string.date_out_of_range_err, rangeText),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(start = 12.dp)
@@ -147,8 +153,8 @@ fun PointFormContent(
         OutlinedTextField(
             value = notes,
             onValueChange = onNotesChange,
-            label = { Text("Notas") },
-            placeholder = { Text("¿Qué lo hace especial?") },
+            label = { Text(stringResource(R.string.point_notes_label)) },
+            placeholder = { Text(stringResource(R.string.point_notes_ph)) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             minLines = 3,
@@ -156,7 +162,7 @@ fun PointFormContent(
         )
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Fotos del lugar", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+            Text(stringResource(R.string.point_pics_label), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 contentPadding = PaddingValues(vertical = 4.dp)

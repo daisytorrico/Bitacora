@@ -6,9 +6,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.catedra.bitacora.R
 import com.catedra.bitacora.core.ui.components.map.MapComponent
 import com.catedra.bitacora.core.domain.model.PointOnMap
 
@@ -31,7 +33,7 @@ fun LocationPicker(
         ) {
             MapComponent(
                 modifier = Modifier.fillMaxSize(),
-                buttonText = "Confirmar ubicación",
+                buttonText = stringResource(R.string.confirm_ubication),
                 onPointSelected = { point ->
                     onLocationSelected(point)
                 }

@@ -1,5 +1,6 @@
 package com.catedra.bitacora.core.ui.components.map
 
+import com.catedra.bitacora.R
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.util.GeoPoint
@@ -26,7 +27,7 @@ class MapState(
             temporaryCoordinates != null -> {
                 val geoPoint = GeoPoint(temporaryCoordinates.latitude, temporaryCoordinates.longitude)
                 selectionMarker.position = geoPoint
-                selectionMarker.title = "Cargando..."
+                selectionMarker.title = mapView.context.getString(R.string.loading)
                 selectionMarker.alpha = 0.5f
                 if (!mapView.overlays.contains(selectionMarker)) {
                     mapView.overlays.add(selectionMarker)

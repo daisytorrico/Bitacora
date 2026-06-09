@@ -13,8 +13,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.catedra.bitacora.R
 import com.catedra.bitacora.core.ui.theme.GrisMedio
 import com.catedra.bitacora.core.ui.theme.GrisSeparador
 
@@ -36,7 +38,7 @@ fun ProfileImage(
         if (!imageUrl.isNullOrBlank() && !isError) {
             AsyncImage(
                 model = imageUrl,
-                contentDescription = "Profile Photo",
+                contentDescription = stringResource(R.string.profile_photo_description),
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
                 onError = { isError = true }
@@ -44,7 +46,7 @@ fun ProfileImage(
         } else {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.DirectionsWalk,
-                contentDescription = "Viajerito",
+                contentDescription = stringResource(R.string.litle_traveller),
                 modifier = Modifier.size((size * 0.6).dp),
                 tint = GrisMedio
             )

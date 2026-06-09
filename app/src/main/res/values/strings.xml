@@ -1,3 +1,87 @@
 <resources>
-    <string name="app_name">Bitacora</string>
+    <string name="app_name" translatable="false">Bitacora</string>
+
+    <!--  Generico  -->
+    <string name="accept">Aceptar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="go_back">Volver</string>
+
+    <!--  Sesión  -->
+    <string name="close_session">Cerrar Sesión</string>
+    <string name="close_session_confirm">¿Seguro que desea cerrar sesión?</string>
+
+    <!--  Navegación  -->
+    <string name="profile">Perfil</string>
+    <string name="explore">Explorar</string>
+    <string name="map">Mapa</string>
+
+    <!--  Forms  -->
+        <!-- Travel -->
+    <string name="travel_name_label">Nombre del viaje</string>
+    <string name="travel_name_ph">Ej: Verano en la Toscana</string>
+    <string name="start">Inicio</string>
+    <string name="end">Fin</string>
+    <string name="date_mismatch_err">La fecha no puede ser anterior al inicio</string>
+    <string name="description_label">Descripcion</string>
+    <string name="travel_description_ph">¿Qué esperas de esta gran aventura?</string>
+    <string name="travel_visibility">Visibilidad</string>
+
+
+    <!--  Travel  -->
+    <string name="public_travel">Publico</string>
+    <string name="followers_travel">Privado</string>
+    <string name="private_travel">Seguidores</string>
+
+    <!-- PoI -->
+    <string name="point_name_label">Nombre del lugar</string>
+    <string name="confirm_ubication">Confirmar ubicación</string>
+    <string name="point_name_ph">Ej. Fontana di Trevi</string>
+    <string name="point_direccion_label">Dirección</string>
+    <string name="point_direction_ph">Calle o coordenadas</string>
+    <string name="my_ubication">Mi ubicación</string>
+    <string name="see_in_map">Ver en mapa</string>
+    <string name="travel_range">Rango del viaje: %1$s al %2$s</string>
+    <string name="point_date_label">Fecha de visita</string>
+    <string name="point_time_label">Hora de visita</string>
+    <string name="date_out_of_range_err">Fuera de rango. %1$s</string>
+    <string name="point_notes_label">Notas</string>
+    <string name="point_notes_ph">¿Qué lo hace especial?</string>
+    <string name="point_pics_label">Fotos del lugar</string>
+    <string name="preparing_map">Preparando mapa...</string>
+    <string name="search_place">Buscar lugar...</string>
+    <string name="center_in_my_ubication">Centrar en mi ubicación</string>
+    <string name="ok">OK</string>
+    <string name="disabled_gps_err">El GPS está desactivado. Actívalo para ver tu ubicación real.</string>
+    <string name="loading">Cargando...</string>
+    <string name="unknown_err">Error desconocido</string>
+    <string name="profile_photo_description">Foto de perfil</string>
+    <string name="litle_traveller">Viajerito</string>
+    <string name="user">usuario</string>
+    <string name="edit_profile">Editar Perfil</string>
+    <string name="travels">Viajes</string>
+    <string name="followers">Seguidores</string>
+    <string name="followed">Seguidos</string>
+    <string name="respond">Responder</string>
+    <string name="no_date">Sin fecha</string>
+    <string name="location">Ubicación</string>
+    <string name="like">Me gusta</string>
+    <string name="comments">Comentarios</string>
+    <string name="save">Guardar</string>
+    <string name="notebook_notes">Notas del Diario</string>
+    <string name="no_notes_yet">No hay notas para este punto.</string>
+
+    <!-- Time -->
+    <string name="time_now">ahora</string>
+    <string name="time_ago">hace %1$s</string>
+    <string name="unit_min">%1$dmin</string>
+    <string name="unit_min_long">%1$d min</string>
+    <string name="unit_hour">%1$dh</string>
+    <string name="unit_hour_long">%1$d h</string>
+    <string name="unit_day">%1$dd</string>
+    <string name="unit_day_long">%1$d d</string>
+    <string name="points_of_interests">Puntos de interés</string>
+    <string name="n_points">%1$d Puntos</string>
+    <string name="your_travel_starts_today">¡Hoy empieza tu viaje!</string>
+    <string name="named_your_adventure_starts">Tu aventura \'%1$s\' arranca hoy. ¡Buen viaje!</string>
+    <string name="selected_point">Punto seleccionado</string>
 </resources>

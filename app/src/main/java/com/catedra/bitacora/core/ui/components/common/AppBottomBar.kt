@@ -9,9 +9,11 @@ import androidx.compose.material.icons.filled.TravelExplore
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
+import com.catedra.bitacora.R
 import com.catedra.bitacora.features.discovery.presentation.navigation.DiscoveryDestinations
 import com.catedra.bitacora.features.map.presentation.navigation.MapDestination
 import com.catedra.bitacora.features.travel.presentation.navigation.TravelDestinations
@@ -32,8 +34,8 @@ fun AppBottomBar(
     ) {
         // PERFIL
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Person, contentDescription = "Perfil") },
-            label = { Text("Perfil") },
+            icon = { Icon(Icons.Default.Person, contentDescription = stringResource(R.string.profile)) },
+            label = { Text(stringResource(R.string.profile)) },
             selected = currentDestination?.hierarchy?.any { it.route == TravelDestinations.TRAVEL_LIST || it.route?.startsWith("travel") == true } == true,
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,
@@ -45,9 +47,9 @@ fun AppBottomBar(
 
         // EXPLORAR
         NavigationBarItem(
-            icon = { Icon(Icons.Default.TravelExplore, contentDescription = "Explorar") },
-            label = { Text("Explorar") },
-            selected = currentDestination?.hierarchy?.any { it.route == "discovery_graph" || it.route == DiscoveryDestinations.EXPLORER || it.route?.contains("public") == true } == true,
+            icon = { Icon(Icons.Default.TravelExplore, contentDescription = stringResource(R.string.explore)) },
+            label = { Text(stringResource(R.string.explore)) },
+            selected = currentDestination?.hierarchy?.any { it.route == DiscoveryDestinations.DISCOVERY_GRAPH || it.route == DiscoveryDestinations.EXPLORER || it.route?.contains("public") == true } == true,
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,
                 selectedTextColor = MaterialTheme.colorScheme.primary,
@@ -58,8 +60,8 @@ fun AppBottomBar(
 
         // MAPA
         NavigationBarItem(
-            icon = { Icon(Icons.Default.Map, contentDescription = "Mapa") },
-            label = { Text("Mapa") },
+            icon = { Icon(Icons.Default.Map, contentDescription = stringResource(R.string.map)) },
+            label = { Text(stringResource(R.string.map)) },
             selected = currentDestination?.hierarchy?.any { it.route == MapDestination.MAP_VIEW } == true,
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,

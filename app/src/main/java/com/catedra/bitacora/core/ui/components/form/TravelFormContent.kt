@@ -9,8 +9,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.catedra.bitacora.R
 import com.catedra.bitacora.features.travel.domain.model.TravelVisibility
 import com.catedra.bitacora.features.travel.presentation.travelCreate.FormPortadaSelector
 
@@ -49,8 +51,8 @@ fun TravelFormContent(
         OutlinedTextField(
             value = name,
             onValueChange = onNameChange,
-            label = { Text("Nombre del viaje") },
-            placeholder = { Text("Ej. Verano en la Toscana") },
+            label = { Text(stringResource(R.string.travel_name_label)) },
+            placeholder = { Text(stringResource(R.string.travel_name_ph)) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             isError = name.isBlank() && name.isNotEmpty(),
@@ -62,14 +64,14 @@ fun TravelFormContent(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             AppDatePickerField(
-                label = "Inicio",
+                label = stringResource(R.string.start),
                 selectedDateMillis = startDate,
                 onDateSelected = onStartDateSelected,
                 modifier = Modifier.weight(1f)
             )
 
             AppDatePickerField(
-                label = "Fin",
+                label = stringResource(R.string.end),
                 selectedDateMillis = endDate,
                 onDateSelected = onEndDateSelected,
                 modifier = Modifier.weight(1f)
@@ -78,7 +80,7 @@ fun TravelFormContent(
         
         if (isDateInvalid) {
             Text(
-                text = "La fecha de fin no puede ser anterior al inicio",
+                text = stringResource(R.string.date_mismatch_err),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall
             )
@@ -87,8 +89,8 @@ fun TravelFormContent(
         OutlinedTextField(
             value = description,
             onValueChange = onDescriptionChange,
-            label = { Text("Descripción") },
-            placeholder = { Text("¿Qué esperas de esta aventura?") },
+            label = { Text(stringResource(R.string.description_label)) },
+            placeholder = { Text(stringResource(R.string.travel_description_ph)) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             minLines = 4,
@@ -100,7 +102,7 @@ fun TravelFormContent(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "Visibilidad",
+                text = stringResource(R.string.travel_visibility),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -116,9 +118,9 @@ fun TravelFormContent(
                         label = {
                             Text(
                                 when (vis) {
-                                    TravelVisibility.PUBLIC -> "Público"
-                                    TravelVisibility.PRIVATE -> "Privado"
-                                    TravelVisibility.FOLLOWERS -> "Seguidores"
+                                    TravelVisibility.PUBLIC -> stringResource(R.string.public_travel)
+                                    TravelVisibility.PRIVATE -> stringResource(R.string.private_travel)
+                                    TravelVisibility.FOLLOWERS -> stringResource(R.string.followers_travel)
                                 }
                             )
                         }

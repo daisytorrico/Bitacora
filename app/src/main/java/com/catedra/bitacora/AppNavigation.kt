@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -29,12 +30,14 @@ import com.catedra.bitacora.features.map.presentation.navigation.mapGraph
 import com.catedra.bitacora.features.travel.presentation.navigation.TravelDestinations
 import com.catedra.bitacora.features.travel.presentation.navigation.travelGraph
 import com.catedra.bitacora.core.ui.components.common.AppBottomBar
+import com.catedra.bitacora.features.discovery.presentation.navigation.DiscoveryDestinations
 
 object Rutas {
     const val LOGIN = AuthDestinations.LOGIN
     const val REGISTRO = AuthDestinations.REGISTRO
     const val USERNAME = AuthDestinations.USERNAME
     const val HOME = TravelDestinations.TRAVEL_LIST
+    const val DISCOVERY_GRAPH = DiscoveryDestinations.DISCOVERY_GRAPH
 }
 
 @Composable
@@ -134,9 +137,9 @@ fun AppNavigation(viewModel: AuthViewModel) {
                 },
                 onNavigateToExplorer = {
                     val rutaActual = navController.currentDestination?.route
-                    if (rutaActual != "discovery_graph") {
-                        val onExplorerHierarchy = currentDestination?.hierarchy?.any { it.route == "discovery_graph" } == true
-                        navController.navigate("discovery_graph") {
+                    if (rutaActual != Rutas.DISCOVERY_GRAPH) {
+                        val onExplorerHierarchy = currentDestination?.hierarchy?.any { it.route == Rutas.DISCOVERY_GRAPH } == true
+                        navController.navigate(Rutas.DISCOVERY_GRAPH) {
                             popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                             launchSingleTop = true
                             restoreState = !onExplorerHierarchy
@@ -157,16 +160,16 @@ fun AppNavigation(viewModel: AuthViewModel) {
     if (showLogOut) {
         AlertDialog(
             onDismissRequest = { showLogOut = false },
-            title = { Text("Cerrar Sesión") },
-            text = { Text("¿Seguro que desea cerrar sesión?") },
+            title = { Text(stringResource(R.string.close_session)) },
+            text = { Text(stringResource(R.string.close_session_confirm)) },
             confirmButton = {
                 TextButton(onClick = { showLogOut = false; viewModel.logout() }) {
-                    Text("Cerrar sesión")
+                    Text(stringResource(R.string.close_session))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showLogOut = false }) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

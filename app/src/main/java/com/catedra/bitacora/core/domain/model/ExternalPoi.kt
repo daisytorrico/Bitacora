@@ -6,4 +6,4 @@ data class ExternalPoi(
     override val name: String,
     override val address: String,
     override val coordinates: Coordinates
-) : PointOnMap(name, address, coordinates)
+) : PointOnMap(name, address, coordinates, null)

@@ -6,6 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.catedra.bitacora.R
 import com.catedra.bitacora.core.domain.model.Coordinates
 import com.catedra.bitacora.core.domain.model.PointOnMap
 import com.catedra.bitacora.core.utils.LocationPermissionHandler
@@ -30,7 +31,7 @@ fun MapComponent(
 
     LocationPermissionHandler { isGranted ->
         if (isGranted && !viewModel.isGpsEnabled()) {
-            Toast.makeText(context, "El GPS está desactivado. Actívalo para ver tu ubicación real.", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.disabled_gps_err), Toast.LENGTH_LONG).show()
         }
     }
 

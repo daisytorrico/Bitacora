@@ -28,7 +28,8 @@ fun DocumentSnapshot.toPointOnMap(): PointOnMap {
         PointOnMap(
             name = name,
             address = address,
-            coordinates = coordinates
+            coordinates = coordinates,
+            nameUiText = null
         )
     }
 }

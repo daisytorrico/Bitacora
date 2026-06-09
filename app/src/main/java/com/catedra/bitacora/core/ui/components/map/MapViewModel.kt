@@ -5,10 +5,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.catedra.bitacora.R
 import com.catedra.bitacora.core.domain.model.Coordinates
 import com.catedra.bitacora.core.domain.model.PointOnMap
 import com.catedra.bitacora.core.domain.useCase.GetPointFromCoordinatesUseCase
 import com.catedra.bitacora.core.domain.useCase.SearchLocationUseCase
+import com.catedra.bitacora.core.ui.util.UiText
 import com.catedra.bitacora.features.travel.domain.useCase.CheckLocationEnabledUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -91,7 +93,8 @@ class MapViewModel @Inject constructor(
                 }
                 .onFailure { exception ->
                     uiState = uiState.copy(
-                        error = exception.message ?: "Error desconocido",
+                        error = exception.message?.let { UiText.DynamicString(it) } 
+                            ?: UiText.StringResource(R.string.unknown_err),
                         isLoading = false,
                         temporaryCoordinates = null
                     )

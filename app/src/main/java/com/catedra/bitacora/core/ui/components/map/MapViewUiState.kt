@@ -2,12 +2,13 @@ package com.catedra.bitacora.core.ui.components.map
 
 import com.catedra.bitacora.core.domain.model.Coordinates
 import com.catedra.bitacora.core.domain.model.PointOnMap
+import com.catedra.bitacora.core.ui.util.UiText
 
 data class MapViewUiState(
     val selectedPoint: PointOnMap? = null,
     val temporaryCoordinates: Coordinates? = null,
     val isLoading: Boolean = false,
-    val error: String? = null,
+    val error: UiText? = null,
     val searchQuery: String = "",
     val searchResults: List<PointOnMap> = emptyList(),
     val isSearching: Boolean = false,

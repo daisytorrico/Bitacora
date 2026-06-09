@@ -1,12 +1,16 @@
 package com.catedra.bitacora.core.domain.useCase
 
+import com.catedra.bitacora.R
+import android.content.Context
 import com.catedra.bitacora.core.helpers.NotificationHelper
 import com.catedra.bitacora.features.travel.domain.model.Travel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.ZoneId
 import javax.inject.Inject
 
 class ScheduleTripStartNotificationUseCase @Inject constructor(
-    private val notificationHelper: NotificationHelper
+    private val notificationHelper: NotificationHelper,
+    @param:ApplicationContext private val context: Context,
 ) {
     operator fun invoke(travel: Travel) {
         val startDate = travel.startDate ?: return
@@ -20,8 +24,8 @@ class ScheduleTripStartNotificationUseCase @Inject constructor(
             notificationHelper.scheduleNotification(
                 id = travel.id.hashCode(),
                 triggerAtMillis = triggerMillis,
-                title = "¡Hoy empieza tu viaje!",
-                message = "Tu aventura '${travel.name}' arranca hoy. ¡Buen viaje!",
+                title = context.getString(R.string.your_travel_starts_today),
+                message = context.getString(R.string.named_your_adventure_starts, travel.name),
                 travelId = travel.id
             )
         }
