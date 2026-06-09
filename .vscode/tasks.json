@@ -1,0 +1,44 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Gradle: Refresh dependencies",
+      "type": "shell",
+      "command": "./gradlew --refresh-dependencies",
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": ["$gradle"]
+    },
+    {
+      "label": "Gradle: Assemble Debug",
+      "type": "shell",
+      "command": "./gradlew :app:assembleDebug",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": ["$gradle"]
+    },
+    {
+      "label": "Gradle: Clean",
+      "type": "shell",
+      "command": "./gradlew clean",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": ["$gradle"]
+    }
+  ]
+}

@@ -129,6 +129,15 @@ class TravelRepositoryFirebase @Inject constructor(
         }
     }
 
+    override suspend fun deleteTravel(travelId: String): Result<Unit> {
+        return try {
+            remoteDataSource.deleteTravel(travelId)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun syncTripAccess(travelId: String, newPrivileges: List<String>, removed: List<String>): Result<Unit> {
         return try {
             remoteDataSource.syncTripAccess(travelId, newPrivileges, removed)

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.catedra.bitacora.features.auth.domain.repository.AuthRepository
 import com.catedra.bitacora.features.travel.domain.repository.TravelsRepository
+import com.catedra.bitacora.features.travel.domain.useCase.DeleteTravelUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,6 +18,7 @@ import javax.inject.Inject
 class TravelDetailViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val travelsRepository: TravelsRepository,
+    private val deleteTravelUseCase: DeleteTravelUseCase,
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
@@ -66,6 +68,25 @@ class TravelDetailViewModel @Inject constructor(
                 
             }.onFailure { e ->
                 _uiState.update { it.copy(error = e.message, isLoading = false) }
+            }
+        }
+    }
+
+    fun setShowDeleteDialog(show: Boolean) {
+        _uiState.update { it.copy(showDeleteDialog = show) }
+    }
+
+    fun deleteTravel() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, showDeleteDialog = false) }
+            val result = deleteTravelUseCase(travelId)
+            if (result.isSuccess) {
+                _uiState.update { it.copy(isLoading = false, isDeleted = true) }
+            } else {
+                _uiState.update { it.copy(
+                    isLoading = false,
+                    error = result.exceptionOrNull()?.message ?: "Error al eliminar el viaje"
+                ) }
             }
         }
     }

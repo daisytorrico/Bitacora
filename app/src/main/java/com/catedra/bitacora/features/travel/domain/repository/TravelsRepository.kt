@@ -25,6 +25,7 @@ interface TravelsRepository {
         authorizedUsers: List<String> = emptyList()
     ): Result<Unit>
     suspend fun deletePoint(travelId: String, pointId: String): Result<Unit>
+    suspend fun deleteTravel(travelId: String): Result<Unit>
     suspend fun syncTripAccess(travelId: String, newPrivileges: List<String>, removed: List<String>): Result<Unit>
 
     companion object {

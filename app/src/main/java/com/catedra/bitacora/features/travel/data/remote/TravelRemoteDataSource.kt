@@ -204,4 +204,74 @@ class TravelRemoteDataSource @Inject constructor(
         }
     }
 
+    suspend fun deleteTravel(travelId: String) {
+        val tripRef = db.collection("trips").document(travelId)
+
+        coroutineScope {
+            // 1. Obtener datos del viaje para saber quiénes tienen acceso (para limpiar tripAccess)
+            val tripDoc = tripRef.get().await()
+            val ownerId = tripDoc.getString("ownerId")
+            val privileges = tripDoc.get("privileges") as? List<String> ?: emptyList()
+            val allUsersWithAccess = (privileges + (ownerId ?: "")).filter { it.isNotEmpty() }.distinct()
+
+            // 2. Obtener todos los puntos de interés
+            val points = tripRef.collection("pointsOfInterest").get().await()
+
+            val toDelete = mutableListOf<com.google.firebase.firestore.DocumentReference>()
+
+            // 3. Por cada punto, recolectar sub-recursos (similar a deletePoint)
+            // Procesamos los puntos en paralelo para mayor velocidad
+            val pointsDataDeferred = points.documents.map { point ->
+                async {
+                    val pointRef = point.reference
+                    val pointSubToDelete = mutableListOf<com.google.firebase.firestore.DocumentReference>()
+
+                    val likes = pointRef.collection("likes").get().await()
+                    val comments = pointRef.collection("comments").get().await()
+
+                    likes.documents.forEach { pointSubToDelete.add(it.reference) }
+
+                    for (comment in comments.documents) {
+                        val cLikes = comment.reference.collection("likes").get().await()
+                        val cReplies = comment.reference.collection("replies").get().await()
+
+                        cLikes.documents.forEach { pointSubToDelete.add(it.reference) }
+
+                        for (reply in cReplies.documents) {
+                            val rLikes = reply.reference.collection("likes").get().await()
+                            rLikes.documents.forEach { pointSubToDelete.add(it.reference) }
+                            pointSubToDelete.add(reply.reference)
+                        }
+                        pointSubToDelete.add(comment.reference)
+                    }
+                    pointSubToDelete.add(pointRef)
+                    pointSubToDelete
+                }
+            }
+
+            // Esperamos a que todos los puntos recolecten sus referencias
+            pointsDataDeferred.forEach { toDelete.addAll(it.await()) }
+
+            // 4. Recolectar referencias de tripAccess para todos los usuarios involucrados
+            allUsersWithAccess.forEach { uid ->
+                toDelete.add(
+                    db.collection("tripAccess")
+                        .document(uid)
+                        .collection("trips")
+                        .document(travelId)
+                )
+            }
+
+            // 5. El viaje mismo
+            toDelete.add(tripRef)
+
+            // 6. Borrar en batches de 500 (límite de Firestore)
+            toDelete.chunked(500).forEach { chunk ->
+                val batch = db.batch()
+                chunk.forEach { batch.delete(it) }
+                batch.commit().await()
+            }
+        }
+    }
+
 }

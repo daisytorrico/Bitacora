@@ -11,5 +11,7 @@ data class TravelDetailUiState(
     val pointsOfInterest: List<PointOfInterest> = emptyList(),
     val isOwner: Boolean = false,
     val canEdit: Boolean = false,
+    val showDeleteDialog: Boolean = false,
+    val isDeleted: Boolean = false,
     val error: String? = null
 )
