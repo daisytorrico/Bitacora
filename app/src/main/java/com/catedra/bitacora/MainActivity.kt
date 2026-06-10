@@ -4,19 +4,22 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.core.content.ContextCompat
 import com.catedra.bitacora.core.ui.theme.BitacoraTheme
 import com.catedra.bitacora.features.auth.presentation.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 
     private val authViewModel: AuthViewModel by viewModels()
 
@@ -36,8 +39,16 @@ class MainActivity : ComponentActivity() {
             navigationBarStyle = SystemBarStyle.auto(surfaceColor, surfaceColor)
         )
         setContent {
-            BitacoraTheme {
-                AppNavigation(viewModel = authViewModel)
+            val locales = AppCompatDelegate.getApplicationLocales()
+            val configuration = LocalConfiguration.current
+            if (!locales.isEmpty) {
+                locales.get(0)?.let { configuration.setLocale(it) }
+            }
+            
+            CompositionLocalProvider(LocalConfiguration provides configuration) {
+                BitacoraTheme {
+                    AppNavigation(viewModel = authViewModel)
+                }
             }
         }
     }

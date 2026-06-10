@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.outlined.Lock
@@ -20,7 +21,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -34,6 +40,9 @@ import com.catedra.bitacora.features.travel.domain.model.TravelStatus
 import com.catedra.bitacora.features.travel.domain.model.TravelVisibility
 import androidx.navigation.NavController
 import com.catedra.bitacora.core.ui.theme.GrisMedio
+import com.catedra.bitacora.R
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,8 +74,32 @@ fun TravelListScreen(
     Scaffold(
         topBar = {
             AppTopBar(
-                titulo = "Tu perfil",
+                titulo = stringResource(R.string.profile),
                 actions = {
+
+                    var expandedLanguages by remember { mutableStateOf(false) }
+                    Box {
+                        IconButton(onClick = { expandedLanguages = true }) {
+                            Icon(
+                                imageVector = Icons.Default.Language,
+                                contentDescription = "Cambiar idioma"
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = expandedLanguages,
+                            onDismissRequest = { expandedLanguages = false }
+                        ) {
+                            languages.forEach { lang ->
+                                DropdownMenuItem(
+                                    text = { Text(lang.name) },
+                                    onClick = {
+                                        viewModel.onLanguageSelected(lang)
+                                        expandedLanguages = false
+                                    }
+                                )
+                            }
+                        }
+                    }
                     IconButton(onClick = { filterPanelVisible = !filterPanelVisible }) {
                         Icon(
                             imageVector = Icons.Default.FilterList,
@@ -101,7 +134,9 @@ fun TravelListScreen(
     ) { paddingValues ->
         if (uiState.loading && uiState.myTravels.isEmpty() && uiState.sharedTravels.isEmpty()) {
             Box(
-                modifier = Modifier.fillMaxSize().padding(paddingValues),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
@@ -170,7 +205,9 @@ fun TravelListScreen(
                                         selectedBorderAlpha = 0.5f,
                                         selectedBorderWidth = 1.dp,
                                         leadingIcon = if (selected) {
-                                            { Box(Modifier.size(6.dp).background(color, CircleShape)) }
+                                            { Box(Modifier
+                                                .size(6.dp)
+                                                .background(color, CircleShape)) }
                                         } else null
                                     )
                                 }
@@ -217,12 +254,12 @@ fun TravelListScreen(
                         Tab(
                             selected = selectedTab == 0,
                             onClick = { selectedTab = 0 },
-                            text = { Text("Mis viajes") }
+                            text = { Text(stringResource(R.string.my_travels)) }
                         )
                         Tab(
                             selected = selectedTab == 1,
                             onClick = { selectedTab = 1 },
-                            text = { Text("Compartidos") }
+                            text = { Text(stringResource(R.string.shared)) }
                         )
                     }
                 }

@@ -4,7 +4,16 @@ import com.catedra.bitacora.core.domain.model.User
 import com.catedra.bitacora.features.travel.domain.model.Travel
 import com.catedra.bitacora.features.travel.domain.model.TravelStatus
 import com.catedra.bitacora.features.travel.domain.model.TravelVisibility
+data class Language(
+    val name: String,
+    val code: String
+)
 
+val languages = listOf(
+    Language("Español", "es"),
+    Language("English", "en"),
+    Language("Italiano", "it")
+)
 data class TravelListUiState(
     val user: User? = null,
     val searchQuery: String = "",
@@ -13,7 +22,8 @@ data class TravelListUiState(
     val page: Int = 0,
     val loading: Boolean = true,
     val selectedStatus: TravelStatus? = null,
-    val selectedVisibility: TravelVisibility? = null
+    val selectedVisibility: TravelVisibility? = null,
+    val selectedLanguage: Language = languages.first()
 ) {
     val filteredMyTravels: List<Travel>
         get() = filterTravels(myTravels)

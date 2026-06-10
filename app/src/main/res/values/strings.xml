@@ -162,4 +162,8 @@
     <string name="point_photo_reminder_message">No olvides subir tus fotos de %1$s a tu bitácora.</string>
     <string name="visit_reminder_title">Recordatorio de visita</string>
     <string name="visit_reminder_message">Es hora de tu parada en %1$s</string>
+    <string name="my_travels">Mis viajes</string>
+    <string name="shared">Compartidos</string>
+    <string name="new_travel">Nuevo Viaje</string>
+    <string name="travel_successfully_created">¡Viaje creado con éxito! ✈️</string>
 </resources>

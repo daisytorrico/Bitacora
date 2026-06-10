@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Bitacora</string>
+    <string name="app_description">La tua Bitacora di Viaggio intelligente</string>
+    <string name="app_slogan">Crea il tuo account e inizia l\'avventura</string>
+
+    <!--  Generic  -->
+    <string name="accept">Accetta</string>
+    <string name="cancel">Annulla</string>
+    <string name="go_back">Indietro</string>
+    <string name="ok" translatable="false">OK</string>
+    <string name="save">Salva</string>
+    <string name="details">Dettagli</string>
+    <string name="delete">Elimina</string>
+    <string name="send">Invia</string>
+    <string name="loading">Caricamento in corso&#8230;</string>
+    <string name="location">Posizione</string>
+    <string name="unknown_err">Errore sconosciuto</string>
+
+    <!--  Session / Auth  -->
+    <string name="log_in">Accedi</string>
+    <string name="sign_in">Registrati</string>
+    <string name="log_out">Esci</string>
+    <string name="close_session_confirm">Sei sicuro di voler uscire?</string>
+    <string name="no_account_register">Non hai un account? Registrati qui</string>
+    <string name="already_account_log_in">Hai già un account? Accedi</string>
+    <string name="continue_with_google">Continua con Google</string>
+    <string name="start_my_adventure">Inizia la mia avventura</string>
+
+    <string name="username">Nome utente</string>
+    <string name="username_ph">es: viaggiatore_24</string>
+    <string name="your_user">Il tuo @utente</string>
+    <string name="choice_an_username">Scegli un nome utente per il tuo profilo</string>
+    <string name="full_name">Nome completo</string>
+    <string name="invalid_email">Email non valida</string>
+    <string name="password">Password</string>
+    <string name="password_min">Minimo 6 caratteri</string>
+    <string name="password_rules">Minimo 3 caratteri (lettere, numeri o _)</string>
+    <string name="confirm_password">Conferma password</string>
+    <string name="unmatching_password">Le password non corrispondono</string>
+
+    <!--  Navigation  -->
+    <string name="profile">Profilo</string>
+    <string name="explore">Esplora</string>
+    <string name="map">Mappa</string>
+
+    <!--  Profile  -->
+    <string name="edit_profile">Modifica profilo</string>
+    <string name="biography">Biografia</string>
+    <string name="litle_traveller">Piccolo viaggiatore</string>
+    <string name="user">utente</string>
+    <string name="travels">Viaggi</string>
+    <string name="followers">Follower</string>
+    <string name="followed">Seguiti</string>
+    <string name="profile_photo_description">Foto del profilo</string>
+    <string name="profile_photo_pic">Foto del profilo</string>
+    <string name="choice_photo">Seleziona foto</string>
+    <string name="change_photo">Cambia foto</string>
+    <string name="save_changes">Salva modifiche</string>
+    <string name="succefull_profile_update">Profilo aggiornato con successo</string>
+
+    <!--  Travels  -->
+    <string name="travel_name_label">Nome del viaggio</string>
+    <string name="travel_name_ph">Es: Estate in Toscana</string>
+    <string name="description_label">Descrizione</string>
+    <string name="travel_description_ph">Cosa ti aspetti da questa grande avventura?</string>
+    <string name="start">Inizio</string>
+    <string name="end">Fine</string>
+    <string name="travel_range">Intervallo del viaggio: dal %1$s al %2$s</string>
+    <string name="date_mismatch_err">La data non può essere precedente all\'inizio</string>
+    <string name="travel_visibility">Visibilità</string>
+    <string name="public_travel">Pubblico</string>
+    <string name="followers_travel">Follower</string>
+    <string name="private_travel">Privato</string>
+
+    <string name="discover_travels">SCOPRI VIAGGI</string>
+    <string name="followed_travels">VIAGGI SEGUITI</string>
+    <string name="all_the_travels">Tutti i viaggi</string>
+    <string name="search_travels">Cerca viaggi&#8230;</string>
+    <string name="short_duration_filter">1&#8211;3 giorni</string>
+    <string name="medium_duration_filter">4&#8211;7 giorni</string>
+    <string name="long_duration_filter">+7 giorni</string>
+    <string name="loading_feed_err">Errore durante il caricamento del feed</string>
+    <string name="filter_err">Errore durante il filtraggio</string>
+    <string name="no_results_on_filter">Nessun risultato per questo filtro</string>
+    <string name="no_results_for_query">Nessun risultato per \"%1$s\"</string>
+
+    <string name="your_travel_starts_today">Il tuo viaggio inizia oggi!</string>
+    <string name="named_your_adventure_starts">La tua avventura \'%1$s\' inizia oggi. Buon viaggio!</string>
+
+    <!--  Points of Interest  -->
+    <string name="points_of_interests">Punti di interesse</string>
+    <string name="n_points">%1$d Punti</string>
+    <string name="edit_point">Modifica punto</string>
+    <string name="point_name_label">Nome del luogo</string>
+    <string name="point_name_ph">Es. Fontana di Trevi</string>
+    <string name="point_direccion_label">Indirizzo</string>
+    <string name="point_direction_ph">Via o coordinate</string>
+    <string name="point_date_label">Data della visita</string>
+    <string name="point_time_label">Ora della visita</string>
+    <string name="date_out_of_range_err">Fuori intervallo. %1$s</string>
+    <string name="point_notes_label">Note</string>
+    <string name="point_notes_ph">Cosa lo rende speciale?</string>
+    <string name="point_pics_label">Foto del luogo</string>
+    <string name="plus_five_points">📍 +5 punti</string>
+
+    <string name="confirm_ubication">Conferma posizione</string>
+    <string name="my_ubication">La mia posizione</string>
+    <string name="see_in_map">Vedi sulla mappa</string>
+    <string name="preparing_map">Preparazione della mappa&#8230;</string>
+    <string name="search_place">Cerca luogo&#8230;</string>
+    <string name="center_in_my_ubication">Centra sulla mia posizione</string>
+    <string name="map_close_you">Mappa vicino a te</string>
+    <string name="disabled_gps_err">Il GPS è disattivato. Attivalo per vedere la tua posizione reale.</string>
+    <string name="selected_point">Punto selezionato</string>
+
+    <string name="confirm_changes">Conferma modifiche</string>
+    <string name="confirm_poi_changes">Sei sicuro di voler salvare le modifiche a questo punto di interesse?</string>
+    <string name="updated_point">Punto aggiornato</string>
+
+    <string name="notebook_notes">Note del diario</string>
+    <string name="no_notes_yet">Non ci sono note per questo punto.</string>
+
+    <!--  Social  -->
+    <string name="like">Mi piace</string>
+    <string name="comments">Commenti</string>
+    <string name="respond">Rispondi</string>
+    <string name="now_you_follow">Ora segui @%1$s</string>
+    <string name="you_unfollowed">Hai smesso di seguire @%1$s</string>
+
+    <string name="write_a_comment">Scrivi un commento&#8230;</string>
+    <string name="write_a_response">Scrivi una risposta&#8230;</string>
+    <string name="responding_to">In risposta a @%1$s</string>
+    <string name="no_comments_yet">Non ci sono ancora commenti.\nSii il primo!</string>
+    <string name="delete_comment_question">Elimina commento?</string>
+    <string name="delete_comment_warning">Verranno eliminate anche tutte le risposte.</string>
+    <string name="delete_response_question">Elimina risposta?</string>
+
+    <!--  Time / Units  -->
+    <string name="no_date">Nessuna data</string>
+    <string name="time_now">adesso</string>
+    <string name="time_ago">%1$s fa</string>
+    <string name="unit_min" translatable="false">%1$dmin</string>
+    <string name="unit_min_long" translatable="false">%1$d min</string>
+    <string name="unit_hour" translatable="false">%1$dh</string>
+    <string name="unit_hour_long" translatable="false">%1$d h</string>
+    <string name="unit_day" translatable="false">%1$dd</string>
+    <string name="unit_day_long" translatable="false">%1$d d</string>
+    <string name="month">📅 Mese</string>
+    <string name="previous_year">Anno precedente</string>
+    <string name="next_year">Anno successivo</string>
+
+    <!-- Toasts -->
+    <string name="travel_created_success">Viaggio creato con successo</string>
+    <string name="travel_updated_success">Viaggio aggiornato</string>
+    <string name="point_saved">Punto di interesse salvato</string>
+    <string name="denied_cammera">Permesso fotocamera negato</string>
+
+    <!-- Notificaciones -->
+    <string name="travel_prep_title">Il tuo viaggio inizia domani!</string>
+    <string name="travel_prep_message">Assicurati di avere tutto pronto per \'%1$s\'. Che emozione!</string>
+    <string name="point_photo_reminder_title">Hai scattato foto?</string>
+    <string name="point_photo_reminder_message">Non dimenticare di caricare le tue foto di %1$s sulla tua bitacora.</string>
+    <string name="visit_reminder_title">Promemoria visita</string>
+    <string name="visit_reminder_message">È ora della tua sosta a %1$s</string>
+    <string name="my_travels">I miei viaggi</string>
+    <string name="shared">Condivisi</string>
+    <string name="new_travel">Nuovo viaggio</string>
+    <string name="travel_successfully_created">Viaggio creato con successo! ✈️</string>
+</resources>

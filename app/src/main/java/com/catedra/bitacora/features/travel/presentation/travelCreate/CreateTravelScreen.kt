@@ -19,11 +19,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.catedra.bitacora.R
 import com.catedra.bitacora.features.travel.domain.model.TravelVisibility
 import com.catedra.bitacora.core.ui.components.form.TravelFormContent
 import com.catedra.bitacora.core.ui.components.common.AppTopBar
@@ -42,7 +44,8 @@ fun CreateTravelScreen(
     LaunchedEffect(uiState.success, uiState.travelId) {
         val travelId = uiState.travelId
         if (uiState.success && travelId != null) {
-            Toast.makeText(context, "¡Viaje creado con éxito! ✈️", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context,
+                context.getString(R.string.travel_successfully_created), Toast.LENGTH_SHORT).show()
             onTravelCreated(travelId)
         }
     }
@@ -74,14 +77,14 @@ fun CreateTravelScreen(
     Scaffold(
         topBar = {
             AppTopBar(
-                titulo = "Nuevo Viaje",
+                titulo = stringResource(R.string.new_travel),
                 onBack = onBack,
                 actions = {
                     IconButton(
                         onClick = { viewModel.saveTravel() },
                         enabled = uiState.canSave && !uiState.loading
                     ) {
-                        Icon(Icons.Default.Check, contentDescription = "Guardar")
+                        Icon(Icons.Default.Check, contentDescription = stringResource(R.string.save))
                     }
                 }
             )

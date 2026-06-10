@@ -128,4 +128,8 @@
     <string name="point_photo_reminder_message">Don\'t forget to upload your photos of %1$s to your journal</string>
     <string name="visit_reminder_title">Visit reminder</string>
     <string name="visit_reminder_message">It\'s time of your stop at %1$s</string>
+    <string name="my_travels">Mis viajes</string>
+    <string name="shared">Compartidos</string>
+    <string name="new_travel">Nuevo Viaje</string>
+    <string name="travel_successfully_created">Travel succeffully created ✈️</string>
 </resources>

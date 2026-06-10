@@ -1,5 +1,7 @@
 package com.catedra.bitacora.features.travel.presentation.travelList
 
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.catedra.bitacora.features.auth.domain.useCase.GetFullUserDataUseCase
@@ -24,6 +26,12 @@ class TravelListViewModel @Inject constructor(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TravelListUiState())
     val uiState: StateFlow<TravelListUiState> = _uiState.asStateFlow()
+
+    init {
+        val currentLocale = AppCompatDelegate.getApplicationLocales().get(0)?.language ?: "es"
+        val initialLanguage = languages.find { it.code == currentLocale } ?: languages.first()
+        _uiState.update { it.copy(selectedLanguage = initialLanguage) }
+    }
 
     fun loadUserData() {
         viewModelScope.launch {
@@ -55,5 +63,13 @@ class TravelListViewModel @Inject constructor(
 
     fun onVisibilityFilterChange(visibility: TravelVisibility?) {
         _uiState.update { it.copy(selectedVisibility = visibility) }
+    }
+
+    fun onLanguageSelected(language: Language) {
+        val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(language.code)
+        AppCompatDelegate.setApplicationLocales(appLocale)
+        // El estado se actualizará tras la recreación de la actividad
+        // o mediante la recolección en el init si el ViewModel sobrevive.
+        _uiState.update { it.copy(selectedLanguage = language) }
     }
 }
