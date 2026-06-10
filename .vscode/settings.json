@@ -1,6 +1,0 @@
-{
-  "java.import.gradle.wrapper.enabled": true,
-  "java.import.gradle.enabled": true,
-  "java.trace.server": "off",
-  "kotlin.languageServer.java.home": "/usr/lib/jvm/java-17-openjdk-amd64"
-}
