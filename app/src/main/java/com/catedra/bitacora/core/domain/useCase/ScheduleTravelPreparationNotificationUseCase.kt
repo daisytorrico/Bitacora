@@ -13,6 +13,9 @@ class ScheduleTravelPreparationNotificationUseCase @Inject constructor(
     @param:ApplicationContext private val context: Context
 ) {
     operator fun invoke(travel: Travel) {
+        val notificationId = (travel.id + "_prep").hashCode()
+        notificationHelper.cancelNotification(notificationId)
+
         val startDate = travel.startDate ?: return
         // Programar para 24 horas antes a las 10:00
         val triggerMillis = startDate
@@ -24,7 +27,7 @@ class ScheduleTravelPreparationNotificationUseCase @Inject constructor(
 
         if (triggerMillis > System.currentTimeMillis()) {
             notificationHelper.scheduleNotification(
-                id = (travel.id + "_prep").hashCode(),
+                id = notificationId,
                 triggerAtMillis = triggerMillis,
                 title = context.getString(R.string.travel_prep_title),
                 message = context.getString(R.string.travel_prep_message, travel.name),

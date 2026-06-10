@@ -13,6 +13,9 @@ class SchedulePointVisitNotificationUseCase @Inject constructor(
     @param:ApplicationContext private val context: Context
 ) {
     operator fun invoke(travelId: String, point: PointOfInterest, pointId: String) {
+        val notificationId = pointId.hashCode()
+        notificationHelper.cancelNotification(notificationId)
+
         val visitDate = point.visitDate ?: return
         val triggerMillis = visitDate
             .atZone(ZoneId.systemDefault())
@@ -21,7 +24,7 @@ class SchedulePointVisitNotificationUseCase @Inject constructor(
 
         if (triggerMillis > System.currentTimeMillis()) {
             notificationHelper.scheduleNotification(
-                id = pointId.hashCode(),
+                id = notificationId,
                 triggerAtMillis = triggerMillis,
                 title = context.getString(R.string.visit_reminder_title),
                 message = context.getString(R.string.visit_reminder_message, point.name),

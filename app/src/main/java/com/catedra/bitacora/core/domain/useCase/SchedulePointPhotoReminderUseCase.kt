@@ -13,6 +13,10 @@ class SchedulePointPhotoReminderUseCase @Inject constructor(
     @param:ApplicationContext private val context: Context
 ) {
     operator fun invoke(travelId: String, point: PointOfInterest, pointId: String) {
+        val notificationId = (pointId + "_photo").hashCode()
+        // Cancelar previa
+        notificationHelper.cancelNotification(notificationId)
+
         val visitDate = point.visitDate ?: return
         // Programar para 1 hora despues de la visita
         val triggerMillis = visitDate
@@ -23,7 +27,7 @@ class SchedulePointPhotoReminderUseCase @Inject constructor(
 
         if (triggerMillis > System.currentTimeMillis()) {
             notificationHelper.scheduleNotification(
-                id = (pointId + "_photo").hashCode(),
+                id = notificationId,
                 triggerAtMillis = triggerMillis,
                 title = context.getString(R.string.point_photo_reminder_title),
                 message = context.getString(R.string.point_photo_reminder_message, point.name),
