@@ -11,6 +11,7 @@ import com.catedra.bitacora.core.domain.useCase.CompressImageUseCase
 import com.catedra.bitacora.core.helpers.PhotoPickerHelper
 import com.catedra.bitacora.core.domain.useCase.UploadImageUseCase
 import com.catedra.bitacora.core.domain.useCase.ScheduleTripStartNotificationUseCase
+import com.catedra.bitacora.core.domain.useCase.ScheduleTravelPreparationNotificationUseCase
 import com.catedra.bitacora.features.travel.domain.useCase.SaveTravelUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +35,8 @@ class CreateTravelViewModel @Inject constructor(
     private val uploadImageUseCase: UploadImageUseCase,
     private val saveTravelUseCase: SaveTravelUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
-    private val scheduleTripStartNotificationUseCase: ScheduleTripStartNotificationUseCase
+    private val scheduleTripStartNotificationUseCase: ScheduleTripStartNotificationUseCase,
+    private val scheduleTravelPreparationNotificationUseCase: ScheduleTravelPreparationNotificationUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreateTravelUiState())
@@ -115,9 +117,10 @@ class CreateTravelViewModel @Inject constructor(
 
                 if (result.isSuccess) {
                     val id = result.getOrNull()
-                    // Notificacion si tiene fecha de inicio
+                    // Notificaciones
                     val savedTravel = newTravel.copy(id = id ?: "")
                     scheduleTripStartNotificationUseCase(savedTravel)
+                    scheduleTravelPreparationNotificationUseCase(savedTravel)
 
                     _uiState.update { it.copy(loading = false, success = true, travelId = id) }
                 } else {

@@ -69,9 +69,8 @@
     <string name="date_mismatch_err">La fecha no puede ser anterior al inicio</string>
     <string name="travel_visibility">Visibilidad</string>
     <string name="public_travel">Publico</string>
-    <string name="followers_travel">Privado</string>
-    <string name="private_travel">Seguidores</string>
-    <string name="denied_cammera">Permiso de cámara denegado</string>
+    <string name="followers_travel">Seguidores</string>
+    <string name="private_travel">Privado</string>
 
     <string name="discover_travels">DESCUBRIR VIAJES</string>
     <string name="followed_travels">VIAJES SEGUIDOS</string>
@@ -149,4 +148,18 @@
     <string name="month">📅 Mes</string>
     <string name="previous_year">Año anterior</string>
     <string name="next_year">Año siguiente</string>
+
+    <!-- Toasts -->
+    <string name="travel_created_success">Viaje creado con éxito</string>
+    <string name="travel_updated_success">Viaje actualizado</string>
+    <string name="point_saved">Punto de interés guardado</string>
+    <string name="denied_cammera">Permiso de cámara denegado</string>
+
+    <!-- Notificaciones -->
+    <string name="travel_prep_title">¡Mañana empieza tu viaje!</string>
+    <string name="travel_prep_message">Asegúrate de tener todo listo para \'%1$s\'. ¡Qué emoción!</string>
+    <string name="point_photo_reminder_title">¿Tomaste fotos?</string>
+    <string name="point_photo_reminder_message">No olvides subir tus fotos de %1$s a tu bitácora.</string>
+    <string name="visit_reminder_title">Recordatorio de visita</string>
+    <string name="visit_reminder_message">Es hora de tu parada en %1$s</string>
 </resources>

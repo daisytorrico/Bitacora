@@ -59,6 +59,7 @@
     <string name="public_travel">Public</string>
     <string name="followers_travel">Private</string>
     <string name="private_travel">Followers</string>
+    <string name="point_saved">Point of interest saved</string>
     <string name="denied_cammera">Camera permissions denied</string>
     <string name="discover_travels">DISCOVER TRAVELS</string>
     <string name="followed_travels">FOLLOWED TRAVELS</string>
@@ -119,4 +120,12 @@
     <string name="month">📅 Month</string>
     <string name="previous_year">Last year</string>
     <string name="next_year">Next year</string>
+    <string name="travel_created_success">Travel created successfully</string>
+    <string name="travel_updated_success">Travel updated</string>
+    <string name="travel_prep_title">Your travel starts tomorrow!</string>
+    <string name="travel_prep_message">Make sure everything is ready for \'%1$s\'. How exciting!</string>
+    <string name="point_photo_reminder_title">Did you take photos?</string>
+    <string name="point_photo_reminder_message">Don\'t forget to upload your photos of %1$s to your journal</string>
+    <string name="visit_reminder_title">Visit reminder</string>
+    <string name="visit_reminder_message">It\'s time of your stop at %1$s</string>
 </resources>

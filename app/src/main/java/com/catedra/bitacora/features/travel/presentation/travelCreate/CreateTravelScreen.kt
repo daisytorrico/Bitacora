@@ -38,10 +38,11 @@ fun CreateTravelScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
 
-    // Manejo de eventos de navegación y errores
+    // Manejo de eventos de navegacion y errores
     LaunchedEffect(uiState.success, uiState.travelId) {
         val travelId = uiState.travelId
         if (uiState.success && travelId != null) {
+            Toast.makeText(context, "¡Viaje creado con éxito! ✈️", Toast.LENGTH_SHORT).show()
             onTravelCreated(travelId)
         }
     }

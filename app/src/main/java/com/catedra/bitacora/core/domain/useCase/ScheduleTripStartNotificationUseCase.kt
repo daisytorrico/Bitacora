@@ -13,6 +13,8 @@ class ScheduleTripStartNotificationUseCase @Inject constructor(
     @param:ApplicationContext private val context: Context,
 ) {
     operator fun invoke(travel: Travel) {
+        notificationHelper.cancelNotification(travel.id.hashCode())
+
         val startDate = travel.startDate ?: return
         val triggerMillis = startDate
             .atTime(9, 10)

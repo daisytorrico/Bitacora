@@ -11,6 +11,7 @@ import com.catedra.bitacora.features.travel.domain.model.PointOfInterest
 import com.catedra.bitacora.features.travel.domain.repository.TravelsRepository
 import com.catedra.bitacora.features.travel.domain.useCase.UpdatePointUseCase
 import com.catedra.bitacora.core.domain.useCase.SchedulePointVisitNotificationUseCase
+import com.catedra.bitacora.core.domain.useCase.SchedulePointPhotoReminderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,7 +32,8 @@ class EditPointViewModel @Inject constructor(
     private val compressImageUseCase: CompressImageUseCase,
     private val uploadImageUseCase: UploadImageUseCase,
     private val photoPickerHelper: PhotoPickerHelper,
-    private val schedulePointVisitNotificationUseCase: SchedulePointVisitNotificationUseCase
+    private val schedulePointVisitNotificationUseCase: SchedulePointVisitNotificationUseCase,
+    private val schedulePointPhotoReminderUseCase: SchedulePointPhotoReminderUseCase
 ) : ViewModel() {
 
     private val travelId: String = checkNotNull(savedStateHandle["travelId"])
@@ -129,8 +131,9 @@ class EditPointViewModel @Inject constructor(
                 )
 
                 updatePointUseCase(travelId, updatedPoint).onSuccess {
-                    // Actualiza notificacion
+                    // Actualiza notificaciones
                     schedulePointVisitNotificationUseCase(travelId, updatedPoint, pointId)
+                    schedulePointPhotoReminderUseCase(travelId, updatedPoint, pointId)
                     _uiState.update { it.copy(isLoading = false, isSuccess = true) }
                 }.onFailure { e ->
                     _uiState.update { it.copy(isLoading = false, error = e.message) }
