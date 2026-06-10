@@ -276,15 +276,6 @@ fun PointDetailContent(
                         )
                     }
                 }
-
-                IconButton(onClick = { /* Sin lógica por ahora */ }) {
-                    Icon(
-                        imageVector = Icons.Default.BookmarkBorder,
-                        contentDescription = stringResource(R.string.save),
-                        modifier = Modifier.size(26.dp),
-                        tint = GrisMedio
-                    )
-                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
